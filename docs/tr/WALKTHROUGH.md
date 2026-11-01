@@ -233,7 +233,8 @@ Bir profil adı seçin (örneğin **`INVOICE`**) ve posta ekibinin verdiği değ
 | Güvenlik / sertifika doğrula | Posta ekibinin verdiği tür / seçili | `IMAPS` veya `STARTTLS` seçimi portla uyumlu olmalıdır. Doğrulamayı açık tutun. |
 | Kullanıcı | Kendi posta giriş adınız | Posta ekibinin verdiği giriş adını yazın; örnek e-posta adresini kullanmayın. |
 | Parola kaynağı | `S` veya `O` | `S`: SAP'de girilir. `O`: Basis sunucuda saklar. |
-| Gelen / işlenmiş klasörü | Posta kutunuzdaki gerçek klasör adları | Örneğin `INBOX` / `SAP-Processed`; iki klasör de mevcut olmalıdır. |
+| Okunacak klasör | Varsayılan `INBOX` | Gelen Kutusu okunur. Başka bir klasörü okumak istiyorsanız aynı posta kutusundaki o klasörün gerçek IMAP adını/yolunu girin; yalnız seçilen klasör okunur. |
+| İşlenmiş klasörü | Önerilen ad `SAP-Processed` | Başarıyla işlenen iletilerin taşınacağı posta klasörü. Aynı posta kutusunda önceden oluşturun; başka ad seçerseniz buraya o adı girin. |
 | Taşıma modu | `MOVE` | UID MOVE desteği gerekir. |
 | Handler programı | `ZIMAP_HANDLER_DEMO` | Hazır örnek; iş belgesi oluşturmaz. |
 | En çok ileti | `50` | Bir çalıştırmadaki örnek üst sınır. |

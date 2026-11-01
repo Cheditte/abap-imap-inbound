@@ -233,7 +233,8 @@ Choose a profile name (for example, **`INVOICE`**) and enter the values from the
 | Security / verify certificate | Mode supplied by the mail team / selected | Select `IMAPS` or `STARTTLS` to match the port. Keep verification enabled. |
 | User | Your actual mailbox login | Enter the login supplied by the mail team, not the example email address. |
 | Credential source | `S` or `O` | `S`: enter the password in SAP. `O`: Basis saves it on the server. |
-| Inbox / processed folder | Actual folder names in your mailbox | For example, `INBOX` / `SAP-Processed`; both folders must exist. |
+| Folder to read | Default `INBOX` | Reads the inbox. To read another folder in the same mailbox, enter its actual IMAP name/path; only the selected folder is read. |
+| Processed folder | Suggested name `SAP-Processed` | Destination for successfully processed messages. Create it in the same mailbox first; if you choose another name, enter it here. |
 | Move mode | `MOVE` | Requires UID MOVE support. |
 | Handler program | `ZIMAP_HANDLER_DEMO` | Supplied demonstration; no business document creation. |
 | Maximum mails | `50` | Example upper limit per run. |

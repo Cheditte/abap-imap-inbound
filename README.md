@@ -28,7 +28,12 @@ Use a **separate test mailbox** dedicated to the trial. Processing may mark mess
 
 **Your email address and correct password may not be enough to connect.** The account must allow IMAP access: permission for another program to read the mailbox. Being able to sign in through Outlook or webmail does not prove this access is available. Ask your email team to confirm that the account can connect with this project. Some accounts require sign-in methods this version does not support; see the separate guide for [detailed connection requirements](docs/TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
 
-The guide uses **`SAP-Processed`** as a suggested name for the **mail folder holding successfully processed messages**. Create it inside the email account, like its inbox. Your email administrator can prepare it. It is not a folder to create in SAP or on your computer's disk.
+### Where is mail read from, and where does it go?
+
+- **Folder to read:** The default is the **inbox (`INBOX`)**. If you want to collect mail from a specific folder instead, enter that folder's name in the settings. For example, selecting an existing `Invoices` folder reads only the messages there.
+- **Processed folder (`SAP-Processed`):** Successfully processed messages are moved here, so you can distinguish pending and completed messages in the mailbox too. Create it inside the email account first, like its inbox; your email administrator can help. `SAP-Processed` is a suggested name; you can choose another folder name in the settings.
+
+Both folders belong to **the same email account**. You do not need to create folders in SAP or on your computer's disk.
 
 ## How can you get started?
 

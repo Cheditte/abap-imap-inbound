@@ -36,7 +36,7 @@ E-posta yöneticinizden şu noktaları doğrulamasını isteyin:
 | Port ve bağlantı güvenliği | E-posta ekibi birlikte verir. Örneğin `993 / IMAPS` yaygın bir çifttir; kendi hesabınız için doğrulanan değerleri kullanın. |
 | Giriş kullanıcı adı | E-posta ekibinin verdiği değerdir. E-posta adresinizle aynı olmak zorunda değildir. |
 | Parola | E-posta ekibinin onayladığı giriş yöntemine uygun paroladır. Parolayı talep kaydına veya ekran görüntüsüne koymayın. |
-| Okunacak klasör | Posta kutusundaki gerçek klasör adıdır. Genellikle Gelen Kutusu için `INBOX` kullanılır; görünen Türkçe ad yerine IMAP adını doğrulayın. |
+| Okunacak klasör | Varsayılan `INBOX`, Gelen Kutusu'nu okur. Başka bir klasörü okumak için o klasörün gerçek IMAP adını/yolunu girin; yalnız seçilen klasör okunur. Görünen Türkçe ad yerine IMAP adını doğrulayın. |
 | İşlenmiş klasörü | Başarılı iletilerin taşınacağı posta klasörüdür; aşağıda açıklanıyor. |
 
 Tablodaki sayılar ve adlar örnektir. Kurulumda kendi hesabınızın gerçek bilgilerini kullanın; bilinmeyen bir değeri tahmin etmek yerine ilgili ekipten alın.

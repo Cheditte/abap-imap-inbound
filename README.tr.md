@@ -28,7 +28,12 @@ Kurulumda **SAP sistem yönetimi ekibinin (Basis)** ve **e-posta yöneticinizin*
 
 **E-posta adresiniz ve doğru parolanız bağlantı için tek başına yeterli olmayabilir.** Hesabın IMAP erişimine, yani başka bir programın posta kutusunu okumasına izin verilmelidir. Outlook'a veya web postaya giriş yapabiliyor olmanız bu iznin bulunduğunu göstermez. E-posta ekibinizden, hesabın bu projeyle bağlantı kurmaya uygun olduğunu doğrulamasını isteyin. Bazı hesapların giriş koşulları mevcut sürümle uyumlu değildir; [ayrıntılı bağlantı koşulları](docs/tr/TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu) ayrı rehberdedir.
 
-Rehberde geçen **`SAP-Processed`**, başarılı iletiler için önerilen **posta klasörünün adıdır**. E-posta hesabınızın içinde, Gelen Kutusu gibi oluşturulur. E-posta yöneticiniz bunu hazırlayabilir. SAP'de veya bilgisayarınızın diskinde açılacak bir klasör değildir.
+### E-postalar nereden okunur, nereye taşınır?
+
+- **Okunacak klasör:** Varsayılan olarak **Gelen Kutusu (`INBOX`)** okunur. Yalnız belirli bir klasördeki e-postaların alınmasını istiyorsanız, ayarlarda o klasörün adını belirtebilirsiniz. Örneğin posta kutunuzdaki `Faturalar` klasörünü seçerseniz yalnız oradaki iletiler okunur.
+- **İşlenmiş klasörü (`SAP-Processed`):** Başarıyla işlenen e-postaların taşındığı klasördür. Böylece bekleyen ve tamamlanan iletileri posta kutunuzda da ayırt edebilirsiniz. Bu klasörü e-posta hesabınızın içinde, Gelen Kutusu gibi önceden oluşturun; e-posta yöneticiniz yardımcı olabilir. `SAP-Processed` önerilen addır; başka bir klasör adı seçip ayarlarda belirtebilirsiniz.
+
+Her iki klasör de **aynı e-posta hesabının içinde** bulunur. SAP'de veya bilgisayarınızın diskinde klasör açmanız gerekmez.
 
 ## Nasıl başlayabilirsiniz?
 

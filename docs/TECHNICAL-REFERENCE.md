@@ -36,7 +36,7 @@ Use **a separate test mailbox dedicated to this trial** first. Normal processing
 | Port and connection security | The email team supplies these together. `993 / IMAPS` is a common example; use the values confirmed for your account. |
 | Login username | Use the value supplied by the email team. It may differ from your email address. |
 | Password | Use the password appropriate to the approved sign-in method. Keep it out of support tickets and screenshots. |
-| Folder to read | The actual folder name in the mailbox. The inbox is commonly `INBOX`; confirm its IMAP name rather than using a translated display name. |
+| Folder to read | The default `INBOX` reads the inbox. To read another folder, enter its actual IMAP name/path; only the selected folder is read. Confirm the IMAP name rather than using a translated display name. |
 | Processed folder | The mail folder for successfully handled messages, explained below. |
 
 Numbers and names above are examples. Use the real settings for your account; ask the responsible team instead of guessing an unknown value.
