@@ -148,7 +148,7 @@ This example only lists eligible UIDs. Clear `p_test` for an intentional normal 
 - `bin` contains `imap.ps1`, `mime.ps1` and Basis-owned `policy.psd1`. SAP must not have write access to executable/policy files. Credential files contain plain text protected by OS permissions.
 - Input/archive data lives under the chosen root in scoped mail directories. Do not hard-code that root in the handler; use supplied paths and shared helpers.
 - Install SAP objects and both server modules as a matching protocol-2 set. For upgrades and pending old archives, follow the [upgrade procedure](WALKTHROUGH.md#8-update-an-existing-installation).
-- Processing, configuration and monitoring are pinned to one application-server host. Include the new handler program in the appropriate `S_DATASET` and business authorization design. See the [role outline](../README.md#access-and-operating-boundaries).
+- Processing, configuration and monitoring are pinned to one application-server host. Include the new handler program in the appropriate `S_DATASET` and business authorization design. See the [role outline](TECHNICAL-REFERENCE.md#access-and-operating-boundaries).
 
 The source avoids modern ABAP syntax, uses ASCII and limits ABAP source to 72 columns. Compatibility with older SAP is a target, not a verified release certification. Keep additions compatible and compile on the actual target system.
 
@@ -156,4 +156,4 @@ The source avoids modern ABAP syntax, uses ASCII and limits ABAP source to 72 co
 
 Use a disposable mailbox and your target SAP system. Confirm normal success, missing/invalid attachments, a returned business error with rollback, a failing local V1 update, an authorized retry, and a movement failure after committed handler success. Confirm recovery does not duplicate the business action. Run the scheduled variant with the intended restricted job user on the selected host.
 
-Source/parser/IMAP tests are run manually; see [CONTRIBUTING.md](../CONTRIBUTING.md). They do not execute your business API or replace SAP compiler/runtime acceptance tests. Current project verification limits are in the [README](../README.md#what-has-been-verified).
+Source/parser/IMAP tests are run manually; see [CONTRIBUTING.md](../CONTRIBUTING.md). They do not execute your business API or replace SAP compiler/runtime acceptance tests. Current project verification limits are in the [technical reference](TECHNICAL-REFERENCE.md#what-has-been-verified).

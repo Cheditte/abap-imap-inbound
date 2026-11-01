@@ -37,7 +37,7 @@ Enter transaction codes in SAP GUI's command field. For example, use `SE38`, or 
 
 Open the [GitHub repository](https://github.com/Cheditte/abap-imap-inbound), choose **Code → Download ZIP**, and extract the complete archive. You do not need to install Git for this route. Keep the folder structure: Basis needs `server/` together with `script/`, and the developer needs the root-level `ZIMAP_INSTALL.abap`. Use files from the same version rather than mixing downloads.
 
-**An email address and correct password alone may not be enough.** IMAP access must be allowed and the sign-in method must be compatible with this project. Two-step verification or organizational policy may block a normal password. Confirm with the email team; this version cannot be used where OAuth is required. [Mailbox suitability and folder explanation](../README.md#before-you-start-is-your-mailbox-suitable).
+**An email address and correct password alone may not be enough.** IMAP access must be allowed and the sign-in method must be compatible with this project. Two-step verification or organizational policy may block a normal password. Confirm with the email team; this version cannot be used where OAuth is required. [Mailbox suitability and folder explanation](TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
 
 ### A request you can send to the mail team
 
@@ -334,7 +334,7 @@ Retry requires change access to the log. The processor also offers **retry error
 
 Ask Basis to schedule `ZIMAP_INBOUND` through **SM36**, using a variant for the intended profile with **list-only cleared**. Agree the interval with operations.
 
-Use the installation's application server. Test with the actual restricted job user; a developer's successful foreground run is insufficient. Basis checks external-command, file, table and handler-specific permissions. See the [role outline](../README.md#access-and-operating-boundaries).
+Use the installation's application server. Test with the actual restricted job user; a developer's successful foreground run is insufficient. Basis checks external-command, file, table and handler-specific permissions. See the [role outline](TECHNICAL-REFERENCE.md#access-and-operating-boundaries).
 
 Before handling real business mail, have an ABAP developer implement and validate the business rules. The [developer guide](TECHNICAL-GUIDE.md) explains the interface. Keep the demo for demonstrations.
 
@@ -363,4 +363,4 @@ Version 1.1.0 changes the script protocol, profile file names and revision stora
 
 A profile with mail history cannot be redirected to another mailbox or deleted. Deactivate it and create a new profile when mailbox identity changes.
 
-See [verification limits](../README.md#what-has-been-verified) and the [developer guide](TECHNICAL-GUIDE.md). Other reference documents may contain older 1.0 examples; this is the current installation procedure.
+See [verification limits](TECHNICAL-REFERENCE.md#what-has-been-verified) and the [developer guide](TECHNICAL-GUIDE.md). Other reference documents may contain older 1.0 examples; this is the current installation procedure.

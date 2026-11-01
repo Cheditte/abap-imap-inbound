@@ -62,4 +62,4 @@ Update SAP and both server modules together when the protocol or file format cha
 
 ## Documentation
 
-Keep the English and Turkish README, walkthrough and developer guide consistent. Explain the user's task before implementation details. Mark historical screenshots and distinguish compatibility targets from verified results. Visuals should explain the business need and first-use steps; retain accurate alt text and avoid claims that the demo creates business documents.
+Keep the English and Turkish README, walkthrough, technical reference and developer guide consistent. Keep the README as a plain-language introduction; put setup details, authorization objects, compatibility notes and test commands in the relevant guides. Explain the user's task before implementation details. Mark historical screenshots and distinguish compatibility targets from verified results. Visuals should explain the business need and first-use steps; retain accurate alt text and avoid claims that the demo creates business documents.

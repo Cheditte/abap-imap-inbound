@@ -37,7 +37,7 @@ Bir geliştirme veya deneme SAP sistemi ve **yalnız bu deneme için ayrılmış
 
 [GitHub deposunu](https://github.com/Cheditte/abap-imap-inbound) açın, **Code → Download ZIP** seçin ve arşivin tamamını bir klasöre çıkartın. Bu yöntem için Git kurmanız gerekmez. Klasör düzenini koruyun: Basis'e `server/` ile `script/` birlikte, geliştiriciye ana klasördeki `ZIMAP_INSTALL.abap` gerekir. Farklı indirmelerin sürümlerini karıştırmayın.
 
-**E-posta adresi ve doğru parola tek başına yeterli olmayabilir.** Hesabın IMAP erişimine izin verilmeli ve giriş yöntemi bu projeyle uyumlu olmalıdır. İki adımlı doğrulama veya kurum politikası normal parolayla bağlantıyı engelleyebilir. Posta ekibinden doğrulama alın; OAuth zorunluysa bu sürüm kullanılamaz. [Posta kutusu uygunluğu ve klasör açıklaması](../../README.tr.md#başlamadan-önce-posta-kutunuz-uygun-mu).
+**E-posta adresi ve doğru parola tek başına yeterli olmayabilir.** Hesabın IMAP erişimine izin verilmeli ve giriş yöntemi bu projeyle uyumlu olmalıdır. İki adımlı doğrulama veya kurum politikası normal parolayla bağlantıyı engelleyebilir. Posta ekibinden doğrulama alın; OAuth zorunluysa bu sürüm kullanılamaz. [Posta kutusu uygunluğu ve klasör açıklaması](TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu).
 
 ### E-posta ekibine gönderebileceğiniz talep
 
@@ -334,7 +334,7 @@ Yeniden deneme log değiştirme yetkisi gerektirir. İşleme ekranındaki **retr
 
 Basis'ten **SM36** ile `ZIMAP_INBOUND` job'ı oluşturmasını isteyin. Varyantta doğru profil seçili, **yalnız listeleme kapalı** olmalıdır. Sıklığı operasyon ekibiyle belirleyin.
 
-Kurulumun uygulama sunucusunu kullanın. Gerçek, kısıtlı job kullanıcısıyla test edin; geliştirici hesabında önden çalışması yeterli değildir. Basis harici komut, dosya, tablo ve handler'a özel yetkileri kontrol eder. [Rol özeti](../../README.tr.md#yetkiler-ve-işletim-sınırları) README'dedir.
+Kurulumun uygulama sunucusunu kullanın. Gerçek, kısıtlı job kullanıcısıyla test edin; geliştirici hesabında önden çalışması yeterli değildir. Basis harici komut, dosya, tablo ve handler'a özel yetkileri kontrol eder. [Rol özeti](TECHNICAL-REFERENCE.md#yetkiler-ve-işletim-sınırları) teknik başvuru rehberindedir.
 
 Gerçek iş postalarından önce ABAP geliştiricisi iş kurallarını uygulayıp doğrulamalıdır. Arayüz [geliştirici rehberinde](TECHNICAL-GUIDE.md) anlatılır. Hazır demoyu gösterim amacıyla kullanın.
 
@@ -363,4 +363,4 @@ Bu isteğe bağlı bölüm Basis/geliştirme ekibinin teşhisi içindir; canlı 
 
 Posta geçmişi olan profil başka kutuya yönlendirilemez veya silinemez. Posta kimliği değişecekse profili pasifleştirip yenisini oluşturun.
 
-[Doğrulama sınırları](../../README.tr.md#neler-doğrulandı) ve [geliştirici rehberine](TECHNICAL-GUIDE.md) bakın. Diğer başvuru belgelerinde eski 1.0 örnekleri bulunabilir; güncel kurulum yolu bu rehberdir.
+[Doğrulama sınırları](TECHNICAL-REFERENCE.md#neler-doğrulandı) ve [geliştirici rehberine](TECHNICAL-GUIDE.md) bakın. Diğer başvuru belgelerinde eski 1.0 örnekleri bulunabilir; güncel kurulum yolu bu rehberdir.

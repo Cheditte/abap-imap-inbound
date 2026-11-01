@@ -148,7 +148,7 @@ Bu örnek yalnız uygun UID'leri listeler. Bilerek normal işleme için `p_test`
 - `bin`, `imap.ps1`, `mime.ps1` ve Basis'in yönettiği `policy.psd1` içerir. SAP'nin çalıştırılabilir/politika dosyalarına yazma erişimi olmamalıdır. Parola dosyaları OS izinleriyle korunan düz metindir.
 - Girdi/arşiv verisi seçilen kökün altında ayrılmış posta klasörlerindedir. Handler'a sabit kök yazmayın; verilen yolları ve ortak yardımcıları kullanın.
 - SAP nesneleri ve iki sunucu modülünü uyumlu protokol-2 bütünü olarak kurun. Eski arşivler ve güncellemeler için [geçiş adımlarını](WALKTHROUGH.md#8-mevcut-kurulumu-güncelleyin) izleyin.
-- Ayar, işleme ve izleme tek sunucuya bağlıdır. Yeni handler'ı uygun `S_DATASET` ve iş yetkisi tasarımına dahil edin. [Rol özetine](../../README.tr.md#yetkiler-ve-işletim-sınırları) bakın.
+- Ayar, işleme ve izleme tek sunucuya bağlıdır. Yeni handler'ı uygun `S_DATASET` ve iş yetkisi tasarımına dahil edin. [Rol özetine](TECHNICAL-REFERENCE.md#yetkiler-ve-işletim-sınırları) bakın.
 
 Kaynak modern ABAP sözdiziminden kaçınır, ASCII kullanır ve ABAP satırlarını 72 sütunda sınırlar. Eski SAP uyumluluğu hedeftir; doğrulanmış sürüm sertifikası değildir. Eklemeleri uyumlu tutup gerçek hedef sistemde derleyin.
 
@@ -156,4 +156,4 @@ Kaynak modern ABAP sözdiziminden kaçınır, ASCII kullanır ve ABAP satırlar�
 
 Ayrılmış deneme kutusu ve hedef SAP sisteminde normal başarıyı, eksik/geçersiz eki, rollback gerektiren iş hatasını, başarısız yerel V1 update'i, yetkili tekrar denemeyi ve handler başarısından sonraki taşıma hatasını deneyin. Kurtarmanın iş belgesini çoğaltmadığını doğrulayın. Zamanlanacak varyantı gerçek kısıtlı job kullanıcısıyla seçili sunucuda çalıştırın.
 
-Kaynak/ayrıştırıcı/IMAP testleri elle çalıştırılır; [CONTRIBUTING.md](../../CONTRIBUTING.md) komutları içerir. Bunlar iş API'nizi çalıştırmaz, SAP derleyicisi ve çalışma zamanı kabul testinin yerini almaz. Güncel doğrulama sınırları [README'dedir](../../README.tr.md#neler-doğrulandı).
+Kaynak/ayrıştırıcı/IMAP testleri elle çalıştırılır; [CONTRIBUTING.md](../../CONTRIBUTING.md) komutları içerir. Bunlar iş API'nizi çalıştırmaz, SAP derleyicisi ve çalışma zamanı kabul testinin yerini almaz. Güncel doğrulama sınırları [teknik başvuru rehberindedir](TECHNICAL-REFERENCE.md#neler-doğrulandı).

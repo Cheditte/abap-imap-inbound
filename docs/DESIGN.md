@@ -3,9 +3,9 @@
 
 > **Background reference:** detailed examples below may describe 1.0 behavior. Use the current [walkthrough](WALKTHROUGH.md) and [developer guide](TECHNICAL-GUIDE.md) for 1.1.0 installation, file identity and handler transaction rules.
 
-This document describes the whole life cycle, from installation to removal. What has actually been tested is listed in the [README](../README.md#what-has-been-verified).
+This document describes the whole life cycle, from installation to removal. What has actually been tested is listed in the [technical reference](TECHNICAL-REFERENCE.md#what-has-been-verified).
 
-**Background.** This project polls an existing IMAP mailbox. It lets the SAP application server's operating system handle IMAP and MIME through a controlled SM69 command, while SAP keeps the settings, business logic and monitoring. SAPconnect's native SMTP inbound route and other integration approaches serve different requirements; choose according to the mail setup and landscape. The plain-language explanation is in the [README](../README.md#why-read-an-existing-mailbox).
+**Background.** This project polls an existing IMAP mailbox. It lets the SAP application server's operating system handle IMAP and MIME through a controlled SM69 command, while SAP keeps the settings, business logic and monitoring. SAPconnect's native SMTP inbound route and other integration approaches serve different requirements; choose according to the mail setup and landscape. The comparison is in the [technical reference](TECHNICAL-REFERENCE.md#why-read-an-existing-mailbox).
 
 Two principles come before every decision:
 
