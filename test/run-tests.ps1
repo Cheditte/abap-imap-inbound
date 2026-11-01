@@ -230,6 +230,16 @@ Save-Eml 'long-attachment.eml' @(
     'Content-Transfer-Encoding: base64', '', [Convert]::ToBase64String($pdf))
 $unicodeBody = ('x' * 249) + [char]::ConvertFromUtf32(0x1F600) + (U '{03b1}')
 Save-Eml 'unicode-width.eml' @('Content-Type: text/plain; charset=utf-8', '', (Raw $unicodeBody 'utf-8'))
+Save-Eml 'html-sections.eml' @(
+    'Content-Type: text/html; charset=utf-8', '',
+    '<!-- hidden > <script>comment</script> --><head><style>hidden</style></head>',
+    '<p>Visible &amp; correct</p><script>hidden</script><style>hidden</style><div>Second<br>line</div>')
+Save-Eml 'html-unclosed.eml' @('Content-Type: text/html; charset=utf-8', '', ('<script>' * 10000))
+Save-Eml 'html-comments.eml' @('Content-Type: text/html; charset=utf-8', '', ('<!--' * 20000))
+Save-Eml 'html-tag-limit.eml' @('Content-Type: text/html; charset=utf-8', '', ('<br>' * 20001))
+Save-Eml 'html-size-limit.eml' @('Content-Type: text/html; charset=utf-8', '', ('x' * 2097153))
+$longPlain = 'x' * 1048576
+Save-Eml 'long-plain.eml' @('Content-Type: text/plain; charset=us-ascii', '', $longPlain)
 
 # --- checks ------------------------------------------------------------------
 Write-Host 'plain-utf8'
@@ -322,6 +332,29 @@ Write-Host 'unicode-width'
 $r = Parse 'unicode-width.eml' 65001
 Check 'UTF-8 result OK' ($r.Exit -eq 0 -and $r.Last -eq 'OK') $r.Last
 Check 'line wrapping preserves Unicode scalar values' (($r.Body -replace '\r?\n', '') -ceq $unicodeBody) $r.Body
+
+Write-Host 'bounded HTML conversion'
+$r = Parse 'html-sections.eml'
+Check 'HTML sections parse successfully' ($r.Exit -eq 0) $r.Last
+Check 'HTML visible text preserved' ($r.Body.Contains('Visible & correct') -and $r.Body.Contains('Second')) $r.Body
+Check 'HTML comments and script/style/head removed' (-not $r.Body.Contains('hidden') -and -not $r.Body.Contains('comment')) $r.Body
+foreach ($mail in 'html-unclosed.eml', 'html-comments.eml', 'html-tag-limit.eml', 'html-size-limit.eml') {
+    $clock = [Diagnostics.Stopwatch]::StartNew()
+    $r = Parse $mail
+    $clock.Stop()
+    Check 'hostile HTML rejected as PARSE' ($r.Exit -ne 0 -and $r.Last -like 'ERR PARSE *') $r.Last
+    Check 'hostile HTML has no readiness marker' (-not (Test-Path (Join-Path $r.Dir 'ready.flg'))) $mail
+    Check 'hostile HTML finishes within test budget' ($clock.Elapsed.TotalSeconds -lt 15) $clock.Elapsed.TotalSeconds
+}
+$clock = [Diagnostics.Stopwatch]::StartNew()
+$r = Parse 'long-plain.eml'
+$clock.Stop()
+Check 'large unwrapped text preserves content' ($r.Exit -eq 0 -and ($r.Body -replace '\r?\n','') -ceq $longPlain) $r.Last
+Check 'large text wrapping finishes within test budget' ($clock.Elapsed.TotalSeconds -lt 15) $clock.Elapsed.TotalSeconds
+
+Write-Host 'fetch failure cleanup'
+& $Shell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'test-fetch-cleanup.ps1')
+Check 'fetch failure cleanup tests' ($LASTEXITCODE -eq 0) 'isolated production-function tests'
 
 Write-Host 'existing output preservation'
 $existingOutput = Join-Path $work 'existing-output'

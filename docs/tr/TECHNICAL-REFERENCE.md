@@ -125,6 +125,10 @@ Basis, yetkileri ilgili kullanıcılara ve tablo yetki gruplarına göre tanıml
 
 ## Bilinen sınırlar
 
+Kaynak ve hedef klasör aynı veya yalnız büyük/küçük harfle farklı olamaz. Bu kontrol SAP profilinde ve scriptte uygulanır; sunucunuz farklı adları aynı klasöre bağlayabiliyorsa iki ayrı klasör seçtiğinizi ayrıca doğrulayın.
+
+HTML dönüşümü en fazla 2.097.152 UTF-16 karakteri, 20.000 etiket ve etiket başına 16.384 karakter kabul eder. Dönüşümün toplam iş bütçesi 2 saniye, her regex eşleşmesinin zaman aşımı 250 ms'dir. Sınır aşımı veya kapanmayan script/style/head bölümü kontrollü `PARSE` hatası verir. Bu sınırlar ağ zaman aşımından ayrıdır.
+
 - Klasör adlarında ASCII harf, rakam ve `. _ / -` kullanılır; boşluk olmaz. Eski mail sunucularıyla uyum için ASCII şifre tercih edin.
 - İlk `text/plain` bölüm metin olarak alınır; yoksa HTML düz metne çevrilir. S/MIME çözme ve `winmail.dat` açma desteği yoktur.
 - Bozuk veya desteklenmeyen MIME, aşırı iç içe yapı/parça sayısı ve SAP dosya biçimine sığmayan metadata, tamamlanmış gibi gösterilmek yerine reddedilir.
@@ -411,3 +415,15 @@ Basis'ten **SM36** ile `ZIMAP_INBOUND` job'ı oluşturmasını isteyin. Varyantt
 Kurulumun uygulama sunucusunu kullanın. Gerçek, kısıtlı job kullanıcısıyla test edin; geliştirici hesabında önden çalışması yeterli değildir. Basis harici komut, dosya, tablo ve handler'a özel yetkileri kontrol eder. [Rol özeti](TECHNICAL-REFERENCE.md#yetkiler-ve-işletim-sınırları) teknik başvuru rehberindedir.
 
 Gerçek iş postalarından önce iş kurallarınızı uygulayıp doğrulayın. Arayüz [geliştirici rehberinde](TECHNICAL-GUIDE.md) anlatılır. Hazır demoyu gösterim amacıyla kullanın.
+
+## Eski profil ve parola dosyalarının bakımı
+
+Profil ve parola revizyonları çalışan bir işlemin kullandığı dosyayı erken silmemek için otomatik temizlenmez. Profil silme işlemi yalnız etkin ayar/parola dosyalarını kaldırmayı dener; eski revizyonlar için yöneticiye bakım uyarısı verir.
+
+1. İlgili profilin zamanlanmış işlerini durdurun ve bu profille çalışan ön plan işlemlerinin tamamlanmasını bekleyin. Ortak sunucuyu kullanan sistem/mandantlarla koordine edin.
+2. Doğru sistem/mandanttaki `ZIMAP_PROFILE` kaydından `REVISION`, `CREDSRC` ve `CREDREV` değerlerini doğrulayın. Parolayı görüntülemeyin veya günlüğe yazmayın.
+3. Etkin `conf/KEY_REVISION.conf` dosyasını ve onun referans verdiği parolayı koruyun: `S` için `secret/KEY_CREDREV.cred`, `O` için `secret/KEY.cred`. Başarısız kaydetmeden kalan bir dosyanın etkin olduğunu varsaymayın.
+4. Artık kullanılmadığı ve geri dönüş planında gerekmediği doğrulanan eski revizyon dosyalarını kurumunuzun saklama politikasına göre, yalnız tam dosya adlarını seçerek kaldırın. `conf` veya `secret` klasörünün tamamını silmeyin. SAP geçmişi olan profilin adını yeniden kullanmayın.
+5. İşleri yeniden açmadan bağlantı ve yalnız listeleme testini tekrarlayın. Sonlandırılmış işlemlerden kalan eski `tmp` dosyaları için de sahiplik ve kullanım kontrolüyle ayrı bakım yapın; bekleyen `in`/`done` verisini silmeyin.
+
+Aynı klasörü kaynak ve hedef olarak kullanan eski bir profil varsa otomatik işlemeyi durdurun. Mevcut iş belgelerini ve bekleyen kayıtları incelemeden yeni profille tüm iletileri yeniden oynatmayın; daha önce oluşmuş mükerrer kayıtlar kod güncellemesiyle otomatik düzelmez.

@@ -142,7 +142,7 @@ This version connects with a username and password; **OAuth-only accounts are no
 Confirm the account can read and move messages. The server must support **UID MOVE**; this version has no COPY fallback.
 
 - **Folder to read:** The default `INBOX` reads the inbox. You can select another folder's actual name/path.
-- **Processed folder:** Select a destination in the same account that is **different from the source folder**. You can use an existing folder; a new folder named `SAP-Processed` is not required. The current code does not separately prevent identical source and destination values, so check this distinction yourself.
+- **Processed folder:** Select a destination in the same account that is **different from the source folder**. You can use an existing folder; a new folder named `SAP-Processed` is not required. Profile validation rejects identical names and names differing only in letter case.
 
 ## 6. Return to the steps inside SAP
 

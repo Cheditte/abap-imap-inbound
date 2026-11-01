@@ -793,7 +793,12 @@ FORM create_domain USING is_dom TYPE ty_dom.
       gv_err = 'X'.
       EXIT.
     ENDIF.
-*   Preserve existing fixed values; append only genuinely new ones.
+*   Retire only our unsupported COPY option, also on existing systems.
+    IF is_dom-name = 'ZIMAP_MOVEMODE'.
+      DELETE lt_old WHERE domvalue_l = 'COPY'
+                      AND domvalue_h = space.
+    ENDIF.
+*   Preserve other fixed values; append only genuinely new ones.
     LOOP AT lt_old INTO ls_old.
       IF ls_old-valpos > lv_pos.
         lv_pos = ls_old-valpos.
@@ -2082,7 +2087,6 @@ FORM fill_defs.
   def 'V|ZIMAP_CREDSRC|S|Password entered on SAP screen'.
   def 'V|ZIMAP_CREDSRC|O|Basis keeps password on server'.
   def 'V|ZIMAP_MOVEMODE|MOVE|IMAP MOVE command'.
-  def 'V|ZIMAP_MOVEMODE|COPY|COPY, deleted flag, EXPUNGE'.
   def 'V|ZIMAP_STATUS|H|Business logic ran, not moved'.
   def 'V|ZIMAP_STATUS|S|Completed'.
   def 'V|ZIMAP_STATUS|E|Error'.

@@ -1,7 +1,7 @@
 # Demo environment on Google Cloud
 > **English** | [Türkçe](../docs/tr/GCP-DEMO.md)
 
-For a one-day demo and screenshots. Target time: 3–5 hours. Costs come out of the trial credit.
+A disposable demo environment for learning and screenshots. Check your cloud account's costs and trial-credit conditions before creating resources. The current SAP 1.1.0 runtime still needs target-system validation.
 
 ```
 Windows (SAP GUI) ──SSH tunnel──► Google Cloud VM (Ubuntu 24.04)
@@ -85,7 +85,7 @@ In `ZIMAP_CONFIG`, the demo mailbox is: server `greenmail`, port `3993`, IMAPS, 
 |---|---|---|
 | 1 | `ZIMAP_INSTALL` output | DDIC, programs, syntax checks, SM69 commands, server test OK |
 | 2 | `ZIMAP_CONFIG` | Profile and the step-by-step connection test |
-| 3 | `ZIMAP_INBOUND`, test mode | Subjects, bodies and attachments listed correctly |
+| 3 | `ZIMAP_INBOUND`, list-only | Eligible message numbers only; no body or attachment preview |
 | 4 | Same report, test mode off | Processed mails |
 | 5 | `ZIMAP_MONITOR` | List, mail details, a PDF and an image opened on the PC |
 | 6 | Error scenario | A mail with `TEST-ERROR` in the subject: status `E`, then reprocessing |

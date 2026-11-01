@@ -125,6 +125,10 @@ Basis assigns permissions to the intended users and table authorization groups. 
 
 ## Known limits
 
+Source and destination folders must differ by more than letter case. Both SAP profile validation and the script enforce this. If your server aliases different names to one folder, also confirm that you selected two distinct folders.
+
+HTML conversion accepts at most 2,097,152 UTF-16 characters, 20,000 tokens and 16,384 characters per tag. The overall work budget is 2 seconds and each regex match has a 250 ms timeout. Exceeded limits or unclosed script/style/head sections produce a controlled `PARSE` error. These limits are separate from the network timeout.
+
 - Folder names use ASCII letters, digits and `. _ / -`, with no spaces. Prefer ASCII passwords for interoperability with older mail servers.
 - The first `text/plain` body is used; otherwise HTML is converted to plain text. S/MIME decryption and `winmail.dat` unpacking are not implemented.
 - Malformed or unsupported MIME, excessive nesting/part counts, and metadata that cannot fit the SAP file format are rejected instead of being reported as complete.
@@ -411,3 +415,15 @@ Ask Basis to schedule `ZIMAP_INBOUND` through **SM36**, using a variant for the 
 Use the installation's application server. Test with the actual restricted job user; a developer's successful foreground run is insufficient. Basis checks external-command, file, table and handler-specific permissions. See the [role outline](TECHNICAL-REFERENCE.md#access-and-operating-boundaries).
 
 Before handling real business mail, implement and validate your business rules. The [developer guide](TECHNICAL-GUIDE.md) explains the interface. Keep the demo for demonstrations.
+
+## Maintaining old profile and credential files
+
+Profile and credential revisions are not automatically removed because an in-flight operation may still need them. Profile deletion attempts to remove current configuration/credential files and warns that older revisions require administrator cleanup.
+
+1. Stop the profile's scheduled jobs and wait for foreground processing to finish. Coordinate with systems/clients sharing the host.
+2. Confirm `REVISION`, `CREDSRC` and `CREDREV` in `ZIMAP_PROFILE` for the intended system/client. Do not display or log the password.
+3. Preserve the active `conf/KEY_REVISION.conf` and its referenced credential: `secret/KEY_CREDREV.cred` for `S`, or `secret/KEY.cred` for `O`. Do not assume a file left by a failed save is active.
+4. Remove only exact old revision filenames confirmed unused and unnecessary for rollback, following your retention policy. Do not delete the entire `conf` or `secret` directory. Do not reuse a profile name with SAP processing history.
+5. Repeat connection and list-only tests before restarting jobs. Old `tmp` files left by terminated processes also need separate ownership/use checks; do not delete pending `in`/`done` data.
+
+If an old profile used the same source and destination folder, stop automatic processing. Reconcile business documents and pending records before replaying messages under a new profile; updating the code does not automatically correct earlier duplicates.

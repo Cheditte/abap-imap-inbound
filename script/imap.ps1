@@ -201,6 +201,10 @@ function Read-Profile([string]$Name, [string]$Revision) {
         if ($v -cnotmatch '^[A-Za-z0-9._/-]{1,100}$') { Stop-WithError 'CFG' "invalid folder name: $k" }
         $p[$k] = $v
     }
+    # Case-only names can alias one mailbox on case-insensitive servers.
+    if ([string]::Equals($p.MAILBOX, $p.DONEBOX, [StringComparison]::OrdinalIgnoreCase)) {
+        Stop-WithError 'CFG' 'read and processed folders must be different'
+    }
     $p.MoveMode = ([string]$c['MOVEMODE']).Trim().ToUpperInvariant()
     if ($p.MoveMode -cne 'MOVE') { Stop-WithError 'CFG' 'COPY mode is disabled; a server with UID MOVE is required' }
 
@@ -426,6 +430,56 @@ function Invoke-List {
     Stop-Ok
 }
 
+function Remove-FetchStage([string]$Path) {
+    if (-not (Test-Path -LiteralPath $Path)) { return }
+    $path = Assert-ManagedPath $Path
+    $expectedParent = [IO.Path]::GetFullPath((Join-Path $Policy.WorkDir 'tmp'))
+    $comparison = [StringComparison]::Ordinal
+    if ($OnWindows) { $comparison = [StringComparison]::OrdinalIgnoreCase }
+    if ([IO.Path]::GetFileName($path) -cnotmatch '^[0-9a-f]{32}\.parsed$' -or
+        -not [string]::Equals([IO.Path]::GetDirectoryName($path), $expectedParent, $comparison)) {
+        throw 'CFG: refusing cleanup outside the fetch staging directory'
+    }
+    $files = @(); $att = $null
+    # Validate every entry before deleting anything. Do not follow links.
+    foreach ($entry in (Get-ChildItem -LiteralPath $path -Force)) {
+        $null = Assert-ManagedPath $entry.FullName
+        if ($entry.PSIsContainer) {
+            if ($entry.Name -cne 'att') { throw 'CFG: unexpected staging directory' }
+            $att = $entry.FullName
+            foreach ($attachment in (Get-ChildItem -LiteralPath $att -Force)) {
+                $null = Assert-ManagedPath $attachment.FullName
+                if ($attachment.PSIsContainer) { throw 'CFG: unexpected nested staging directory' }
+                $files += $attachment.FullName
+            }
+        } elseif ($entry.Name -cin @('header.txt','body.txt','attach.txt','mail.eml','ready.flg','identity.txt')) {
+            $files += $entry.FullName
+        } else { throw 'CFG: unexpected staging file' }
+    }
+    foreach ($file in $files) { [IO.File]::Delete($file) }
+    if ($att) { [IO.Directory]::Delete($att) }
+    [IO.Directory]::Delete($path)
+}
+
+function Move-ManagedDirectory([string]$Source, [string]$Destination) {
+    for ($attempt = 0; $attempt -lt 5; $attempt++) {
+        $null = Assert-ManagedPath $Source
+        $null = Assert-ManagedPath $Destination
+        try { [IO.Directory]::Move($Source, $Destination); return }
+        catch {
+            $cause = $_.Exception
+            while ($cause.InnerException) { $cause = $cause.InnerException }
+            # Windows scanners may temporarily deny a just-written rename.
+            # Never overwrite a target or change permissions to force it.
+            if (-not $OnWindows -or $attempt -ge 4 -or
+                (Test-Path -LiteralPath $Destination) -or
+                ($cause -isnot [IO.IOException] -and $cause -isnot [UnauthorizedAccessException])) { throw }
+            Write-Log 'retrying temporary directory rename failure'
+            Start-Sleep -Milliseconds (100 * ($attempt + 1))
+        }
+    }
+}
+
 function Invoke-Fetch([string]$Uid, [string]$Uidv) {
     $dest = Get-MailPath 'in' $Uid $Uidv
     $present = Get-SearchUids $Uidv "UID SEARCH UID $Uid"
@@ -450,15 +504,22 @@ function Invoke-Fetch([string]$Uid, [string]$Uidv) {
     # Default UID downloads work on old curl versions as well. BODY[] may
     # set Seen; SAP test mode only lists UIDs and never invokes this action.
     $url = (Get-MailboxUrl $Prof.MAILBOX $Uidv) + "/;UID=$Uid"
-    Invoke-Curl @($url, '--max-filesize', [string]$Prof.MaxBytes, '-o', $eml) | Out-Null
-    if (-not (Test-Path -LiteralPath $eml) -or (Get-Item -LiteralPath $eml).Length -eq 0) { Stop-WithError 'NOMAIL' 'mail not found' }
-    if ((Get-Item -LiteralPath $eml).Length -gt $Prof.MaxBytes) { Stop-WithError 'SIZE' 'mail exceeds the size limit' }
     $stage = Assert-ManagedPath (Join-Path $tmp "$token.parsed")
-    $MimeLimits.MaxBytes = $Prof.MaxBytes
-    Expand-Mail $eml $stage
-    [IO.File]::WriteAllLines((Join-Path $stage 'identity.txt'), [string[]](Get-MailIdentity $Uid $Uidv), $Utf8NoBom)
-    [IO.Directory]::Move($stage, $dest)
-    [IO.File]::Delete($eml)
+    try {
+        Invoke-Curl @($url, '--max-filesize', [string]$Prof.MaxBytes, '-o', $eml) | Out-Null
+        if (-not (Test-Path -LiteralPath $eml) -or (Get-Item -LiteralPath $eml).Length -eq 0) { throw 'NOMAIL: mail not found' }
+        if ((Get-Item -LiteralPath $eml).Length -gt $Prof.MaxBytes) { throw 'SIZE: mail exceeds the size limit' }
+        $MimeLimits.MaxBytes = $Prof.MaxBytes
+        Expand-Mail $eml $stage
+        [IO.File]::WriteAllLines((Join-Path $stage 'identity.txt'), [string[]](Get-MailIdentity $Uid $Uidv), $Utf8NoBom)
+        Move-ManagedDirectory $stage $dest
+    } finally {
+        # Only this operation's GUID paths; never published in/done data.
+        try { if (Test-Path -LiteralPath $eml) { [IO.File]::Delete((Assert-ManagedPath $eml)) } }
+        catch { Write-Log ('temporary download cleanup: ' + $_.Exception.Message) }
+        try { Remove-FetchStage $stage }
+        catch { Write-Log ('temporary parse cleanup: ' + $_.Exception.Message) }
+    }
     Stop-Ok
 }
 
@@ -481,7 +542,7 @@ function Invoke-Done([string]$Uid, [string]$Uidv) {
         [IO.File]::WriteAllText($marker, 'OK', $Utf8NoBom)
     }
     [IO.File]::WriteAllText((Join-Path $src 'completed.utc'), [DateTime]::UtcNow.ToString('o'), $Utf8NoBom)
-    [IO.Directory]::Move($src, $dst)
+    Move-ManagedDirectory $src $dst
     try { Remove-OldDone } catch { Write-Log ('retention: ' + $_.Exception.Message) }
     Stop-Ok
 }
@@ -596,6 +657,6 @@ try {
     }
 } catch {
     $message = $_.Exception.Message
-    if ($message -cmatch '^(PARSE|CFG|SIZE): (.*)$') { Stop-WithError $Matches[1] $Matches[2] }
+    if ($message -cmatch '^(PARSE|CFG|SIZE|NOMAIL): (.*)$') { Stop-WithError $Matches[1] $Matches[2] }
     Stop-WithError 'EXC' $message
 }

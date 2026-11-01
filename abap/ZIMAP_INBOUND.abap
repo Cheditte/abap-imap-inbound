@@ -8,8 +8,8 @@
 *   S  completed
 *   E  error; retry with P_RETRY or ZIMAP_MONITOR > Reprocess
 *   R  to be reprocessed (ZIMAP_MONITOR)
-* A mail never runs through the business logic twice: the H record
-* is committed; if the move fails, only the move is repeated.
+* A committed H record resumes only the pending move. Handlers must
+* honor the LUW contract and deduplicate external business effects.
 *
 * 4.6C compatible; lines at most 72 characters; ASCII only.
 *---------------------------------------------------------------

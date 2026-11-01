@@ -1,7 +1,7 @@
 # Google Cloud üzerinde demo ortamı
 > [English](../../cloud/GCP-DEMO.md) | **Türkçe**
 
-Bir günlük demo ve ekran görüntüleri için. Hedef süre: 3-5 saat. Maliyet deneme kredisinden karşılanır.
+Öğrenme ve ekran görüntüleri için geçici demo ortamı. Kaynak oluşturmadan hesabınızın maliyet ve deneme kredisi koşullarını kontrol edin. Güncel SAP 1.1.0 çalışma zamanı hedef sistemde doğrulanmayı bekliyor.
 
 ```
 Windows (SAP GUI) ──SSH tüneli──► Google Cloud VM (Ubuntu 24.04)
@@ -75,7 +75,7 @@ SAP Logon → yeni bağlantı: application server `127.0.0.1`, instance number `
 
 ## 5. SAP'de kurulum
 
-[README](../../README.tr.md) içindeki geliştirici adımlarını izleyin. Bu demoda sunucu ana klasörü `/usr/sap/sapimap`'tir; `ZIMAP_INSTALL`, Linux ve Unicode olduğunu kendisi anlar.
+[SAP kurulum adımları](WALKTHROUGH.md#2-kurulum-programını-oluşturun) içindeki geliştirici adımlarını izleyin. Bu demoda sunucu ana klasörü `/usr/sap/sapimap`'tir; `ZIMAP_INSTALL`, Linux ve Unicode olduğunu kendisi anlar.
 
 `ZIMAP_CONFIG`'te demo posta kutusu şöyledir: server `greenmail`, port `3993`, IMAPS, sertifika kontrolü kapalı, kullanıcı `sap@demo.local`, şifre `sapdemo` (yalnızca GreenMail test değerleri).
 
@@ -85,7 +85,7 @@ SAP Logon → yeni bağlantı: application server `127.0.0.1`, instance number `
 |---|---|---|
 | 1 | `ZIMAP_INSTALL` çıktısı | DDIC, programlar, sözdizimi kontrolleri, SM69 komutları, sunucu testi OK |
 | 2 | `ZIMAP_CONFIG` | Profil ve adım adım bağlantı testi |
-| 3 | `ZIMAP_INBOUND`, test modu | Konular, gövdeler ve ekler doğru listelenmiş |
+| 3 | `ZIMAP_INBOUND`, yalnız listeleme | Yalnız uygun ileti numaraları; içerik veya ek önizlemesi yok |
 | 4 | Aynı rapor, test modu kapalı | İşlenen mailler |
 | 5 | `ZIMAP_MONITOR` | Liste, mail ayrıntıları, bilgisayarda açılmış bir PDF ve bir görsel |
 | 6 | Hata senaryosu | Konusunda `TEST-ERROR` geçen bir mail: durum `E`, sonra yeniden işleme |

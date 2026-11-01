@@ -367,6 +367,9 @@ FORM map_error USING    iv_line   TYPE c
     WHEN 'SIZE'.
       cv_text = 'Mail exceeds the size limit.'.
       cv_hint = 'ZIMAP_CONFIG: increase the max mail size (MB).'.
+    WHEN 'PARSE'.
+      cv_text = 'Mail content is invalid or exceeds parser limits.'.
+      cv_hint = 'Review MIME/HTML detail; ask for a corrected mail.'.
     WHEN 'ARG'.
       cv_text = 'Invalid parameter passed to the script.'.
     WHEN 'SXPG1'.

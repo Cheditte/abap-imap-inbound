@@ -339,6 +339,8 @@ FORM save_profile_locked CHANGING cv_ok TYPE c cv_msg TYPE c.
         lv_chars(80) TYPE c,
         lv_logged LIKE zimap_log-profile,
         lv_revision TYPE p DECIMALS 0,
+        lv_source(100) TYPE c,
+        lv_target(100) TYPE c,
         lv_mlen TYPE i,
         lv_dlen TYPE i.
 
@@ -392,6 +394,17 @@ FORM save_profile_locked CHANGING cv_ok TYPE c cv_msg TYPE c.
      p_done(lv_dlen) CN lv_chars OR
      p_mbox(lv_mlen) CA space OR p_done(lv_dlen) CA space.
     cv_msg = 'Folder names: letters, digits and . _ / - (no spaces).'.
+    EXIT.
+  ENDIF.
+* Reject case-only differences too: some servers alias those names.
+  lv_source = p_mbox.
+  lv_target = p_done.
+  TRANSLATE lv_source USING
+    'aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ'.
+  TRANSLATE lv_target USING
+    'aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ'.
+  IF lv_source = lv_target.
+    cv_msg = 'Read and processed folders must be different.'.
     EXIT.
   ENDIF.
   IF p_hprog IS INITIAL.
@@ -637,7 +650,7 @@ FORM delete_profile_locked.
     PERFORM show_msg USING 'E' 'Enter the profile name.'.
   ENDIF.
   CONCATENATE 'Delete profile' p_prof
-    'with its conf and password files?'
+    'and current files? Older revisions need admin cleanup.'
     INTO lv_q SEPARATED BY space.
   PERFORM fm_exists USING 'POPUP_TO_CONFIRM' CHANGING lv_ok.
   IF NOT lv_ok IS INITIAL.
@@ -690,7 +703,8 @@ FORM delete_profile_locked.
     ENDIF.
     PERFORM delete_file USING lv_path.
   ENDIF.
-  PERFORM show_msg USING 'S' 'Profile deleted.'.
+  PERFORM show_msg USING 'S'
+    'Profile deleted; review old conf/secret revisions with admin.'.
 ENDFORM.
 
 *---------------------------------------------------------------

@@ -334,6 +334,7 @@ FORM open_on_pc USING iv_path TYPE c
         lv_tmps      TYPE string,
         lv_tmp(200)  TYPE c,
         lv_uidc(10)  TYPE c,
+        lv_key(28) TYPE c,
         lv_file(255) TYPE c,
         lv_fstr      TYPE string,
         lv_wsname    LIKE rlgrap-filename,
@@ -370,7 +371,9 @@ FORM open_on_pc USING iv_path TYPE c
 
   lv_uidc = gs_log-mailuid.
   SHIFT lv_uidc LEFT DELETING LEADING '0'.
-  CONCATENATE lv_tmp '\zimap_' gs_log-profile '_' lv_uidc '_'
+  PERFORM storage_key USING gs_log-profile CHANGING lv_key.
+  CONCATENATE lv_tmp '\zimap_' lv_key '_'
+              gs_log-uidvalidity '_' lv_uidc '_'
               iv_name INTO lv_fstr.
   IF STRLEN( lv_fstr ) > 255.
     PERFORM show_msg USING 'S' 'Download file path is too long'.

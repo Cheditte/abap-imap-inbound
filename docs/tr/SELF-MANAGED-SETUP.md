@@ -142,7 +142,7 @@ Bu sürüm kullanıcı adı/parola ile bağlanır; **yalnız OAuth kabul eden he
 Hesabın ileti okuma ve taşıma izinlerini doğrulayın. Posta sunucusu **UID MOVE** desteklemelidir; bu sürümde COPY alternatifi yoktur.
 
 - **Okunacak klasör:** Varsayılan `INBOX` Gelen Kutusu'nu okur. İsterseniz başka bir klasörün gerçek adını/yolunu seçebilirsiniz.
-- **İşlenmiş klasörü:** Aynı posta hesabında, **okunacak klasörden farklı** bir hedef seçin. Mevcut klasör kullanılabilir; `SAP-Processed` adında yeni klasör açmak zorunlu değildir. Kaynakla hedefin aynı olması güncel kodda ayrıca engellenmediğinden bu ayrımı kendiniz kontrol edin.
+- **İşlenmiş klasörü:** Aynı posta hesabında, **okunacak klasörden farklı** bir hedef seçin. Mevcut klasör kullanılabilir; `SAP-Processed` adında yeni klasör açmak zorunlu değildir. Kaynak ve hedefin aynı olması veya yalnız büyük/küçük harfle ayrılması profil doğrulamasında reddedilir.
 
 ## 6. SAP içindeki adımlara dönün
 

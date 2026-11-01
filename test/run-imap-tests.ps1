@@ -49,11 +49,11 @@ function Write-Policy([bool]$AllowInsecure) {
 }
 function Write-Profile([string]$Name, [string]$HostName = $MailHost, [string]$UserName = $testUser,
     [string]$Password = $testPassword, [string]$Mailbox = 'INBOX', [string]$MoveMode = 'MOVE',
-    [string]$Rev = $revision, [string]$SecretUser = '') {
+    [string]$Rev = $revision, [string]$SecretUser = '', [string]$Donebox = 'SAP-Processed') {
     [IO.File]::WriteAllLines((Join-Path (Join-Path $work 'conf') "${Name}_$Rev.conf"), @(
         "PROFILE=$Name", "REVISION=$Rev", 'CREDSRC=S', "CREDREV=$Rev",
         "HOST=$HostName", "PORT=$ImapsPort", 'SECURITY=IMAPS', 'VERIFY=',
-        "USER=$UserName", "MAILBOX=$Mailbox", 'DONEBOX=SAP-Processed', "MOVEMODE=$MoveMode",
+        "USER=$UserName", "MAILBOX=$Mailbox", "DONEBOX=$Donebox", "MOVEMODE=$MoveMode",
         'MAXMB=20', 'TIMEOUT=30', 'RETENTION=1', 'CODEPAGE=65001'), $utf8)
     $lines = @("PASSWORD=$Password")
     if ($SecretUser) { $lines += "USER=$SecretUser" }
@@ -200,6 +200,20 @@ Require-Ok @('list', $key, $revision) | Out-Null
 Write-Profile 'TST_001_COPY' -MoveMode 'COPY'
 $r = Imap @('list', 'TST_001_COPY', $revision)
 Check 'unsafe COPY fallback disabled' ($script:lastImapExit -ne 0 -and $r[-1] -clike 'ERR CFG *') ($r -join ' | ')
+foreach ($folders in @(@('INBOX','INBOX'), @('inbox','INBOX'), @('Archive','archive'))) {
+    Write-Profile 'TST_001_SAME' -Mailbox $folders[0] -Donebox $folders[1]
+    foreach ($request in @(
+        @('test', 'TST_001_SAME', $revision),
+        @('list', 'TST_001_SAME', $revision),
+        @('fetch', 'TST_001_SAME', $uids[2], $uidv, $revision),
+        @('done', 'TST_001_SAME', $uids[2], $uidv, $revision)
+    )) {
+        $r = Imap $request
+        Check 'same source/destination rejected before mail processing' ($script:lastImapExit -ne 0 -and $r[-1] -clike 'ERR CFG *different*') ($r -join ' | ')
+    }
+}
+$remaining = Require-Ok @('list', $key, $revision)
+Check 'rejected self-folder actions preserve original UIDs' (@($remaining | Where-Object { $_ -cmatch '^UID [0-9]+$' }).Count -eq 2 -and $remaining -ccontains ('UID ' + $uids[2])) ($remaining -join ' | ')
 
 Write-Host 'oversized message rejected before download'
 $largeMail = Join-Path $work 'oversized.eml'
@@ -224,6 +238,33 @@ $largeOutput = Join-Path (Join-Path (Join-Path $work 'in') $smallKey) "$uidv-$($
 Check 'oversize mail is not published' (-not (Test-Path -LiteralPath (Join-Path $largeOutput 'ready.flg'))) ''
 $newTempFiles = @(Get-ChildItem -LiteralPath $tempDir -File | Where-Object { $tempBefore -notcontains $_.FullName })
 Check 'oversize preflight creates no temporary download' ($newTempFiles.Count -eq 0) ($newTempFiles.Name -join ',')
+
+Write-Host 'failed production fetch cleans raw mail and partial attachments'
+$badMail = Join-Path $work 'malformed-production.eml'
+$badLines = @('Subject: isolated malformed MIME fixture',
+    'Content-Type: multipart/mixed; boundary=BAD', '', '--BAD',
+    'Content-Type: application/octet-stream; name=good.bin',
+    'Content-Transfer-Encoding: base64', '', 'QUJD', '--BAD',
+    'Content-Type: application/octet-stream; name=bad.bin',
+    'Content-Transfer-Encoding: base64', '', 'A%%%', '--BAD--')
+[IO.File]::WriteAllText($badMail, ($badLines -join "`r`n"), $utf8)
+& $curl --fail --silent --show-error --max-time 30 "smtp://${MailHost}:$SmtpPort" --mail-from 'supplier@demo.local' --mail-rcpt $testUser -T $badMail
+if ($LASTEXITCODE -ne 0) { throw 'Could not deliver malformed MIME fixture' }
+$r = Require-Ok @('list', $key, $revision)
+$badUids = @($r | Where-Object { $_ -cmatch '^UID [0-9]+$' } | ForEach-Object { $_.Substring(4) } | Where-Object { $uids -notcontains $_ -and $largeUids -notcontains $_ })
+Check 'one malformed fixture UID' ($badUids.Count -eq 1) ($badUids -join ',')
+if ($badUids.Count -ne 1) { throw 'Cannot identify malformed fixture' }
+$sentinel = Join-Path $tempDir 'preserve-unrelated.txt'
+[IO.File]::WriteAllText($sentinel, 'existing data', $utf8)
+$archiveHash = (Get-FileHash -LiteralPath (Join-Path $archive 'mail.eml') -Algorithm SHA256).Hash
+foreach ($attempt in 1,2) {
+    $r = Imap @('fetch', $key, $badUids[0], $uidv, $revision)
+    Check 'bad MIME reports PARSE' ($script:lastImapExit -ne 0 -and $r[-1] -clike 'ERR PARSE *') ($r -join ' | ')
+    $debris = @(Get-ChildItem -LiteralPath $tempDir -Force | Where-Object { $_.Name -cne 'preserve-unrelated.txt' })
+    Check 'bad MIME leaves no temporary files or directories' ($debris.Count -eq 0) ($debris.Name -join ',')
+    Check 'cleanup preserves unrelated file' ([IO.File]::ReadAllText($sentinel) -ceq 'existing data') ''
+    Check 'cleanup preserves completed mail' ((Get-FileHash -LiteralPath (Join-Path $archive 'mail.eml') -Algorithm SHA256).Hash -ceq $archiveHash) ''
+}
 
 Write-Policy $false
 $r = Imap @('list', $key, $revision)

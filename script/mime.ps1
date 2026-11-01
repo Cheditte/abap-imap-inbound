@@ -152,11 +152,47 @@ function ConvertFrom-TransferEncoding([string]$Body, [string]$Cte) {
 }
 
 function ConvertFrom-Html([string]$Html) {
-    $t = [regex]::Replace($Html, '<(script|style|head)[^>]*>.*?</\1>', '', $RxIgnoreCaseDotAll)
-    $t = [regex]::Replace($t, '<br\s*/?>|</p>|</div>|</tr>|</li>|</h\d>', "`n", $RxIgnoreCase)
-    $t = [regex]::Replace($t, '<[^>]+>', '')
-    $t = [System.Net.WebUtility]::HtmlDecode($t)
-    [regex]::Replace($t, '(\r?\n[ \t]*){3,}', "`n`n")
+    # Tokenize once instead of repeatedly scanning for closing script tags.
+    # Limits are independent of the network timeout and work on PS 5.1.
+    if ($Html.Length -gt 2097152) { throw 'PARSE: HTML body exceeds the character limit (2097152)' }
+    $clock = [Diagnostics.Stopwatch]::StartNew()
+    $matchTimeout = [TimeSpan]::FromMilliseconds(250)
+    $text = New-Object Text.StringBuilder
+    $offset = 0; $blocked = ''; $tokens = 0
+    try {
+        $tags = [regex]::Matches($Html, '<!--[\s\S]*?-->|<[^<>]*>', $RxIgnoreCase, $matchTimeout)
+        foreach ($tag in $tags) {
+            $tokens++
+            if ($tokens -gt 20000 -or $clock.ElapsedMilliseconds -gt 2000) {
+                throw 'PARSE: HTML conversion work limit exceeded'
+            }
+            if (-not $blocked) { [void]$text.Append($Html, $offset, $tag.Index - $offset) }
+            $offset = $tag.Index + $tag.Length
+            if ($tag.Value.StartsWith('<!--')) { continue }
+            if ($tag.Length -gt 16384) { throw 'PARSE: HTML tag limit exceeded' }
+            $name = [regex]::Match($tag.Value, '^<\s*(/?)\s*([A-Za-z][A-Za-z0-9]*)', $RxIgnoreCase, $matchTimeout)
+            if (-not $name.Success) { continue }
+            $closing = $name.Groups[1].Value -ceq '/'
+            $kind = $name.Groups[2].Value.ToLowerInvariant()
+            if ($blocked) {
+                if ($closing -and $kind -ceq $blocked) { $blocked = '' }
+                continue
+            }
+            if (-not $closing -and $kind -cin @('script','style','head') -and -not $tag.Value.EndsWith('/>')) {
+                $blocked = $kind
+            } elseif ($kind -ceq 'br' -or ($closing -and $kind -cin @('p','div','tr','li','h1','h2','h3','h4','h5','h6'))) {
+                [void]$text.Append("`n")
+            }
+        }
+        if ($blocked) { throw 'PARSE: unclosed HTML script, style or head section' }
+        [void]$text.Append($Html, $offset, $Html.Length - $offset)
+        $decoded = [System.Net.WebUtility]::HtmlDecode($text.ToString())
+        $result = [regex]::Replace($decoded, '(\r?\n[ \t]*){3,}', "`n`n", $RxIgnoreCase, $matchTimeout)
+        if ($clock.ElapsedMilliseconds -gt 2000) { throw 'PARSE: HTML conversion work limit exceeded' }
+        return $result
+    } catch [Text.RegularExpressions.RegexMatchTimeoutException] {
+        throw 'PARSE: HTML conversion time limit exceeded'
+    } finally { $clock.Stop() }
 }
 
 # File names are ASCII only, so that an old non-Unicode SAP system can
@@ -266,13 +302,14 @@ function Split-Long([string]$Text, [int]$Width) {
     $Text = $Text.Replace("`t", ' ')
     foreach ($l in ($Text -split '\r?\n|\r')) {
         $l = ($l -replace '[\x00-\x1F]', ' ').TrimEnd()
-        while ($l.Length -gt $Width) {
+        $offset = 0
+        while ($l.Length - $offset -gt $Width) {
             $cut = $Width
-            if ([char]::IsHighSurrogate($l[$cut - 1])) { $cut-- }
-            $out.Add($l.Substring(0, $cut))
-            $l = $l.Substring($cut)
+            if ([char]::IsHighSurrogate($l[$offset + $cut - 1])) { $cut-- }
+            $out.Add($l.Substring($offset, $cut))
+            $offset += $cut
         }
-        $out.Add($l)
+        $out.Add($l.Substring($offset))
     }
     while ($out.Count -gt 0 -and $out[$out.Count - 1] -eq '') { $out.RemoveAt($out.Count - 1) }
     return , $out.ToArray()

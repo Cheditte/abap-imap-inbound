@@ -793,7 +793,12 @@ FORM create_domain USING is_dom TYPE ty_dom.
       gv_err = 'X'.
       EXIT.
     ENDIF.
-*   Preserve existing fixed values; append only genuinely new ones.
+*   Retire only our unsupported COPY option, also on existing systems.
+    IF is_dom-name = 'ZIMAP_MOVEMODE'.
+      DELETE lt_old WHERE domvalue_l = 'COPY'
+                      AND domvalue_h = space.
+    ENDIF.
+*   Preserve other fixed values; append only genuinely new ones.
     LOOP AT lt_old INTO ls_old.
       IF ls_old-valpos > lv_pos.
         lv_pos = ls_old-valpos.
@@ -2082,7 +2087,6 @@ FORM fill_defs.
   def 'V|ZIMAP_CREDSRC|S|Password entered on SAP screen'.
   def 'V|ZIMAP_CREDSRC|O|Basis keeps password on server'.
   def 'V|ZIMAP_MOVEMODE|MOVE|IMAP MOVE command'.
-  def 'V|ZIMAP_MOVEMODE|COPY|COPY, deleted flag, EXPUNGE'.
   def 'V|ZIMAP_STATUS|H|Business logic ran, not moved'.
   def 'V|ZIMAP_STATUS|S|Completed'.
   def 'V|ZIMAP_STATUS|E|Error'.
@@ -2649,6 +2653,11 @@ FORM fill_common.
   src '      cv_text = ''Mail exceeds the size limit.''.'.
   src '      cv_hint = ''ZIMAP_CONFIG: increase the max mail size (MB)'.
   cnt '.''.'.
+  src '    WHEN ''PARSE''.'.
+  src '      cv_text = ''Mail content is invalid or exceeds parser lim'.
+  cnt 'its.''.'.
+  src '      cv_hint = ''Review MIME/HTML detail; ask for a corrected'.
+  cnt ' mail.''.'.
   src '    WHEN ''ARG''.'.
   src '      cv_text = ''Invalid parameter passed to the script.''.'.
   src '    WHEN ''SXPG1''.'.
@@ -3084,9 +3093,10 @@ FORM fill_inbound.
   src '*   S  completed'.
   src '*   E  error; retry with P_RETRY or ZIMAP_MONITOR > Reprocess'.
   src '*   R  to be reprocessed (ZIMAP_MONITOR)'.
-  src '* A mail never runs through the business logic twice: the H rec'.
-  cnt 'ord'.
-  src '* is committed; if the move fails, only the move is repeated.'.
+  src '* A committed H record resumes only the pending move. Handlers'.
+  cnt ' must'.
+  src '* honor the LUW contract and deduplicate external business effe'.
+  cnt 'cts.'.
   src '*'.
   src '* 4.6C compatible; lines at most 72 characters; ASCII only.'.
   src '*--------------------------------------------------------------'.
@@ -3896,6 +3906,8 @@ FORM fill_config.
   src '        lv_chars(80) TYPE c,'.
   src '        lv_logged LIKE zimap_log-profile,'.
   src '        lv_revision TYPE p DECIMALS 0,'.
+  src '        lv_source(100) TYPE c,'.
+  src '        lv_target(100) TYPE c,'.
   src '        lv_mlen TYPE i,'.
   src '        lv_dlen TYPE i.'.
   src ''.
@@ -3955,6 +3967,18 @@ FORM fill_config.
   src '     p_mbox(lv_mlen) CA space OR p_done(lv_dlen) CA space.'.
   src '    cv_msg = ''Folder names: letters, digits and . _ / - (no sp'.
   cnt 'aces).''.'.
+  src '    EXIT.'.
+  src '  ENDIF.'.
+  src '* Reject case-only differences too: some servers alias those na'.
+  cnt 'mes.'.
+  src '  lv_source = p_mbox.'.
+  src '  lv_target = p_done.'.
+  src '  TRANSLATE lv_source USING'.
+  src '    ''aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ''.'.
+  src '  TRANSLATE lv_target USING'.
+  src '    ''aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ''.'.
+  src '  IF lv_source = lv_target.'.
+  src '    cv_msg = ''Read and processed folders must be different.''.'.
   src '    EXIT.'.
   src '  ENDIF.'.
   src '  IF p_hprog IS INITIAL.'.
@@ -4216,7 +4240,7 @@ FORM fill_config.
   src '    PERFORM show_msg USING ''E'' ''Enter the profile name.''.'.
   src '  ENDIF.'.
   src '  CONCATENATE ''Delete profile'' p_prof'.
-  src '    ''with its conf and password files?'''.
+  src '    ''and current files? Older revisions need admin cleanup.'''.
   src '    INTO lv_q SEPARATED BY space.'.
   src '  PERFORM fm_exists USING ''POPUP_TO_CONFIRM'' CHANGING lv_ok.'.
   src '  IF NOT lv_ok IS INITIAL.'.
@@ -4269,7 +4293,9 @@ FORM fill_config.
   src '    ENDIF.'.
   src '    PERFORM delete_file USING lv_path.'.
   src '  ENDIF.'.
-  src '  PERFORM show_msg USING ''S'' ''Profile deleted.''.'.
+  src '  PERFORM show_msg USING ''S'''.
+  src '    ''Profile deleted; review old conf/secret revisions with ad'.
+  cnt 'min.''.'.
   src 'ENDFORM.'.
   src ''.
   src '*--------------------------------------------------------------'.
@@ -4711,6 +4737,7 @@ FORM fill_monitor.
   src '        lv_tmps      TYPE string,'.
   src '        lv_tmp(200)  TYPE c,'.
   src '        lv_uidc(10)  TYPE c,'.
+  src '        lv_key(28) TYPE c,'.
   src '        lv_file(255) TYPE c,'.
   src '        lv_fstr      TYPE string,'.
   src '        lv_wsname    LIKE rlgrap-filename,'.
@@ -4750,8 +4777,9 @@ FORM fill_monitor.
   src ''.
   src '  lv_uidc = gs_log-mailuid.'.
   src '  SHIFT lv_uidc LEFT DELETING LEADING ''0''.'.
-  src '  CONCATENATE lv_tmp ''\zimap_'' gs_log-profile ''_'' lv_uidc'.
-  cnt ' ''_'''.
+  src '  PERFORM storage_key USING gs_log-profile CHANGING lv_key.'.
+  src '  CONCATENATE lv_tmp ''\zimap_'' lv_key ''_'''.
+  src '              gs_log-uidvalidity ''_'' lv_uidc ''_'''.
   src '              iv_name INTO lv_fstr.'.
   src '  IF STRLEN( lv_fstr ) > 255.'.
   src '    PERFORM show_msg USING ''S'' ''Download file path is too lo'.
