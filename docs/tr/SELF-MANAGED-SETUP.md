@@ -146,6 +146,6 @@ Hesabın ileti okuma ve taşıma izinlerini doğrulayın. Posta sunucusu **UID M
 
 ## 6. SAP içindeki adımlara dönün
 
-Sunucu testiniz başarılı, çalışma klasörünüz ve posta bağlantı bilgileriniz hazırsa [SAP kurulum programını oluşturma adımına](WALKTHROUGH.md#2-kurulum-programını-oluşturun) dönün. Windows/Linux yönetici hesabınızdan ayrı olarak SAP içinde program oluşturma ve çalıştırma yetkiniz de olmalıdır.
+Sunucu testiniz başarılı, çalışma klasörünüz ve posta bağlantı bilgileriniz hazırsa [SAP kurulum programını oluşturma adımına](WALKTHROUGH.md#31-kurulum-programını-oluşturun) dönün. Windows/Linux yönetici hesabınızdan ayrı olarak SAP içinde program oluşturma ve çalıştırma yetkiniz de olmalıdır.
 
 Profili kaydedin, bağlantıyı test edin, önce yalnız listeleme sonra hazır örnekle normal deneme yapın. SAP'de sonucu ve posta kutusunda taşınan iletiyi kontrol edin. Ayrıntılar [kurulum rehberindedir](WALKTHROUGH.md).

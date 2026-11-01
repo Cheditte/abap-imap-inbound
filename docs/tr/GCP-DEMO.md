@@ -75,7 +75,7 @@ SAP Logon → yeni bağlantı: application server `127.0.0.1`, instance number `
 
 ## 5. SAP'de kurulum
 
-[SAP kurulum adımları](WALKTHROUGH.md#2-kurulum-programını-oluşturun) içindeki geliştirici adımlarını izleyin. Bu demoda sunucu ana klasörü `/usr/sap/sapimap`'tir; `ZIMAP_INSTALL`, Linux ve Unicode olduğunu kendisi anlar.
+[SAP kurulum adımları](WALKTHROUGH.md#31-kurulum-programını-oluşturun) içindeki geliştirici adımlarını izleyin. Bu demoda sunucu ana klasörü `/usr/sap/sapimap`'tir; `ZIMAP_INSTALL`, Linux ve Unicode olduğunu kendisi anlar.
 
 `ZIMAP_CONFIG`'te demo posta kutusu şöyledir: server `greenmail`, port `3993`, IMAPS, sertifika kontrolü kapalı, kullanıcı `sap@demo.local`, şifre `sapdemo` (yalnızca GreenMail test değerleri).
 

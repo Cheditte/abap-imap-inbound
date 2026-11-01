@@ -75,7 +75,7 @@ SAP Logon → new connection: application server `127.0.0.1`, instance number `0
 
 ## 5. Install in SAP
 
-Follow the [SAP installation steps](../docs/WALKTHROUGH.md#2-create-the-installer-program). On this demo the server root folder is `/usr/sap/sapimap`; `ZIMAP_INSTALL` detects Linux and Unicode by itself.
+Follow the [SAP installation steps](../docs/WALKTHROUGH.md#31-create-the-installer-program). On this demo the server root folder is `/usr/sap/sapimap`; `ZIMAP_INSTALL` detects Linux and Unicode by itself.
 
 In `ZIMAP_CONFIG`, the demo mailbox is: server `greenmail`, port `3993`, IMAPS, certificate check off, user `sap@demo.local`, password `sapdemo` (GreenMail test values only).
 

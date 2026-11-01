@@ -1,27 +1,34 @@
-# Kurulum rehberi: ilk e-postayı SAP'de görün
+# Kurulum rehberi: üç bölümü hazırlayın, ilk e-postayı SAP'de görün
 
-> [English](../WALKTHROUGH.md) | **Türkçe** · [Projeyi tanıyın](../../README.tr.md) · [Teknik ayrıntılar](TECHNICAL-REFERENCE.md)
+> [English](../WALKTHROUGH.md) | **Türkçe** · [Genel bakış](../../README.tr.md) · [Teknik ayrıntılar](TECHNICAL-REFERENCE.md)
 
-Bu rehberin sonunda bir deneme e-postasını ve ekini SAP içinden görebileceksiniz. Hazır örneği kullanacağız; kendi iş sürecinizi daha sonra ekleyebilirsiniz.
+Bu kurulumda bir posta hesabını, SAP'nin çalıştığı makineyi ve SAP ERP içindeki programları birbirine bağlayacağız. Sonunda hazır örnekle bir deneme e-postasını ve ekini SAP'de göreceğiz.
 
-Bu rehber, **SE38 üzerinden program oluşturma, etkinleştirme ve çalıştırma bilgisine ve yetkisine sahip olduğunuzu** varsayar. SAP programlarını siz kuracak, posta profilini tanımlayacak ve hazır örneği çalıştıracaksınız. Sunucu ve posta hazırlığını ise yönetim yetkiniz varsa kendiniz yapabilir, başka ekipler yönetiyorsa onlardan isteyebilirsiniz.
+## Önce bütün resmi görün
 
-**Sunucu ve posta işlemlerini de siz yapacaksanız:** SAP'nin çalıştığı makineye Windows'ta **Uzak Masaüstü (RDP)**, Linux'ta **SSH** ile bağlanmanız gerekebilir. Posta hesabı için de sağlayıcınızın yönetim panelini kullanabilirsiniz. Bunun için ilgili sunucuya veya hesaba erişim ve yönetim yetkiniz olmalı. [Ekip desteği olmadan kurulum rehberi](SELF-MANAGED-SETUP.md), hangi durumda hangi yolu izleyeceğinizi anlatır.
+Kurulumun tamamlanması için **üç bölüm** hazır olmalı:
 
-**Önce bir deneme SAP sistemi ve deneme posta kutusu kullanın.** İşlem sırasında e-postalar okundu işaretlenebilir ve başka klasöre taşınabilir. Hazır örnek fatura veya sipariş oluşturmaz.
+```mermaid
+flowchart TD
+    M["1. Posta sunucusu<br/>Hesap, erişim ve klasörler"]
+    H["2. SAP'nin kurulu olduğu makine<br/>Araçlar ve proje dosyaları"]
+    S["3. SAP ERP<br/>Programlar, posta ayarları ve ilk deneme"]
+    M --> H --> S
+```
 
-Bu rehber 1.1.0 kaynakları içindir. Bu sürümün gerçek SAP sistemindeki kurulum ve çalışma testleri henüz tamamlanmadı. Görseller önceki 1.0 demosundandır; ekranlarda farklılık olabilir. [Test durumu](TECHNICAL-REFERENCE.md#neler-doğrulandı).
+Bu üç ayrı makine kurmak anlamına gelmez. **2. bölüm**, SAP sunucusundaki Windows/Linux hazırlığı; **3. bölüm**, SAP GUI içinden yaptığınız program ve ayar işlemleridir. Posta hizmetiniz zaten mevcut olabilir.
 
-## Başlamadan önce: neyi, nerede hazırlıyoruz?
+Önce 1. bölümde bağlantı bilgilerini hazırlayacağız, sonra 2. bölümde bu bağlantıyı SAP makinesinden kuracağız. 3. bölümde SAP programlarını kurup bu bilgileri kullanacağız. Son olarak hepsini tek bir deneme e-postasıyla kontrol edeceğiz.
 
-Kurulumun iki parçası var:
+## Başlamadan önce
 
-| Nerede? | Ne yapıyoruz? | Neden gerekiyor? |
-|---|---|---|
-| **SAP'nin çalıştığı makinede** | Gerekli yardımcı araçları kontrol edip eksik olanları kuruyor, projenin sunucu dosyalarını yerleştiriyoruz. | Posta hesabına bağlanıp iletileri ve eklerini almak için. |
-| **SAP içinde** | Projenin programlarını kuruyor ve posta kutusu bilgilerini giriyoruz. | İşlemi SAP'den başlatmak ve sonuçları SAP ekranında görmek için. |
+SE38'de program oluşturma, etkinleştirme ve çalıştırma bilgi ve yetkinizin bulunduğunu varsayıyoruz. SAP adımlarını siz yapacaksınız. Posta ve sunucu yönetim yetkisi sizdeyse o hazırlıkları da yapabilirsiniz; başka ekipteyse ilgili bölümdeki bilgileri onlardan isteyin. Bu rehberde Basis, sunucu yönetim sorumluluğunu üstlenen kişi veya ekibi ifade eder.
 
-SAP GUI'yi açtığınız bilgisayarla SAP'nin çalıştığı makine farklı olabilir. Sunucu hazırlığını siz veya ilgili sunucu yöneticisi yapmalıdır. Bu rehberde Basis, bu sorumluluğu üstlenen kişi veya ekibi ifade eder. Ayrıca bir entegrasyon sunucusu kurmanız gerekmez.
+RDP/SSH ile kendiniz bağlanacaksanız [kendi sistemini yönetenler için rehber](SELF-MANAGED-SETUP.md) bağlantı ve dosya aktarımını anlatır.
+
+**Deneme SAP sistemi ve deneme posta kutusu kullanın.** Normal işlem iletileri okundu işaretleyebilir ve başka klasöre taşıyabilir. Hazır örnek fatura oluşturmaz.
+
+Bu rehber 1.1.0 kaynakları içindir; güncel sürümün gerçek SAP kabul testleri henüz tamamlanmadı. Görseller önceki 1.0 demosundandır, alanlar farklı olabilir. [Test durumu](TECHNICAL-REFERENCE.md#neler-doğrulandı).
 
 ### Dosyaları indirin
 
@@ -29,7 +36,9 @@ SAP GUI'yi açtığınız bilgisayarla SAP'nin çalıştığı makine farklı ol
 
 Klasör yapısını koruyun; farklı sürümlerden dosyaları karıştırmayın. SAP adımlarında ana klasördeki `ZIMAP_INSTALL.abap` dosyasını kullanacaksınız. Sunucu hazırlığını başka biri yapacaksa aynı paketi onunla paylaşın; `server` ve `script` klasörleri birlikte gerekir.
 
-### Deneme posta kutusunu hazırlayın
+## 1. Posta sunucusunu hazırlayın
+
+**Hedef:** SAP'nin okuyacağı posta hesabını, erişim yöntemini ve klasörleri belirlemek. Yeni bir posta sunucusu kurmanız gerekmez; mevcut bir hizmette uygun bir hesap kullanabilirsiniz.
 
 E-posta yöneticinizden sunucu adını, bağlantı portunu, güvenlik türünü ve giriş bilgilerini alın. **Doğru e-posta adresi ve parola tek başına yeterli olmayabilir.** Başka bir programın kutuyu okumasına, yani **IMAP erişimine**, izin verilmelidir. Posta ekibi hesabın bu projeyle bağlantı kurmaya uygun olduğunu doğrulasın. [Ayrıntılı bağlantı koşulları](TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu).
 
@@ -37,7 +46,9 @@ E-posta ekibiniz yoksa bu bilgileri, yönettiğiniz hesabın sağlayıcı paneli
 
 Varsayılan olarak **Gelen Kutusu (`INBOX`)** okunur. Yalnız belirli bir klasördeki iletileri almak isterseniz o klasörü seçebilirsiniz. İşlenen iletiler için de aynı posta hesabındaki mevcut bir klasörü kullanabilirsiniz. `SAP-Processed` başlangıç adıdır; bu adla yeni klasör açmak zorunda değilsiniz. Seçtiğiniz klasörlerin gerçek adlarını posta ekibinden doğrulayın.
 
-## 1. Sunucuyu hazırlayın (Basis)
+**Bu bölümün çıktısı:** Posta sunucusu adı, port, güvenlik türü, giriş bilgileri, okunacak klasör ve ondan farklı hedef klasörün gerçek adları. Parolayı destek kaydına veya ekran görüntüsüne koymayın.
+
+## 2. SAP'nin kurulu olduğu makineyi hazırlayın
 
 **Ne yapıyoruz?** SAP'nin kurulu olduğu Windows veya Linux makinede e-postaları alacak araçları ve proje dosyalarını hazırlıyoruz. Bu, genellikle ilk kurulumda bir kez yapılır.
 
@@ -56,7 +67,11 @@ Basis ekibiniz yoksa bu adımı, yönetim yetkiniz bulunan kendi deneme sunucunu
 
 **Ne zaman devam edebilirsiniz?** Sunucuyu siz hazırladıysanız testin başarılı olduğunu kontrol edin; başka ekip hazırladıysa bu sonucu onlardan alın. Kullanılacak SAP sunucusunu ve çalışma klasörünün **tam yolunu** not edin. Sonraki adımlarda aynı sunucuyu ve klasörü kullanacağız.
 
-## 2. Kurulum programını oluşturun
+## 3. SAP ERP içindeki kurulumu yapın
+
+Posta bilgileri ve sunucu hazırlığı tamamlandı. Şimdi SAP GUI içinde programları kuracak ve bu iki bölümden gelen bilgileri SAP'ye tanıtacağız. Bu bölümde üç işlem var: kurulum programını oluşturma, çalıştırma ve posta profilini kaydetme.
+
+### 3.1. Kurulum programını oluşturun
 
 **Ne yapıyoruz?** SAP'nin gerekli programlarını ve tablolarını oluşturacak kurulum programını hazırlıyoruz. Bu adımı kendi SAP geliştirme yetkinizle uygulayın.
 
@@ -72,7 +87,7 @@ SE38 üzerinden aşağıdaki programı oluşturun.
 
 **Ne zaman devam edebilirsiniz?** Program hata vermeden etkinleştiğinde. Sözdizimi veya etkinleştirme hatası varsa çözmeden sonraki adıma geçmeyin. Program adını aynen kullanın.
 
-## 3. Kurulum programını çalıştırın
+### 3.2. Kurulum programını çalıştırın
 
 **Ne yapıyoruz?** Kurulum programı gerekli SAP ekranlarını, tablolarını ve sunucuyla bağlantı için gereken tanımları oluşturacak.
 
@@ -89,7 +104,7 @@ SE38'de **`ZIMAP_INSTALL`** açıp **Execute / Çalıştır (F8)** seçin.
 
 **Kalıcı kullanım için:** Kurulum programı ürettiği nesneleri şu anda `$TMP` adlı yerel alana koyar. Programın kendisini pakete kaydetmek bunu değiştirmez. Nesneleri müşteri paketinize alıp test/canlı sisteme taşıma sürecini planlayın; transport ayarları başka ekipteyse onlarla koordine edin. [Paket ve taşıma ayrıntıları](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport).
 
-## 4. Posta kutusu profilini tanımlayın
+### 3.3. Posta kutusu profilini tanımlayın
 
 **Ne yapıyoruz?** Hangi posta hesabına bağlanacağımızı ve hangi klasördeki iletileri okuyacağımızı SAP'ye söylüyoruz. Bu ayarların birlikte kaydedilmiş haline **profil** denir.
 
@@ -114,7 +129,11 @@ SE38'de **`ZIMAP_CONFIG`** açıp **F8** ile çalıştırın. Basis'in hazırlad
 
 **Ne zaman devam edebilirsiniz?** Doğru posta hesabına bağlantı testi başarılı olduğunda. Ayarların kaydedilmesi tek başına bağlantının kurulduğu anlamına gelmez.
 
-## 5. E-postayı işleyin
+## 4. Üç bölümü birlikte deneyin
+
+Üç bölümün de ayrı ayrı hazır görünmesi yeterli değildir. Bir e-postanın seçtiğiniz posta klasöründen alınıp SAP'de görünmesini ve hedef klasöre taşınmasını kontrol edeceğiz.
+
+### 4.1. E-postayı işleyin
 
 **Ne yapıyoruz?** Önce posta kutusunun okunabildiğini kontrol ediyor, sonra deneme iletisini gerçekten alıyoruz.
 
@@ -129,7 +148,7 @@ Deneme posta kutusuna küçük bir PDF veya metin eki bulunan e-posta gönderin.
 
 **Ne zaman devam edebilirsiniz?** Çalıştırma tamamlandığında. Şimdi sonucu SAP'de ve posta kutusunda kontrol edeceğiz.
 
-## 6. E-postaları ve ekleri izleyin
+### 4.2. E-postaları ve ekleri izleyin
 
 **Ne yapıyoruz?** İşlemin sonucunu görüyor ve ekin SAP'den erişilebilir olduğunu kontrol ediyoruz.
 
@@ -151,7 +170,7 @@ PDF ve yaygın görseller uygun uygulamayla açılabilir. Excel gibi diğer ekle
 
 **İlk deneme başarılıysa:** SAP'de `S` durumunu, erişilebilir eki ve posta hesabında taşınan iletiyi görmüş olmalısınız. Hazır örnekte ayrıca fatura veya sipariş oluşması beklenmez.
 
-### Bir adımda hata alırsanız
+#### Bir adımda hata alırsanız
 
 - **Giriş veya klasör hatası:** E-posta ekibine bağlantı bilgilerini, IMAP iznini ve seçilen klasör adlarını kontrol ettirin.
 - **Bağlantı, sertifika veya SAP yetki hatası:** Basis'ten destek alın; sertifika doğrulamasını kapatarak geçmeyin.
@@ -159,7 +178,7 @@ PDF ve yaygın görseller uygun uygulamayla açılabilir. Excel gibi diğer ekle
 
 Hata metnini ve kaldığınız adımı paylaşın; parola paylaşmayın. Yetkili kullanıcı hatalı iletileri yeniden denemeye alabilir. Log veya sunucu dosyalarını silerek tekrar işlemeyi denemeyin. [Yeniden deneme ayrıntıları](TECHNICAL-REFERENCE.md#saklama-ve-yeniden-deneme-ayrıntıları).
 
-## 7. Düzenli çalışmayı zamanlayın
+## 5. Düzenli çalışmayı zamanlayın
 
 **Ne yapıyoruz?** Başarılı denemeden sonra posta kontrolünün elle başlatılmadan, belirlenen aralıklarla çalışmasını sağlıyoruz.
 

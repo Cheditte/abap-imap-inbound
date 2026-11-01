@@ -146,6 +146,6 @@ Confirm the account can read and move messages. The server must support **UID MO
 
 ## 6. Return to the steps inside SAP
 
-Once the server test passes and you have the working-folder path and mailbox settings, return to [creating the SAP installer program](WALKTHROUGH.md#2-create-the-installer-program). You also need permission to create and run SAP programs; this is separate from Windows/Linux administrator access.
+Once the server test passes and you have the working-folder path and mailbox settings, return to [creating the SAP installer program](WALKTHROUGH.md#31-create-the-installer-program). You also need permission to create and run SAP programs; this is separate from Windows/Linux administrator access.
 
 Save the profile, test the connection, run list-only first and then a normal trial with the supplied example. Check the result in SAP and the moved message in the mailbox. The [walkthrough](WALKTHROUGH.md) explains these steps.

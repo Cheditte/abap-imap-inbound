@@ -1,27 +1,34 @@
-# Walkthrough: see your first email in SAP
+# Walkthrough: prepare three parts and see your first email in SAP
 
-> **English** | [Türkçe](tr/WALKTHROUGH.md) · [Project overview](../README.md) · [Technical details](TECHNICAL-REFERENCE.md)
+> **English** | [Türkçe](tr/WALKTHROUGH.md) · [Overview](../README.md) · [Technical details](TECHNICAL-REFERENCE.md)
 
-By the end of this guide, you will be able to view a test email and its attachment from SAP. We will use the supplied example; you can add your own business process afterwards.
+We will connect a mail account, the machine running SAP and the programs inside SAP ERP. At the end, we will use the supplied example to view a test email and attachment in SAP.
 
-This guide assumes **you can create, activate and run programs through SE38 and have permission to do so**. You will install the SAP programs, define the mailbox profile and run the example. Prepare the server and mailbox yourself if you have administration permissions, or ask the teams that manage them.
+## Start with the whole picture
 
-**If you will also prepare the server and mailbox yourself:** You may need to connect to the machine running SAP through **Remote Desktop (RDP)** on Windows or **SSH** on Linux. For the email account, you may use your provider's administration panel. You need access and management permissions for the relevant server or account. The [self-managed setup guide](SELF-MANAGED-SETUP.md) explains which route to follow.
+Installation needs **three prepared parts**:
 
-**Start with a test SAP system and a test mailbox.** Processing may mark messages as read and move them to another folder. The supplied example does not create invoices or purchase orders.
+```mermaid
+flowchart TD
+    M["1. Mail server<br/>Account, access and folders"]
+    H["2. Machine running SAP<br/>Tools and project files"]
+    S["3. SAP ERP<br/>Programs, mailbox settings and first trial"]
+    M --> H --> S
+```
 
-This guide covers the 1.1.0 sources. Installation and runtime tests for this version on an actual SAP system are still pending. Images show the earlier 1.0 demonstration, so screens may differ. [Test status](TECHNICAL-REFERENCE.md#what-has-been-verified).
+This does not mean installing three separate machines. **Part 2** is Windows/Linux preparation on the SAP host; **part 3** is the work done through SAP GUI. The mail service may already exist.
 
-## Before you start: what are we preparing, and where?
+First prepare the connection details in part 1, then make the connection available from the SAP machine in part 2. In part 3, install the SAP programs and enter those settings. Finally, check everything with one test email.
 
-Installation has two parts:
+## Before you start
 
-| Where? | What do we do? | Why is it needed? |
-|---|---|---|
-| **On the machine running SAP** | Check the helper tools, install anything missing and place the project's server files. | To connect to the email account and retrieve messages and attachments. |
-| **Inside SAP** | Install the project's programs and enter the mailbox settings. | To start processing and view results from SAP screens. |
+We assume you can create, activate and run programs in SE38 and have permission to do so. You perform the SAP steps yourself. Prepare the mailbox and server yourself if you administer them; otherwise ask their administrators for the items listed in those sections. Here, Basis means whoever takes responsibility for server administration.
 
-The computer where you open SAP GUI may be different from the machine running SAP. You or the responsible server administrator should prepare it. In this guide, Basis means the person or team taking that responsibility. You do not need a separate integration server.
+For authorized RDP/SSH access and file transfer, use the [self-managed setup guide](SELF-MANAGED-SETUP.md).
+
+**Use a test SAP system and test mailbox.** Normal processing may mark mail as read and move it. The example does not create invoices.
+
+This guide covers the 1.1.0 sources; actual SAP acceptance tests for this version are still pending. Images show the earlier 1.0 demonstration and fields may differ. [Test status](TECHNICAL-REFERENCE.md#what-has-been-verified).
 
 ### Download the files
 
@@ -29,7 +36,9 @@ Open the [GitHub repository](https://github.com/Cheditte/abap-imap-inbound), cho
 
 Keep the folder structure and use files from the same version. You will use the root-level `ZIMAP_INSTALL.abap` file for the SAP steps. If someone else prepares the server, share the same package with them; they need both the `server` and `script` folders.
 
-### Prepare the test mailbox
+## 1. Prepare the mail server
+
+**Goal:** Choose the account SAP will read, its sign-in method and folders. You do not need to install a new mail server; use a suitable account on an existing service.
 
 Obtain the server name, port, security type and login details from your email administrator. **An email address and correct password may not be enough.** The account must allow another program to read it through **IMAP access**. Have the email team confirm that the account can connect with this project. [Detailed connection requirements](TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
 
@@ -37,7 +46,9 @@ If you do not have an email team, obtain these settings from your account's prov
 
 The default source is the **inbox (`INBOX`)**. You can select a different folder if you only want messages from there. For processed messages, you can use an existing folder in the same email account. The initial `SAP-Processed` value is an example; you do not have to create a new folder with that name. Confirm the actual folder names with the email team.
 
-## 1. Prepare the server (Basis)
+**Output from this part:** Actual IMAP hostname, port, security type, login details, source folder and a different destination folder. Keep passwords out of tickets and screenshots.
+
+## 2. Prepare the machine running SAP
 
 **What are we doing?** Preparing the tools and project files that retrieve email on the Windows or Linux machine running SAP. This is usually done once at initial setup.
 
@@ -56,7 +67,11 @@ Without a Basis team, you can perform this step on your own test server if you h
 
 **When can you continue?** If you prepared the server, check that the test passes; if another team prepared it, obtain their confirmation. Record the SAP server to use and the **full path** of the working folder. We will use that same server and folder in the following steps.
 
-## 2. Create the installer program
+## 3. Install the programs in SAP ERP
+
+The mailbox settings and host preparation are ready. Now use SAP GUI to install the programs and enter the information from those two parts. There are three steps here: create the installer, run it and save a mailbox profile.
+
+### 3.1. Create the installer program
 
 **What are we doing?** Preparing a program that creates the SAP programs and tables the project needs. Perform this step with your own SAP development permissions.
 
@@ -72,7 +87,7 @@ Create the following program in SE38.
 
 **When can you continue?** Once the program activates without errors. Resolve syntax or activation errors before moving on. Keep the program name as shown.
 
-## 3. Run the installer
+### 3.2. Run the installer
 
 **What are we doing?** The installer will create the SAP screens, tables and definitions needed to connect SAP to the server tools.
 
@@ -89,7 +104,7 @@ Open **`ZIMAP_INSTALL`** in SE38 and choose **Execute (F8)**.
 
 **For maintained use:** The installer currently creates its objects in the local area `$TMP`. Saving the installer itself in a package does not change this. Assign the objects to your customer package and plan transport to test and production systems; coordinate transport settings with their administrators where needed. [Package and transport details](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport).
 
-## 4. Set up a mailbox profile
+### 3.3. Set up a mailbox profile
 
 **What are we doing?** Telling SAP which email account to connect to and which folder to read. These settings are saved together as a **profile**.
 
@@ -114,7 +129,11 @@ Press **F8** to save and test the connection. Keep passwords out of screenshots 
 
 **When can you continue?** Once the connection test succeeds for the intended mailbox. Saved settings alone do not prove the connection works.
 
-## 5. Process mail
+## 4. Test the three parts together
+
+Check the complete path: a message must be retrieved from the source folder, become visible in SAP and move to your destination folder.
+
+### 4.1. Process mail
 
 **What are we doing?** First checking that the mailbox can be read, then retrieving a test message.
 
@@ -129,7 +148,7 @@ Send an email with a small PDF or text attachment to the test mailbox. If you se
 
 **When can you continue?** Once the run finishes. Next, we will check the result in SAP and in the mailbox.
 
-## 6. Monitor mails and attachments
+### 4.2. Monitor mails and attachments
 
 **What are we doing?** Checking the result and confirming that the attachment can be accessed from SAP.
 
@@ -151,7 +170,7 @@ PDFs and common images can open in a suitable application. Download other attach
 
 **A successful first trial means:** you see status `S`, can access the attachment and can find the message in the processed folder. The supplied example does not also create an invoice or purchase order.
 
-### If a step fails
+#### If a step fails
 
 - **Sign-in or folder error:** Ask the email team to check connection details, IMAP access and the selected folder names.
 - **Connection, certificate or SAP permission error:** Ask Basis for help. Keep certificate verification enabled.
@@ -159,7 +178,7 @@ PDFs and common images can open in a suitable application. Download other attach
 
 Share the error text and the step you reached, without passwords. Authorized users can mark failed messages for another attempt. Do not delete log records or server files to force reprocessing. [Retry details](TECHNICAL-REFERENCE.md#retention-and-retry-details).
 
-## 7. Schedule regular processing
+## 5. Schedule regular processing
 
 **What are we doing?** After the trial succeeds, having the mailbox checked automatically at agreed intervals.
 

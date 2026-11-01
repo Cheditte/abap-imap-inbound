@@ -2,64 +2,89 @@
 
 > [English](README.md) | **Türkçe**
 
-E-postayla gelen belgeleri SAP içinden toplamak ve işlem sonuçlarını takip etmek için açık kaynak bir proje.
+Bir posta sunucusundaki e-postaları **SAP'de görmek ve okumak, eklerini almak ve işlemek** istiyorsanız bu projeyi kullanabilirsiniz. Eklerle yapılacak iş adımını kendi ABAP kodunuzla tanımlarsınız.
 
-![E-postayla gelen belgeleri toplama ihtiyacı, SAP içinden izleme ve hazır örnekle ilk deneme](docs/assets/business-need-tr.jpg)
+```mermaid
+flowchart TD
+    M["Posta sunucusundaki<br/>e-postalar ve ekler"]
+    S["SAP"]
+    R["E-postaları görün<br/>ve okuyun"]
+    A["Ekleri kendi ABAP<br/>kodunuzla işleyin"]
+    M --> S
+    S --> R
+    S --> A
+```
 
-## Ne işe yarar?
 
-Tedarikçilerinizin faturaları veya sevkiyat belgelerini ortak bir e-posta adresine gönderdiğini düşünün. Bir kişi her iletiyi açıyor, ekleri indiriyor ve SAP'deki işleme hazırlıyor. Bu proje, e-postaların ve eklerinin alınmasını otomatikleştirmek için bir başlangıç sağlar.
+Kurulumu yapacak kişinin **SE38'de program oluşturabildiği, etkinleştirebildiği ve çalıştırabildiği** varsayılır. Önce bir deneme SAP sistemi ve deneme posta kutusuyla başlayın.
 
-- Belirlediğiniz posta kutusundaki iletileri ve ekleri alır.
-- Hangi iletilerin başarıyla işlendiğini, hangilerinde hata olduğunu SAP'de gösterir.
-- Başarıyla işlenen iletileri posta kutusunda ayrı bir klasöre taşır.
+## Büyük resim: kurulum üç bölümden oluşur
 
-Hazır örnekle bu akışı deneyebilirsiniz. Fatura oluşturma, PDF içinden tutar okuma veya belgeyi bir siparişe bağlama gibi iş adımlarını kendi ihtiyacınıza göre ekleyebilirsiniz.
+**Bu projenin kurulumunun tamamlanması için üç bölümün hazırlanması gerekir:**
 
-## Bu rehber kimler için?
+1. **Posta sunucusu:** SAP'nin okuyacağı posta hesabını ve bağlantı izinlerini hazırlarsınız.
+2. **SAP'nin kurulu olduğu makine:** Postayı alacak yardımcı araçları ve proje dosyalarını hazırlarsınız.
+3. **SAP ERP:** ABAP programlarını kurar, posta bilgilerini girer ve işlemi SAP'den çalıştırırsınız.
 
-Bu rehber, **SAP geliştiricileri ve en azından SE38 üzerinden program oluşturabilen, kaydedip etkinleştirebilen ve çalıştırabilen kişiler** içindir. Bu işlemler için SAP geliştirme yetkinizin olması gerekir. SAP programlarının kurulmasını, posta ayarlarını ve hazır örneğin çalıştırılmasını siz yapacaksınız.
+Bunlar üç ayrı makine kurmanız gerektiği anlamına gelmez. İkinci bölüm SAP sunucusunun Windows/Linux tarafı, üçüncü bölüm aynı sistemin SAP ekranlarından yaptığınız işlemlerdir. Posta hizmetiniz de zaten kullandığınız bir hizmet olabilir.
 
-Sunucu ve posta yönetimi yetkileri ayrı olabilir. Kendi sisteminizi yönetiyorsanız bu hazırlıkları da siz yapabilirsiniz; başka ekipler yönetiyorsa ilgili adımları onlardan isteyin.
+### Kurulum haritası
 
-| Hazırlık | Yetki sizdeyse | Başka ekip yönetiyorsa |
-|---|---|---|
-| SAP'nin çalıştığı makine | RDP/SSH ile bağlanıp gerekli araçları ve proje dosyalarını hazırlayın. | Basis veya sunucu yöneticisinden hazırlığı isteyin. |
-| Posta hesabı | Sağlayıcı panelinden bağlantı bilgilerini ve erişim izinlerini kontrol edin. | E-posta yöneticisinden veya sağlayıcı desteğinden bilgileri alın. |
+Aşağıdaki harita hazırlık sırasını gösterir. Her bölümün ayrıntısı hemen altında açıklanıyor.
 
-Sunucuya bağlantı ve posta hazırlığı [kendi sistemini yönetenler için rehberde](docs/tr/SELF-MANAGED-SETUP.md) anlatılıyor.
+```mermaid
+flowchart TD
+    M["1. Posta sunucusu<br/>Hesap, erişim ve klasörler"]
+    H["2. SAP'nin kurulu olduğu makine<br/>Araçlar ve proje dosyaları"]
+    S["3. SAP ERP<br/>Programlar, posta ayarları ve ilk deneme"]
+    M --> H --> S
+```
 
-## Başlamadan önce ne bilmelisiniz?
+## 1. Posta sunucusunda ne yapacaksınız?
 
-İlk denemeyi bu iş için ayrılmış bir **deneme posta kutusunda** yapın. İşlem sırasında iletiler okundu işaretlenebilir ve başka klasöre taşınabilir.
+SAP'nin hangi posta hesabına bağlanacağını ve hangi klasörü okuyacağını belirleyeceksiniz. Hesap size ait olabilir; yine de **doğru e-posta adresi ve parola tek başına yeterli olmayabilir**. Hesabın IMAP erişimine, yani başka bir programın iletileri okumasına izin vermesi gerekir. Giriş yöntemi de bu projeyle uyumlu olmalıdır.
 
-**E-posta adresiniz ve doğru parolanız bağlantı için tek başına yeterli olmayabilir.** Hesabın IMAP erişimine, yani başka bir programın posta kutusunu okumasına izin verilmelidir. Outlook'a veya web postaya giriş yapabiliyor olmanız bu iznin bulunduğunu göstermez. Hesabı yönetiyorsanız sağlayıcının bağlantı koşullarını kontrol edin; başka bir ekip yönetiyorsa onlardan doğrulama alın. Bazı hesapların giriş koşulları mevcut sürümle uyumlu değildir; [ayrıntılı bağlantı koşulları](docs/tr/TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu) ayrı rehberdedir.
+Varsayılan olarak **Gelen Kutusu (`INBOX`)** okunur. İsterseniz başka bir klasör seçebilirsiniz. Başarıyla işlenen iletiler için aynı posta hesabında farklı bir hedef klasör seçin. `SAP-Processed` örnek başlangıç adıdır; bu adla yeni klasör açmak zorunda değilsiniz.
 
-### E-postalar nereden okunur, nereye taşınır?
+**Bu bölüm hazır olduğunda:** Gerçek posta sunucusu adı, port, güvenlik türü, giriş bilgileri ve iki klasörün adları elinizde olmalı. Posta hesabını siz yönetiyorsanız bunları kendiniz kontrol edin; başka ekip yönetiyorsa e-posta yöneticisinden veya sağlayıcı desteğinden alın.
 
-- **Okunacak klasör:** Varsayılan olarak **Gelen Kutusu (`INBOX`)** okunur. Yalnız belirli bir klasördeki e-postaların alınmasını istiyorsanız, ayarlarda o klasörün adını belirtebilirsiniz. Örneğin posta kutunuzdaki `Faturalar` klasörünü seçerseniz yalnız oradaki iletiler okunur.
-- **İşlenmiş klasörü:** Başarıyla işlenen e-postaların taşınacağı posta klasörünü ayarlarda siz seçersiniz. Okunacak klasörden farklı, mevcut bir klasörünüzü kullanabilirsiniz. `SAP-Processed` yalnızca başlangıçta gösterilen örnek addır; bu adla yeni bir klasör açmanız gerekmez.
+[Posta hesabını hazırlama adımları →](docs/tr/WALKTHROUGH.md#1-posta-sunucusunu-hazırlayın)
 
-Her iki klasör de **aynı e-posta hesabının içinde** bulunur. SAP'de veya bilgisayarınızın diskinde klasör açmanız gerekmez.
+## 2. SAP'nin kurulu olduğu makinede ne yapacaksınız?
 
-## Nasıl başlayabilirsiniz?
+Bu proje e-postayı almak için **PowerShell** ve **curl** kullanır. PowerShell proje komutlarını çalıştırır; curl posta sunucusuna bağlanır. Bu araçlar ve projenin sunucu dosyaları, **SAP'nin çalıştığı Windows/Linux makinede** hazırlanır. SAP GUI'yi açtığınız bilgisayar farklı olabilir.
 
-1. **[Kurulum rehberini açıp dosyaları indirin](docs/tr/WALKTHROUGH.md).** Sunucu ve posta hazırlığını yetkileriniz doğrultusunda kendiniz yapın veya ilgili ekiplerden isteyin.
-2. **SAP kurulumunu yapın.** SE38'de kurulum programını oluşturup etkinleştirin ve çalıştırın. Ardından posta kutusu ayarlarını kaydedip bağlantıyı test edin.
-3. **Hazır örneği deneyin.** Küçük bir ek içeren deneme e-postası gönderin; SAP'deki sonucu, eki ve iletinin taşındığı klasörü kontrol edin.
-4. **Kendi iş adımınızı ekleyin.** Örneğin gelen belgenin hangi siparişe bağlanacağını süreç sorumlusuyla belirleyip [geliştirici rehberindeki örneklerle](docs/tr/TECHNICAL-GUIDE.md) uygulayın.
+Araçlar zaten uygunsa tekrar kurulmaz. Projenin sunucu kurulumuyla, iletilerin ve eklerin tutulacağı korumalı çalışma klasörü de hazırlanır.
 
-## Daha fazla bilgi
+**Bu bölüm hazır olduğunda:** Sunucu testi başarılı olmalı; kullanacağınız SAP sunucusunu ve çalışma klasörünün tam yolunu bilmelisiniz. Yönetim yetkiniz varsa RDP/SSH ile bağlanıp hazırlığı yapabilirsiniz; yoksa Basis veya sunucu yöneticisinden isteyin.
 
-| Aradığınız bilgi | Rehber |
-|---|---|
-| Kurulum ve ilk kullanım | [Adım adım rehber](docs/tr/WALKTHROUGH.md) |
-| Ayrı Basis/e-posta ekibi olmadan kendi deneme sisteminizi hazırlamak | [Kendi sistemini yönetenler için rehber](docs/tr/SELF-MANAGED-SETUP.md) |
-| Bağlantı koşulları, yetkiler, teknik sınırlar ve test durumu | [Teknik başvuru rehberi](docs/tr/TECHNICAL-REFERENCE.md) |
-| Kendi iş adımınızı eklemek için kod örnekleri | [Geliştirici rehberi](docs/tr/TECHNICAL-GUIDE.md) |
+[Makineyi hazırlama adımları →](docs/tr/WALKTHROUGH.md#2-sapnin-kurulu-olduğu-makineyi-hazırlayın)
 
-**Güncel kaynak sürümü: 1.1.0.** Bu sürümün gerçek SAP sistemindeki kurulum ve çalışma testleri henüz tamamlanmadı. Önce deneme sisteminde değerlendirin; [nelerin test edildiğini](docs/tr/TECHNICAL-REFERENCE.md#neler-doğrulandı) teknik rehberde bulabilirsiniz.
+## 3. SAP ERP içinde ne yapacaksınız?
 
-## Lisans
+SE38'de `ZIMAP_INSTALL` programını oluşturup etkinleştirecek ve çalıştıracaksınız. Bu program, projenin ihtiyaç duyduğu SAP programlarını ve tablolarını oluşturur.
 
-[MIT](LICENSE) — lisans koşulları kapsamında kullanabilir, değiştirebilir ve paylaşabilirsiniz.
+Ardından `ZIMAP_CONFIG` içinde ilk bölümde hazırladığınız posta bağlantı bilgilerini kaydedersiniz. Bu ayarların birlikte kaydedildiği tanıma **profil** diyoruz. İkinci bölümde hazırladığınız sunucu ve klasör de SAP kurulumu tarafından kullanılır.
+
+**Bu bölüm hazır olduğunda:** SAP kurulum kontrolleri ve posta bağlantı testi başarılı olmalı. Bu SAP adımlarını kendi geliştirme yetkinizle siz yaparsınız.
+
+[SAP ERP kurulum adımları →](docs/tr/WALKTHROUGH.md#3-sap-erp-içindeki-kurulumu-yapın)
+
+## Üç bölüm hazırsa ilk denemeyi yapın
+
+Küçük bir ek içeren deneme e-postası gönderin. Önce `ZIMAP_INBOUND` ile **yalnız listeleme** yapın; sonra hazır örnekle normal işleme geçin. `ZIMAP_MONITOR` içinde sonucu ve eki, posta hesabında da iletinin seçtiğiniz hedef klasöre taşındığını kontrol edin.
+
+Hazır örnek bu temel akışı denetler. Fatura oluşturma, PDF'den tutar okuma veya eki bir siparişe bağlama gibi kendi iş adımlarınızı ayrıca eklersiniz.
+
+[İlk denemeyi adım adım yapın →](docs/tr/WALKTHROUGH.md#4-üç-bölümü-birlikte-deneyin)
+
+## Hangi rehberi açmalısınız?
+
+- [Kurulum rehberi](docs/tr/WALKTHROUGH.md): Üç bölümü sırayla hazırlayın ve ilk e-postayı işleyin.
+- [Sunucu ve posta yönetimini kendiniz yapacaksanız](docs/tr/SELF-MANAGED-SETUP.md): RDP/SSH, dosya aktarımı ve yönetim paneli adımları.
+- [Geliştirici rehberi](docs/tr/TECHNICAL-GUIDE.md): Kendi ABAP iş mantığınızı ekleyin.
+- [Teknik başvuru](docs/tr/TECHNICAL-REFERENCE.md): Ayrıntılı koşullar, yetkiler, sınırlar ve test durumu.
+
+**Güncel kaynak: 1.1.0.** Güncel sürümün gerçek SAP kurulum/çalışma kabul testleri henüz tamamlanmadı. [Doğrulama durumu](docs/tr/TECHNICAL-REFERENCE.md#neler-doğrulandı).
+
+[MIT lisansı](LICENSE) kapsamında kullanabilir, değiştirebilir ve paylaşabilirsiniz.

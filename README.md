@@ -2,64 +2,89 @@
 
 > **English** | [Türkçe](README.tr.md)
 
-An open-source project for collecting documents sent by email and tracking processing results inside SAP.
+Use this project to **view and read emails from a mail server in SAP, retrieve their attachments and process them**. Define the business action for those attachments in your own ABAP code.
 
-![Why email documents need collecting, viewing results in SAP, and a first trial with the supplied example](docs/assets/business-need-en.jpg)
+```mermaid
+flowchart TD
+    M["Emails and attachments<br/>on the mail server"]
+    S["SAP"]
+    R["View and read<br/>the emails"]
+    A["Process attachments<br/>with your ABAP code"]
+    M --> S
+    S --> R
+    S --> A
+```
 
-## What does it help with?
 
-Imagine suppliers sending invoices or delivery documents to a shared email address. Someone opens each message, downloads its attachments and prepares them for use in SAP. This project provides a starting point for automating the collection of those messages and attachments.
+Installation assumes **you can create, activate and run programs in SE38**. Start with a test SAP system and a dedicated test mailbox.
 
-- Retrieves messages and attachments from the mailbox you select.
-- Shows which messages were processed successfully and which encountered errors in SAP.
-- Moves successfully processed messages to a separate folder in the mailbox.
+## The big picture: three parts to prepare
 
-You can try this flow with the supplied example. Add business actions such as creating invoices, reading amounts from PDFs or attaching documents to purchase orders according to your needs.
+**Completing this project's installation requires preparation in three areas:**
 
-## Who is this guide for?
+1. **Mail server:** Prepare the account SAP will read and its connection permissions.
+2. **Machine running SAP:** Prepare the helper tools and project files that retrieve mail.
+3. **SAP ERP:** Install the ABAP programs, enter mailbox settings and run processing from SAP.
 
-This guide is for **SAP developers and people who can at least create, save, activate and run programs through SE38**. You need SAP development permissions for these steps. You will install the SAP programs, enter the mailbox settings and run the supplied example yourself.
+These are not three separate machines you need to install. The second area is the Windows/Linux side of the SAP server; the third is the work you do through SAP screens on that system. The mail service may be one you already use.
 
-Server and email administration may require separate permissions. If you administer your own system, you can prepare those parts too; otherwise, ask the teams that manage them.
+### Installation map
 
-| Preparation | If you have permission | If another team manages it |
-|---|---|---|
-| Machine running SAP | Connect through RDP/SSH and prepare the required tools and project files. | Ask Basis or the server administrator to prepare it. |
-| Email account | Check connection settings and access permissions in the provider panel. | Obtain the settings from the email administrator or provider support. |
+This map shows the preparation order. Each part is explained below.
 
-The [self-managed setup guide](docs/SELF-MANAGED-SETUP.md) explains server access and mailbox preparation.
+```mermaid
+flowchart TD
+    M["1. Mail server<br/>Account, access and folders"]
+    H["2. Machine running SAP<br/>Tools and project files"]
+    S["3. SAP ERP<br/>Programs, mailbox settings and first trial"]
+    M --> H --> S
+```
 
-## What should you know before starting?
+## 1. What do you prepare on the mail server?
 
-Use a **separate test mailbox** dedicated to the trial. Processing may mark messages as read and move them to another folder.
+Choose the email account SAP will connect to and the folder it will read. Even for your own account, **a correct email address and password may not be enough**. It must allow IMAP access, so another program can read its messages, and support the sign-in method implemented by this project.
 
-**Your email address and correct password may not be enough to connect.** The account must allow IMAP access: permission for another program to read the mailbox. Being able to sign in through Outlook or webmail does not prove this access is available. If you manage the account, check the provider's connection requirements; otherwise, ask its administrators to confirm them. Some accounts require sign-in methods this version does not support; see the separate guide for [detailed connection requirements](docs/TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
+The source defaults to the **inbox (`INBOX`)**. You can select another folder. For successful messages, select a different destination in the same account. `SAP-Processed` is an initial example name; you do not have to create a new folder with that name.
 
-### Where is mail read from, and where does it go?
+**This part is ready when:** You have the actual IMAP hostname, port, security type, login details and both folder names. Check these yourself if you administer the account; otherwise obtain them from the email administrator or provider support.
 
-- **Folder to read:** The default is the **inbox (`INBOX`)**. If you want to collect mail from a specific folder instead, enter that folder's name in the settings. For example, selecting an existing `Invoices` folder reads only the messages there.
-- **Processed folder:** Choose the mail folder for successfully processed messages in the settings. You can use an existing folder that is different from the source folder. `SAP-Processed` is just the initial example name; you do not need to create a new folder with that name.
+[Mail account preparation steps →](docs/WALKTHROUGH.md#1-prepare-the-mail-server)
 
-Both folders belong to **the same email account**. You do not need to create folders in SAP or on your computer's disk.
+## 2. What do you prepare on the machine running SAP?
 
-## How can you get started?
+The project uses **PowerShell** and **curl** to retrieve mail. PowerShell runs the project commands; curl connects to the mail server. Prepare these tools and the server files **on the Windows/Linux machine running SAP**. The computer where you open SAP GUI may be different.
 
-1. **[Open the walkthrough and download the files](docs/WALKTHROUGH.md).** Prepare the server and mailbox yourself where you have permission, or ask the responsible teams.
-2. **Install the SAP programs.** Create, activate and run the installer in SE38. Then save the mailbox settings and test the connection.
-3. **Try the supplied example.** Send a test email with a small attachment and check the result, attachment and destination folder.
-4. **Add your business action.** For example, agree with the process owner which purchase order a document belongs to, then implement it using the [developer guide's examples](docs/TECHNICAL-GUIDE.md).
+Suitable tools do not need reinstalling. The project's server setup also prepares a protected working folder for messages and attachments.
 
-## Further reading
+**This part is ready when:** The server test passes and you know the SAP host and full working-folder path. With administration permissions, you can connect through RDP/SSH and prepare it yourself; otherwise ask Basis or the server administrator.
 
-| What you need | Guide |
-|---|---|
-| Installation and first use | [Step-by-step walkthrough](docs/WALKTHROUGH.md) |
-| Preparing your own test system without separate Basis/email teams | [Self-managed setup guide](docs/SELF-MANAGED-SETUP.md) |
-| Connection requirements, permissions, technical limits and test status | [Technical reference](docs/TECHNICAL-REFERENCE.md) |
-| Code examples for adding your business action | [Developer guide](docs/TECHNICAL-GUIDE.md) |
+[Host preparation steps →](docs/WALKTHROUGH.md#2-prepare-the-machine-running-sap)
 
-**Current source version: 1.1.0.** Installation and runtime tests for this version on an actual SAP system are still pending. Evaluate it in a test system first; the technical reference describes [what has been tested](docs/TECHNICAL-REFERENCE.md#what-has-been-verified).
+## 3. What do you do inside SAP ERP?
 
-## License
+Create, activate and run `ZIMAP_INSTALL` in SE38. It creates the SAP programs and tables the project needs.
 
-[MIT](LICENSE) — you may use, modify and share the project under the license terms.
+Then enter the mailbox details prepared in the first part into `ZIMAP_CONFIG`. We call this saved set of settings a **profile**. The SAP installation also uses the host and folder prepared in the second part.
+
+**This part is ready when:** The SAP installation checks and mailbox connection test pass. You perform these SAP steps with your own development permissions.
+
+[SAP ERP installation steps →](docs/WALKTHROUGH.md#3-install-the-programs-in-sap-erp)
+
+## Once all three parts are ready, try them together
+
+Send a test email with a small attachment. Run `ZIMAP_INBOUND` with **List only** first, then process it normally with the supplied example. Check the result and attachment in `ZIMAP_MONITOR`, and confirm the message moved to the destination folder in the mailbox.
+
+The example checks this basic flow. Add business actions such as invoice creation, reading PDF amounts or attaching documents to purchase orders separately.
+
+[Follow the first trial step by step →](docs/WALKTHROUGH.md#4-test-the-three-parts-together)
+
+## Which guide should you open?
+
+- [Walkthrough](docs/WALKTHROUGH.md): Prepare the three parts in order and process the first email.
+- [Self-managed host and mailbox preparation](docs/SELF-MANAGED-SETUP.md): RDP/SSH, file transfer and administration panels.
+- [Developer guide](docs/TECHNICAL-GUIDE.md): Add your ABAP business logic.
+- [Technical reference](docs/TECHNICAL-REFERENCE.md): Detailed requirements, permissions, limits and verification status.
+
+**Current sources: 1.1.0.** Actual SAP installation/runtime acceptance tests for this version are still pending. [Verification status](docs/TECHNICAL-REFERENCE.md#what-has-been-verified).
+
+You may use, modify and share the project under the [MIT license](LICENSE).
