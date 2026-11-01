@@ -31,7 +31,7 @@ Kurulumda **SAP sistem yönetimi ekibinin (Basis)** ve **e-posta yöneticinizin*
 ### E-postalar nereden okunur, nereye taşınır?
 
 - **Okunacak klasör:** Varsayılan olarak **Gelen Kutusu (`INBOX`)** okunur. Yalnız belirli bir klasördeki e-postaların alınmasını istiyorsanız, ayarlarda o klasörün adını belirtebilirsiniz. Örneğin posta kutunuzdaki `Faturalar` klasörünü seçerseniz yalnız oradaki iletiler okunur.
-- **İşlenmiş klasörü:** Başarıyla işlenen e-postaların taşınacağı posta klasörünü ayarlarda siz seçersiniz. Mevcut bir klasörünüzü kullanabilirsiniz. `SAP-Processed` yalnızca başlangıçta gösterilen örnek addır; bu adla yeni bir klasör açmanız gerekmez.
+- **İşlenmiş klasörü:** Başarıyla işlenen e-postaların taşınacağı posta klasörünü ayarlarda siz seçersiniz. Okunacak klasörden farklı, mevcut bir klasörünüzü kullanabilirsiniz. `SAP-Processed` yalnızca başlangıçta gösterilen örnek addır; bu adla yeni bir klasör açmanız gerekmez.
 
 Her iki klasör de **aynı e-posta hesabının içinde** bulunur. SAP'de veya bilgisayarınızın diskinde klasör açmanız gerekmez.
 
@@ -46,6 +46,7 @@ Her iki klasör de **aynı e-posta hesabının içinde** bulunur. SAP'de veya bi
 | Aradığınız bilgi | Rehber |
 |---|---|
 | Kurulum ve ilk kullanım | [Adım adım rehber](docs/tr/WALKTHROUGH.md) |
+| Ayrı Basis/e-posta ekibi olmadan kendi deneme sisteminizi hazırlamak | [Kendi sistemini yönetenler için rehber](docs/tr/SELF-MANAGED-SETUP.md) |
 | Bağlantı koşulları, yetkiler, teknik sınırlar ve test durumu | [Teknik başvuru rehberi](docs/tr/TECHNICAL-REFERENCE.md) |
 | Kendi iş adımınızı eklemek için kod örnekleri | [Geliştirici rehberi](docs/tr/TECHNICAL-GUIDE.md) |
 

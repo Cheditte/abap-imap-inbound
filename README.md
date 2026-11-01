@@ -31,7 +31,7 @@ Use a **separate test mailbox** dedicated to the trial. Processing may mark mess
 ### Where is mail read from, and where does it go?
 
 - **Folder to read:** The default is the **inbox (`INBOX`)**. If you want to collect mail from a specific folder instead, enter that folder's name in the settings. For example, selecting an existing `Invoices` folder reads only the messages there.
-- **Processed folder:** Choose the mail folder for successfully processed messages in the settings. You can use an existing folder. `SAP-Processed` is just the initial example name; you do not need to create a new folder with that name.
+- **Processed folder:** Choose the mail folder for successfully processed messages in the settings. You can use an existing folder that is different from the source folder. `SAP-Processed` is just the initial example name; you do not need to create a new folder with that name.
 
 Both folders belong to **the same email account**. You do not need to create folders in SAP or on your computer's disk.
 
@@ -46,6 +46,7 @@ Both folders belong to **the same email account**. You do not need to create fol
 | What you need | Guide |
 |---|---|
 | Installation and first use | [Step-by-step walkthrough](docs/WALKTHROUGH.md) |
+| Preparing your own test system without separate Basis/email teams | [Self-managed setup guide](docs/SELF-MANAGED-SETUP.md) |
 | Connection requirements, permissions, technical limits and test status | [Technical reference](docs/TECHNICAL-REFERENCE.md) |
 | Code examples for adding your business action | [Developer guide](docs/TECHNICAL-GUIDE.md) |
 

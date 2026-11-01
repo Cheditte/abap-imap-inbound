@@ -6,6 +6,8 @@ By the end of this guide, you will be able to view a test email and its attachme
 
 A functional consultant or process owner can coordinate setup. **Basis** (SAP system administration) helps prepare the server, your **email administrator** prepares the account, and an **ABAP developer** helps install the SAP programs.
 
+**If you do not have these teams:** You can do the relevant preparation yourself when you administer your own test system. You may need to connect to the machine running SAP through **Remote Desktop (RDP)** on Windows or **SSH** on Linux. For the email account, you may use your provider's administration panel. You need access and management permissions for the relevant server or account. The [self-managed setup guide](SELF-MANAGED-SETUP.md) explains which route to follow.
+
 **Start with a test SAP system and a test mailbox.** Processing may mark messages as read and move them to another folder. The supplied example does not create invoices or purchase orders.
 
 This guide covers the 1.1.0 sources. Installation and runtime tests for this version on an actual SAP system are still pending. Images show the earlier 1.0 demonstration, so screens may differ. [Test status](TECHNICAL-REFERENCE.md#what-has-been-verified).
@@ -31,6 +33,8 @@ Share the same package with Basis and the developer. Keep the folder structure a
 
 Obtain the server name, port, security type and login details from your email administrator. **An email address and correct password may not be enough.** The account must allow another program to read it through **IMAP access**. Have the email team confirm that the account can connect with this project. [Detailed connection requirements](TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
 
+If you do not have an email team, obtain these settings from your account's provider panel or provider support. Being able to open your mailbox does not mean you can change mail-server settings. [Preparing the account yourself](SELF-MANAGED-SETUP.md).
+
 The default source is the **inbox (`INBOX`)**. You can select a different folder if you only want messages from there. For processed messages, you can use an existing folder in the same email account. The initial `SAP-Processed` value is an example; you do not have to create a new folder with that name. Confirm the actual folder names with the email team.
 
 ## 1. Prepare the server (Basis)
@@ -47,6 +51,8 @@ The default source is the **inbox (`INBOX`)**. You can select a different folder
 Suitable PowerShell and curl installations do not need to be installed again. Basis installs anything missing using your organization's process, then runs the server setup included in the project. The Windows and Linux commands are in [server setup for Basis](TECHNICAL-REFERENCE.md#server-setup-commands-and-checks).
 
 Basis also checks that **the machine running SAP can connect to the mail server**. Accessing the account from your own computer does not replace this check.
+
+Without a Basis team, you can perform this step on your own test server if you have administration permissions. The [separate guide](SELF-MANAGED-SETUP.md) explains how to connect, transfer the files and choose the terminal in which to run the commands.
 
 **When can you continue?** Once Basis confirms that the server test passes. Obtain the SAP server to use and the **full path** of the prepared working folder. We will use that same server and folder in the following steps.
 
@@ -98,7 +104,7 @@ Open **`ZIMAP_CONFIG`** in SE38 and run it with **F8**. Use a SAP session connec
 | Server, port and security | Actual values from your email team. Do not enter your email address in the server field. Keep certificate verification enabled. |
 | Username and password | Login details confirmed by the email team. Password source `S` means entering the password in SAP; `O` means Basis saves it on the server. Agree the method with Basis. |
 | Folder to read | The default `INBOX` reads the inbox. For another folder, enter its actual name/path. |
-| Processed folder | Actual name/path of the folder you select in the same email account for successful messages. The name `SAP-Processed` is not required. |
+| Processed folder | Actual name/path of the folder you select in the same email account for successful messages; choose a different folder from the source. The name `SAP-Processed` is not required. |
 | Move method | Select `MOVE` for the first trial. |
 | Handler program | Leave **`ZIMAP_HANDLER_DEMO`** selected. This is the supplied example program that runs for each message. |
 

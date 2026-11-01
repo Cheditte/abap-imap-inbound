@@ -6,6 +6,8 @@ Bu rehberin sonunda bir deneme e-postasını ve ekini SAP içinden görebileceks
 
 Bir modül danışmanı veya süreç sorumlusu kurulumu koordine edebilir. **Basis** (SAP sistem yönetimi) sunucu hazırlığında, **e-posta yöneticisi** posta hesabında, **ABAP geliştiricisi** SAP programlarının kurulmasında yardımcı olur.
 
+**Bu ekipler yoksa:** Kendi deneme sisteminizi yönetiyorsanız ilgili hazırlıkları siz de yapabilirsiniz. SAP'nin çalıştığı makineye Windows'ta **Uzak Masaüstü (RDP)**, Linux'ta **SSH** ile bağlanmanız gerekebilir. Posta hesabı için de sağlayıcınızın yönetim panelini kullanabilirsiniz. Bunun için ilgili sunucuya veya hesaba erişim ve yönetim yetkiniz olmalı. [Ekip desteği olmadan kurulum rehberi](SELF-MANAGED-SETUP.md), hangi durumda hangi yolu izleyeceğinizi anlatır.
+
 **Önce bir deneme SAP sistemi ve deneme posta kutusu kullanın.** İşlem sırasında e-postalar okundu işaretlenebilir ve başka klasöre taşınabilir. Hazır örnek fatura veya sipariş oluşturmaz.
 
 Bu rehber 1.1.0 kaynakları içindir. Bu sürümün gerçek SAP sistemindeki kurulum ve çalışma testleri henüz tamamlanmadı. Görseller önceki 1.0 demosundandır; ekranlarda farklılık olabilir. [Test durumu](TECHNICAL-REFERENCE.md#neler-doğrulandı).
@@ -31,6 +33,8 @@ Aynı paketi Basis ve geliştiriciyle paylaşın. Klasör yapısını koruyun; f
 
 E-posta yöneticinizden sunucu adını, bağlantı portunu, güvenlik türünü ve giriş bilgilerini alın. **Doğru e-posta adresi ve parola tek başına yeterli olmayabilir.** Başka bir programın kutuyu okumasına, yani **IMAP erişimine**, izin verilmelidir. Posta ekibi hesabın bu projeyle bağlantı kurmaya uygun olduğunu doğrulasın. [Ayrıntılı bağlantı koşulları](TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu).
 
+E-posta ekibiniz yoksa bu bilgileri, yönettiğiniz hesabın sağlayıcı panelinden veya sağlayıcının desteğinden alın. Yalnız kendi posta kutunuzu açabiliyor olmanız, posta sunucusunun ayarlarını değiştirebildiğiniz anlamına gelmez. [Posta hesabını kendiniz hazırlama](SELF-MANAGED-SETUP.md).
+
 Varsayılan olarak **Gelen Kutusu (`INBOX`)** okunur. Yalnız belirli bir klasördeki iletileri almak isterseniz o klasörü seçebilirsiniz. İşlenen iletiler için de aynı posta hesabındaki mevcut bir klasörü kullanabilirsiniz. `SAP-Processed` başlangıç adıdır; bu adla yeni klasör açmak zorunda değilsiniz. Seçtiğiniz klasörlerin gerçek adlarını posta ekibinden doğrulayın.
 
 ## 1. Sunucuyu hazırlayın (Basis)
@@ -47,6 +51,8 @@ Varsayılan olarak **Gelen Kutusu (`INBOX`)** okunur. Yalnız belirli bir klasö
 PowerShell veya curl zaten uygunsa tekrar kurulmaz. Basis eksikleri kurumunuzun kurulum yöntemiyle tamamlar; ardından paketteki sunucu kurulumunu çalıştırır. Kullanılacak Windows/Linux komutları [Basis için sunucu kurulum bölümündedir](TECHNICAL-REFERENCE.md#sunucu-kurulumu-komutlar-ve-kontroller).
 
 Basis ayrıca **SAP'nin çalıştığı makineden posta sunucusuna bağlantı kurulabildiğini** kontrol eder. Kendi bilgisayarınızdan posta hesabına erişmeniz bu kontrolün yerini tutmaz.
+
+Basis ekibiniz yoksa bu adımı, yönetim yetkiniz bulunan kendi deneme sunucunuzda siz uygulayabilirsiniz. Sunucuya nasıl bağlanacağınız, dosyaları nereye aktaracağınız ve komutları nerede çalıştıracağınız [ayrı rehberde](SELF-MANAGED-SETUP.md) açıklanıyor.
 
 **Ne zaman devam edebilirsiniz?** Basis sunucu testinin başarılı olduğunu doğruladığında. Basis'ten kullanılacak SAP sunucusunu ve hazırlanan çalışma klasörünün **tam yolunu** alın. Sonraki adımlarda aynı sunucuyu ve klasörü kullanacağız.
 
@@ -98,7 +104,7 @@ SE38'de **`ZIMAP_CONFIG`** açıp **F8** ile çalıştırın. Basis'in hazırlad
 | Sunucu, port ve güvenlik | E-posta ekibinizin verdiği gerçek bilgiler. Sunucu alanına e-posta adresinizi yazmayın. Sertifika doğrulaması açık kalsın. |
 | Kullanıcı ve parola | E-posta ekibinizin doğruladığı bilgiler. Parola kaynağı `S` ise parolayı SAP ekranından girersiniz; `O` ise Basis sunucuda kaydeder. Yöntemi Basis ile belirleyin. |
 | Okunacak klasör | Varsayılan `INBOX`, Gelen Kutusu'nu okur. Başka klasör için onun gerçek adını/yolunu girin. |
-| İşlenmiş klasörü | Başarılı iletilerin taşınacağı, aynı posta hesabındaki seçtiğiniz klasörün gerçek adı/yolu. `SAP-Processed` adı zorunlu değildir. |
+| İşlenmiş klasörü | Başarılı iletilerin taşınacağı, aynı posta hesabındaki, okunacak klasörden farklı seçtiğiniz klasörün gerçek adı/yolu. `SAP-Processed` adı zorunlu değildir. |
 | Taşıma yöntemi | İlk denemede `MOVE` seçin. |
 | Handler programı | **`ZIMAP_HANDLER_DEMO`** kalsın. Bu, her e-posta için çalışacak hazır örnek programdır. |
 
