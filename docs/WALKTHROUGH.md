@@ -2,19 +2,13 @@
 
 > **English** | [Türkçe](tr/WALKTHROUGH.md) · [Overview](../README.md) · [Technical details](TECHNICAL-REFERENCE.md)
 
-We will connect a mail account, the machine running SAP and the programs inside SAP ERP. At the end, we will use the supplied example to view a test email and attachment in SAP.
+Use this guide to set up email and attachment retrieval from your mail server into SAP. Start with the three preparation areas, complete each in order, then open a test email in SAP.
 
 ## Start with the whole picture
 
 Installation needs **three prepared parts**:
 
-```mermaid
-flowchart TD
-    M["1. Mail server<br/>Account, access and folders"]
-    H["2. Machine running SAP<br/>Tools and project files"]
-    S["3. SAP ERP<br/>Programs, mailbox settings and first trial"]
-    M --> H --> S
-```
+![Three-part setup: mail server, SAP host and SAP ERP](assets/diagrams/setup-en.svg)
 
 This does not mean installing three separate machines. **Part 2** is Windows/Linux preparation on the SAP host; **part 3** is the work done through SAP GUI. The mail service may already exist.
 
@@ -46,11 +40,15 @@ If you do not have an email team, obtain these settings from your account's prov
 
 The default source is the **inbox (`INBOX`)**. You can select a different folder if you only want messages from there. For processed messages, you can use an existing folder in the same email account. The initial `SAP-Processed` value is an example; you do not have to create a new folder with that name. Confirm the actual folder names with the email team.
 
+![Message path from the source folder through SAP processing to a different destination](assets/diagrams/mail-flow-en.svg)
+
 **Output from this part:** Actual IMAP hostname, port, security type, login details, source folder and a different destination folder. Keep passwords out of tickets and screenshots.
 
 ## 2. Prepare the machine running SAP
 
 **What are we doing?** Preparing the tools and project files that retrieve email on the Windows or Linux machine running SAP. This is usually done once at initial setup.
+
+![Prepare the tools, project files and protected working folder on the SAP machine](assets/diagrams/host-prep-en.svg)
 
 | Component to prepare | What is it for? |
 |---|---|
@@ -70,6 +68,8 @@ Without a Basis team, you can perform this step on your own test server if you h
 ## 3. Install the programs in SAP ERP
 
 The mailbox settings and host preparation are ready. Now use SAP GUI to install the programs and enter the information from those two parts. There are three steps here: create the installer, run it and save a mailbox profile.
+
+![SAP ERP setup: create the program, run installation and configure the mailbox](assets/diagrams/sap-steps-en.svg)
 
 ### 3.1. Create the installer program
 

@@ -2,19 +2,13 @@
 
 > [English](../WALKTHROUGH.md) | **Türkçe** · [Genel bakış](../../README.tr.md) · [Teknik ayrıntılar](TECHNICAL-REFERENCE.md)
 
-Bu kurulumda bir posta hesabını, SAP'nin çalıştığı makineyi ve SAP ERP içindeki programları birbirine bağlayacağız. Sonunda hazır örnekle bir deneme e-postasını ve ekini SAP'de göreceğiz.
+Bu rehberle, posta sunucusundaki e-postaları ve eklerini SAP'ye alacak kurulumu yapacaksınız. Önce üç hazırlık alanını göreceğiz; sonra her birini sırayla tamamlayıp bir deneme e-postasını SAP'de açacağız.
 
 ## Önce bütün resmi görün
 
 Kurulumun tamamlanması için **üç bölüm** hazır olmalı:
 
-```mermaid
-flowchart TD
-    M["1. Posta sunucusu<br/>Hesap, erişim ve klasörler"]
-    H["2. SAP'nin kurulu olduğu makine<br/>Araçlar ve proje dosyaları"]
-    S["3. SAP ERP<br/>Programlar, posta ayarları ve ilk deneme"]
-    M --> H --> S
-```
+![Üç parçalı kurulum: posta sunucusu, SAP makinesi ve SAP ERP](../assets/diagrams/setup-tr.svg)
 
 Bu üç ayrı makine kurmak anlamına gelmez. **2. bölüm**, SAP sunucusundaki Windows/Linux hazırlığı; **3. bölüm**, SAP GUI içinden yaptığınız program ve ayar işlemleridir. Posta hizmetiniz zaten mevcut olabilir.
 
@@ -46,11 +40,15 @@ E-posta ekibiniz yoksa bu bilgileri, yönettiğiniz hesabın sağlayıcı paneli
 
 Varsayılan olarak **Gelen Kutusu (`INBOX`)** okunur. Yalnız belirli bir klasördeki iletileri almak isterseniz o klasörü seçebilirsiniz. İşlenen iletiler için de aynı posta hesabındaki mevcut bir klasörü kullanabilirsiniz. `SAP-Processed` başlangıç adıdır; bu adla yeni klasör açmak zorunda değilsiniz. Seçtiğiniz klasörlerin gerçek adlarını posta ekibinden doğrulayın.
 
+![Okunacak klasörden SAP işlemeye ve farklı hedef klasöre giden ileti yolu](../assets/diagrams/mail-flow-tr.svg)
+
 **Bu bölümün çıktısı:** Posta sunucusu adı, port, güvenlik türü, giriş bilgileri, okunacak klasör ve ondan farklı hedef klasörün gerçek adları. Parolayı destek kaydına veya ekran görüntüsüne koymayın.
 
 ## 2. SAP'nin kurulu olduğu makineyi hazırlayın
 
 **Ne yapıyoruz?** SAP'nin kurulu olduğu Windows veya Linux makinede e-postaları alacak araçları ve proje dosyalarını hazırlıyoruz. Bu, genellikle ilk kurulumda bir kez yapılır.
+
+![SAP makinesinde hazırlanacaklar: araçlar, proje dosyaları ve korumalı klasör](../assets/diagrams/host-prep-tr.svg)
 
 | Hazırlanacak parça | Ne işe yarar? |
 |---|---|
@@ -70,6 +68,8 @@ Basis ekibiniz yoksa bu adımı, yönetim yetkiniz bulunan kendi deneme sunucunu
 ## 3. SAP ERP içindeki kurulumu yapın
 
 Posta bilgileri ve sunucu hazırlığı tamamlandı. Şimdi SAP GUI içinde programları kuracak ve bu iki bölümden gelen bilgileri SAP'ye tanıtacağız. Bu bölümde üç işlem var: kurulum programını oluşturma, çalıştırma ve posta profilini kaydetme.
+
+![SAP ERP kurulum sırası: programı oluşturun, kurulumu çalıştırın ve postayı tanımlayın](../assets/diagrams/sap-steps-tr.svg)
 
 ### 3.1. Kurulum programını oluşturun
 

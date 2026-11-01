@@ -4,16 +4,7 @@
 
 Use this project to **view and read emails from a mail server in SAP, retrieve their attachments and process them**. Define the business action for those attachments in your own ABAP code.
 
-```mermaid
-flowchart TD
-    M["Emails and attachments<br/>on the mail server"]
-    S["SAP"]
-    R["View and read<br/>the emails"]
-    A["Process attachments<br/>with your ABAP code"]
-    M --> S
-    S --> R
-    S --> A
-```
+![Read emails in SAP and process attachments with ABAP](docs/assets/diagrams/usage-en.svg)
 
 
 Installation assumes **you can create, activate and run programs in SE38**. Start with a test SAP system and a dedicated test mailbox.
@@ -32,13 +23,7 @@ These are not three separate machines you need to install. The second area is th
 
 This map shows the preparation order. Each part is explained below.
 
-```mermaid
-flowchart TD
-    M["1. Mail server<br/>Account, access and folders"]
-    H["2. Machine running SAP<br/>Tools and project files"]
-    S["3. SAP ERP<br/>Programs, mailbox settings and first trial"]
-    M --> H --> S
-```
+![Installation order: mail server, machine running SAP, SAP ERP](docs/assets/diagrams/setup-en.svg)
 
 ## 1. What do you prepare on the mail server?
 

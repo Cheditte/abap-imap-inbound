@@ -4,16 +4,7 @@
 
 Bir posta sunucusundaki e-postaları **SAP'de görmek ve okumak, eklerini almak ve işlemek** istiyorsanız bu projeyi kullanabilirsiniz. Eklerle yapılacak iş adımını kendi ABAP kodunuzla tanımlarsınız.
 
-```mermaid
-flowchart TD
-    M["Posta sunucusundaki<br/>e-postalar ve ekler"]
-    S["SAP"]
-    R["E-postaları görün<br/>ve okuyun"]
-    A["Ekleri kendi ABAP<br/>kodunuzla işleyin"]
-    M --> S
-    S --> R
-    S --> A
-```
+![Posta sunucusundan SAP'ye: e-postaları görün ve okuyun, ekleri ABAP kodunuzla işleyin](docs/assets/diagrams/usage-tr.svg)
 
 
 Kurulumu yapacak kişinin **SE38'de program oluşturabildiği, etkinleştirebildiği ve çalıştırabildiği** varsayılır. Önce bir deneme SAP sistemi ve deneme posta kutusuyla başlayın.
@@ -32,13 +23,7 @@ Bunlar üç ayrı makine kurmanız gerektiği anlamına gelmez. İkinci bölüm 
 
 Aşağıdaki harita hazırlık sırasını gösterir. Her bölümün ayrıntısı hemen altında açıklanıyor.
 
-```mermaid
-flowchart TD
-    M["1. Posta sunucusu<br/>Hesap, erişim ve klasörler"]
-    H["2. SAP'nin kurulu olduğu makine<br/>Araçlar ve proje dosyaları"]
-    S["3. SAP ERP<br/>Programlar, posta ayarları ve ilk deneme"]
-    M --> H --> S
-```
+![Kurulum sırası: posta sunucusu, SAP'nin kurulu olduğu makine, SAP ERP](docs/assets/diagrams/setup-tr.svg)
 
 ## 1. Posta sunucusunda ne yapacaksınız?
 
