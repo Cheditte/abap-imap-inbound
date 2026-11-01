@@ -22,7 +22,7 @@ Göndericiler adrese doğrudan yazabilir; ya da mail sunucusundaki bir yönlendi
 | **Kullanıcı adı ve şifreyle giriş** | Bu sürüm OAuth'u desteklemez. Kullanıcı adı genelde mail adresi ya da sunucunun beklediği giriş adıdır. |
 | **ASCII şifre** | Harf, rakam ve yaygın semboller. ASCII dışı karakterler (örneğin `ş`, `ä`) IMAP `LOGIN` komutunda standart değildir ve girişin başarısız olmasına yol açabilir. |
 | **Şifre politikası** | Ya süresiz geçerli olmalı ya da süresi dolmadan önce `ZIMAP_CONFIG` içinde güncellenmesi için kararlaştırılmış bir düzen olmalı. Süresi dolan şifre, işlemeyi `AUTH` hatasıyla durdurur. |
-| **İki klasör** | Okunacak klasör (genelde `INBOX`) ve işlenenler klasörü (varsayılan adı `SAP-Processed`). **İşlenenler klasörünü** posta kutusunda oluşturun; bağlantı testi bu klasörün var olup olmadığına bakar. |
+| **İki klasör** | Okunacak klasör (varsayılan `INBOX`) ve işlenen iletilerin taşınacağı mevcut posta klasörü. `SAP-Processed` yalnız başlangıç adıdır; seçtiğiniz klasörün gerçek adını girin. Bağlantı testi seçilen klasörün varlığına bakar. |
 | **Haklar** | Mail okuma, bayrak (flag) koyma, maili işlenenler klasörüne taşıma ya da kopyalama, gelen kutusundan silme. Normal bir sahip girişi bunların hepsine sahiptir. |
 | **Boyut sınırı** | Beklediğiniz en büyük eki düşünün. Profillerin kendi azami mail boyutu da vardır (varsayılan 20 MB). |
 
@@ -37,11 +37,11 @@ Bunu mail ekibine gönderebilirsiniz:
 > - Adres: `invoices@example.com` (ortak / işlevsel posta kutusu, kişisel değil)
 > - Erişim: TLS üzerinden IMAP (IMAPS 993 ya da STARTTLS 143), kullanıcı adı ve şifreyle giriş
 > - Şifre: yalnızca ASCII karakterler; süresiz geçerli olsun ya da son kullanma tarihini önceden bildirin
-> - Klasörler: `INBOX` ve yeni bir `SAP-Processed` klasörü
+> - Klasörler: okunacak klasör (varsayılan `INBOX`) ve işlenen iletiler için seçeceğimiz mevcut posta klasörü
 > - Erişim kaynağı: SAP'nin kurulu olduğu makine(ler) `<sunucu adları / IP adresleri>`
 > - Lütfen bize bildirin: sunucu adı, port, giriş adı biçimi ve sunucu sertifikasını hangi CA'nın imzaladığı
 >
-> SAP birkaç dakikada bir yeni mailleri okur, işler ve `SAP-Processed` klasörüne taşır. Bu posta kutusundan hiçbir şey gönderilmez.
+> SAP birkaç dakikada bir yeni mailleri okur, işler ve ayarlarda seçilen posta klasörüne taşır. Bu posta kutusundan hiçbir şey gönderilmez.
 
 ## 4. Yaygın sunucular için notlar
 

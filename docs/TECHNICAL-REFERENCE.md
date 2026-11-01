@@ -41,20 +41,13 @@ Use **a separate test mailbox dedicated to this trial** first. Normal processing
 
 Numbers and names above are examples. Use the real settings for your account; ask the responsible team instead of guessing an unknown value.
 
-### Where do you create `SAP-Processed`?
+### How do you choose a processed folder?
 
-Create it **inside the email mailbox that SAP will read**, as a **mail folder** like the inbox. It is not a folder to create in SAP or on the server's disk.
+Choose the destination for successfully processed messages in the SAP profile's **Processed folder** field. You can use an existing folder in the same mailbox. `SAP-Processed` is only the initial value; you do not need to create a new folder with that name.
 
-For example, your test mailbox could contain:
+Enter the selected folder's actual IMAP name/path. It must exist on the mail server; a local Outlook archive or disk folder cannot be used. If you prefer a new folder, ask your email administrator to prepare it.
 
-```text
-INBOX          → Messages to read (inbox)
-SAP-Processed  → Destination for successfully processed messages
-```
-
-Ask your email administrator to create it, or use webmail if you have permission. If you create it in Outlook, it must belong to the account that synchronizes with the mail server; a local archive folder on your computer cannot be used.
-
-`SAP-Processed` is a suggested name. If you choose another name, enter that folder's actual IMAP name/path in the SAP profile's **Processed folder** field. Create the folder first. This project accepts English letters, digits and `. _ / -` in folder names, with no spaces or non-ASCII characters.
+Folder names accept English letters, digits and `. _ / -`, with no spaces or non-ASCII characters.
 
 ## Installation: what order should you follow?
 

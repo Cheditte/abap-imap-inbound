@@ -41,7 +41,7 @@ Open the [GitHub repository](https://github.com/Cheditte/abap-imap-inbound), cho
 
 ### A request you can send to the mail team
 
-> Please provide a dedicated test mailbox for SAP IMAP processing, its login name, IMAP hostname, port and encryption mode. It must allow username/password authentication and UID MOVE. Please create a mail folder named SAP-Processed inside this mailbox, like its inbox, rather than on the server disk or in a local Outlook archive. Confirm that IMAP access and a username/password sign-in method compatible with this project are allowed. Share the password through our approved secret-sharing method. For an internal certificate authority, please give Basis the required CA certificates. SAP will read incoming messages and move successfully handled messages to SAP-Processed.
+> Please provide a dedicated test mailbox for SAP IMAP processing, its login name, IMAP hostname, port and encryption mode. It must allow username/password authentication and UID MOVE. Confirm that IMAP access and a username/password sign-in method compatible with this project are allowed. Share the password through our approved secret-sharing method. For an internal certificate authority, please give Basis the required CA certificates. SAP will read incoming messages and move successfully handled messages to an existing mail folder we select in the settings.
 
 | Setting | Example | What it means |
 |---|---|---|
@@ -49,9 +49,9 @@ Open the [GitHub repository](https://github.com/Cheditte/abap-imap-inbound), cho
 | Port / security | `993` / `IMAPS` | Encryption from the start. Port `143` with `STARTTLS` is another supported option. |
 | User | `invoices@example.com` | Login name from the mail team; it may differ from the visible email address. |
 | Source folder | `INBOX` | Where incoming messages arrive. |
-| Processed folder | `SAP-Processed` | Where successful messages will be moved. Create it first. |
+| Processed folder | An existing mail folder you select | Destination for successful messages; enter its name in the settings. |
 
-**Hostnames, users and ports in this table illustrate the format; do not copy them as your installation settings.** Obtain actual values from the mail team. `SAP-Processed` is a suggested folder name. If you choose another name, create that folder first and use the same name in the SAP profile.
+**Hostnames, users and ports in this table illustrate the format; do not copy them as your installation settings.** Obtain actual values from the mail team. `SAP-Processed` is only the initial value; you do not have to create a new folder with that name. Select an existing mail folder and enter its actual name in the SAP profile.
 
 OAuth is not implemented. **UID MOVE** is required; the `COPY` fallback is disabled. Folder names accept ASCII letters, digits and `. _ / -`, without spaces. Prefer ASCII passwords for older mail-server interoperability. Keep passwords out of tickets and screenshots.
 
@@ -234,7 +234,7 @@ Choose a profile name (for example, **`INVOICE`**) and enter the values from the
 | User | Your actual mailbox login | Enter the login supplied by the mail team, not the example email address. |
 | Credential source | `S` or `O` | `S`: enter the password in SAP. `O`: Basis saves it on the server. |
 | Folder to read | Default `INBOX` | Reads the inbox. To read another folder in the same mailbox, enter its actual IMAP name/path; only the selected folder is read. |
-| Processed folder | Suggested name `SAP-Processed` | Destination for successfully processed messages. Create it in the same mailbox first; if you choose another name, enter it here. |
+| Processed folder | Name of the mail folder you select | You can use an existing folder. Replace the initial `SAP-Processed` value with its actual IMAP name/path. |
 | Move mode | `MOVE` | Requires UID MOVE support. |
 | Handler program | `ZIMAP_HANDLER_DEMO` | Supplied demonstration; no business document creation. |
 | Maximum mails | `50` | Example upper limit per run. |

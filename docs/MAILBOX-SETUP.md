@@ -22,7 +22,7 @@ Senders can write to the address directly, or a forwarding / transport rule on t
 | **Login with user name and password** | This version does not support OAuth. The user name is usually the mail address or the login name the server expects. |
 | **ASCII password** | Letters, digits and common symbols. Non-ASCII characters (for example `ş`, `ä`) are not standard in the IMAP `LOGIN` command and may fail. |
 | **Password policy** | Either no expiry, or an agreed routine to update it in `ZIMAP_CONFIG` before it expires. An expired password stops processing with an `AUTH` error. |
-| **Two folders** | The folder to read (usually `INBOX`) and the processed folder (default name `SAP-Processed`). **Create the processed folder** in the mailbox; the connection test checks that it exists. |
+| **Two folders** | The folder to read (default `INBOX`) and an existing mail folder for processed messages. `SAP-Processed` is only the initial name; enter the actual name of the folder you select. The connection test checks that the selected folder exists. |
 | **Rights** | Read mail, set flags, move or copy mail into the processed folder, delete from the inbox. A normal owner login has all of these. |
 | **Size limit** | Consider the largest attachment you expect. Profiles also have their own maximum mail size (default 20 MB). |
 
@@ -37,11 +37,11 @@ You can send this to the mail team:
 > - Address: `invoices@example.com` (shared/functional mailbox, not a personal one)
 > - Access: IMAP over TLS (IMAPS 993, or STARTTLS 143), login with user name and password
 > - Password: ASCII characters only; no expiry, or tell us the expiry date in advance
-> - Folders: `INBOX` and a new folder `SAP-Processed`
+> - Folders: the folder to read (default `INBOX`) and an existing mail folder we select for processed messages
 > - Access from: the machine(s) SAP is installed on `<host names / IP addresses>`
 > - Please tell us: server name, port, login name format, and which CA signed the server certificate
 >
-> SAP reads new mail every few minutes, processes it and moves it to `SAP-Processed`. Nothing is sent from this mailbox.
+> SAP reads new mail every few minutes, processes it and moves it to the mail folder selected in the settings. Nothing is sent from this mailbox.
 
 ## 4. Notes for common servers
 

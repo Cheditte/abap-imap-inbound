@@ -41,7 +41,7 @@ Bir geliştirme veya deneme SAP sistemi ve **yalnız bu deneme için ayrılmış
 
 ### E-posta ekibine gönderebileceğiniz talep
 
-> SAP'nin IMAP üzerinden okuyacağı ayrı bir deneme posta kutusu rica ediyoruz. Giriş adı, IMAP sunucu adı, port ve şifreleme türünü paylaşabilir misiniz? Sunucu kullanıcı adı/parola ile girişe ve UID MOVE işlemine izin vermeli. Bu posta kutusunun içinde, Gelen Kutusu gibi SAP-Processed adlı bir posta klasörü oluşturulmalı; sunucu diskinde veya yerel Outlook arşivinde değil. Hesabın IMAP erişimine ve bu projeyle uyumlu kullanıcı adı/parola yöntemine izin verildiğini doğrulayın. Parolayı kurumun onaylı gizli bilgi paylaşım yöntemiyle iletin. İç sertifika otoritesi kullanılıyorsa gerekli CA sertifikalarını Basis'e verin. SAP gelen iletileri okuyacak, başarıyla işlenenleri SAP-Processed klasörüne taşıyacak.
+> SAP'nin IMAP üzerinden okuyacağı ayrı bir deneme posta kutusu rica ediyoruz. Giriş adı, IMAP sunucu adı, port ve şifreleme türünü paylaşabilir misiniz? Sunucu kullanıcı adı/parola ile girişe ve UID MOVE işlemine izin vermeli. Hesabın IMAP erişimine ve bu projeyle uyumlu kullanıcı adı/parola yöntemine izin verildiğini doğrulayın. Parolayı kurumun onaylı gizli bilgi paylaşım yöntemiyle iletin. İç sertifika otoritesi kullanılıyorsa gerekli CA sertifikalarını Basis'e verin. SAP gelen iletileri okuyacak, başarıyla işlenenleri ayarlarda seçeceğimiz mevcut posta klasörüne taşıyacak.
 
 | Bilgi | Örnek | Ne anlama gelir? |
 |---|---|---|
@@ -49,9 +49,9 @@ Bir geliştirme veya deneme SAP sistemi ve **yalnız bu deneme için ayrılmış
 | Port / güvenlik | `993` / `IMAPS` | Başından itibaren şifreli bağlantı. `143` / `STARTTLS` da desteklenir. |
 | Kullanıcı | `invoices@example.com` | Ekibin verdiği giriş adı; görünen e-posta adresinden farklı olabilir. |
 | Kaynak klasör | `INBOX` | Gelen iletilerin bulunduğu klasör. |
-| İşlenmiş klasörü | `SAP-Processed` | Başarılı iletilerin taşınacağı klasör; önceden oluşturun. |
+| İşlenmiş klasörü | Seçtiğiniz mevcut posta klasörü | Başarılı iletilerin taşınacağı yer; adını ayarlara yazın. |
 
-**Tablodaki sunucu, kullanıcı ve port değerleri biçim örneğidir; kurulum verisi olarak kopyalamayın.** Gerçek değerleri posta ekibinden alın. `SAP-Processed` önerilen klasör adıdır; başka ad seçerseniz önce o klasörü oluşturun ve SAP profilinde aynı adı kullanın.
+**Tablodaki sunucu, kullanıcı ve port değerleri biçim örneğidir; kurulum verisi olarak kopyalamayın.** Gerçek değerleri posta ekibinden alın. `SAP-Processed` yalnız başlangıç değeridir; bu adla yeni klasör açmak zorunda değilsiniz. Mevcut bir posta klasörünü seçip gerçek adını SAP profiline yazabilirsiniz.
 
 OAuth uygulanmadı. **UID MOVE** gerekir; `COPY` alternatifi kapalıdır. Klasör adları ASCII harf/rakam ve `. _ / -` kabul eder; boşluk içeremez. Eski posta sunucularıyla uyum için ASCII parola tercih edin. Parolaları talep kayıtlarına ve ekran görüntülerine koymayın.
 
@@ -234,7 +234,7 @@ Bir profil adı seçin (örneğin **`INVOICE`**) ve posta ekibinin verdiği değ
 | Kullanıcı | Kendi posta giriş adınız | Posta ekibinin verdiği giriş adını yazın; örnek e-posta adresini kullanmayın. |
 | Parola kaynağı | `S` veya `O` | `S`: SAP'de girilir. `O`: Basis sunucuda saklar. |
 | Okunacak klasör | Varsayılan `INBOX` | Gelen Kutusu okunur. Başka bir klasörü okumak istiyorsanız aynı posta kutusundaki o klasörün gerçek IMAP adını/yolunu girin; yalnız seçilen klasör okunur. |
-| İşlenmiş klasörü | Önerilen ad `SAP-Processed` | Başarıyla işlenen iletilerin taşınacağı posta klasörü. Aynı posta kutusunda önceden oluşturun; başka ad seçerseniz buraya o adı girin. |
+| İşlenmiş klasörü | Seçtiğiniz posta klasörünün adı | Mevcut bir klasörü kullanabilirsiniz. Başlangıçtaki `SAP-Processed` değerini seçtiğiniz klasörün gerçek IMAP adı/yoluyla değiştirin. |
 | Taşıma modu | `MOVE` | UID MOVE desteği gerekir. |
 | Handler programı | `ZIMAP_HANDLER_DEMO` | Hazır örnek; iş belgesi oluşturmaz. |
 | En çok ileti | `50` | Bir çalıştırmadaki örnek üst sınır. |

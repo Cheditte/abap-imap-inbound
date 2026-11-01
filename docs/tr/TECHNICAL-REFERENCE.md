@@ -41,20 +41,13 @@ E-posta yöneticinizden şu noktaları doğrulamasını isteyin:
 
 Tablodaki sayılar ve adlar örnektir. Kurulumda kendi hesabınızın gerçek bilgilerini kullanın; bilinmeyen bir değeri tahmin etmek yerine ilgili ekipten alın.
 
-### `SAP-Processed` klasörü nerede oluşturulur?
+### İşlenmiş klasörünü nasıl seçersiniz?
 
-**SAP'nin okuyacağı e-posta hesabının içinde**, Gelen Kutusu gibi bir **posta klasörü** olarak oluşturulur. SAP'de veya sunucunun diskinde oluşturulacak bir klasör değildir.
+Başarıyla işlenen iletilerin taşınacağı klasörü SAP profilindeki **İşlenmiş klasörü** alanında siz belirlersiniz. Aynı posta kutusundaki mevcut bir klasörü kullanabilirsiniz. `SAP-Processed` yalnız başlangıç değeridir; bu adla yeni klasör oluşturmanız gerekmez.
 
-Örneğin deneme posta kutunuzda şu iki klasör bulunabilir:
+Seçtiğiniz klasörün gerçek IMAP adını/yolunu girin. Klasör posta sunucusunda mevcut olmalıdır; bilgisayarınızdaki yerel Outlook arşivi veya disk klasörü kullanılamaz. Yeni bir klasör kullanmak isterseniz e-posta yöneticinizden hazırlamasını isteyebilirsiniz.
 
-```text
-INBOX          → Okunacak iletiler (Gelen Kutusu)
-SAP-Processed  → Başarıyla işlenen iletilerin taşınacağı klasör
-```
-
-E-posta yöneticinizden oluşturmasını isteyebilir veya yetkiniz varsa web posta ekranından oluşturabilirsiniz. Outlook'ta oluşturuyorsanız posta sunucusuyla eşitlenen hesabın altında olmalıdır; bilgisayarınızdaki yerel arşiv klasörü kullanılamaz.
-
-`SAP-Processed` önerilen addır. Başka bir ad seçerseniz SAP profilindeki **İşlenmiş klasörü** alanına o klasörün gerçek IMAP adını/yolunu yazın. Klasörü önceden oluşturun. Bu projede klasör adları boşluk ve Türkçe karakter içeremez; İngilizce harfler, rakamlar ve `. _ / -` kullanılabilir.
+Klasör adları boşluk veya Türkçe karakter içeremez; İngilizce harfler, rakamlar ve `. _ / -` kullanılabilir.
 
 ## Kurulum: hangi sırayla ilerleyeceksiniz?
 
