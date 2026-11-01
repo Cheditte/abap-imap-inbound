@@ -2,160 +2,124 @@
 
 > **English** | [Türkçe](README.tr.md)
 
-A way for SAP to collect incoming mail and pass it to your business process, without a separate integration server.
+An open-source project that lets SAP check an email mailbox, collect messages and attachments, and show processing results inside SAP.
 
-![Project note: why email documents need collecting, the SAP monitoring approach, and a first trial with the supplied example](docs/assets/business-need-en.jpg)
+![Why email documents need collecting, viewing results in SAP, and a first trial with the supplied example](docs/assets/business-need-en.jpg)
 
-Imagine a shared mailbox where suppliers send invoices. Someone opens each mail, saves the PDF and adds it to a transaction in SAP. This project automates the collection step: SAP checks the mailbox, reads the message and attachments, calls your ABAP business logic, and records the result.
+Imagine suppliers sending invoices to a shared email address. Someone opens each message, downloads the PDF and adds it to a transaction in SAP. This project provides a foundation for **automating the collection of those messages and attachments**.
 
-You provide the business rules—for example, which purchase order an attachment belongs to. The project provides the mailbox connection, file handling, processing flow and monitoring screen.
+The supplied example lets you check that mail can be retrieved, attachments can be read and results can be recorded. **Creating invoices, reading amounts from PDFs or attaching documents to purchase orders requires development for your business process.**
 
-**Current source:** version **1.1.0**, script protocol **2**. Start with the [walkthrough](docs/WALKTHROUGH.md) for installation and first use.
+**Current source version: 1.1.0.** Follow the [step-by-step walkthrough](docs/WALKTHROUGH.md) for installation. Installation and runtime tests for this version on an actual SAP system are still pending; read [what has been verified](#what-has-been-verified) below.
 
-## Start with your role
+## Who can use it, and who needs to help?
 
-You do not need to be a developer to try the demonstration or use the configuration and monitoring screens. A functional consultant can lead the setup with Basis support. The [walkthrough](docs/WALKTHROUGH.md) explains the terms, what to enter, how to recognize success and who can resolve each type of error.
+You do not need to write ABAP code to try the supplied example, enter mailbox settings or inspect results. A functional consultant can coordinate setup. Server preparation, SAP permissions and adding your own business process need support from the relevant teams.
 
-| What you want to do | Where to start |
+| Person / team | What they do |
 |---|---|
-| Understand whether this helps your business process | Read the examples below. |
-| Try the supplied example, configure a mailbox or inspect results | [Step-by-step walkthrough](docs/WALKTHROUGH.md). |
-| Prepare the SAP server, permissions and transport route | [Basis preparation](docs/WALKTHROUGH.md#0-prepare-the-server-basis) and [package/transport](docs/WALKTHROUGH.md#2b-before-production-package-and-transport). |
-| Connect your own business action | [Developer guide with a complete handler example](docs/TECHNICAL-GUIDE.md). |
+| Functional consultant or process owner | Defines the need, prepares a test message, enters settings and checks the result. |
+| Email administrator | Prepares the mailbox and folders; confirms IMAP access, the sign-in method and connection settings. |
+| Basis / SAP system administration | Prepares the machine running SAP, network access, file permissions and SAP user permissions. |
+| ABAP developer | Installs the SAP programs and adds your business action, such as attaching a document to a purchase order. |
 
-## Where could you use it?
+## Terms you may be seeing for the first time
 
-Supplier invoices, order confirmations, delivery documents and service requests can all arrive by email. This project provides a common way to collect those messages and see what happened to them. Your team decides the business action: attaching a document, validating a reference or starting an agreed workflow requires your own rules and development.
+| Term | Meaning in this project |
+|---|---|
+| IMAP | A connection method that lets a program read messages and folders on a mail server. |
+| Profile | A saved set of mailbox server, user, folder and processing settings in SAP. |
+| Handler | The ABAP program that decides what to do with each message. Use the supplied `ZIMAP_HANDLER_DEMO` for your first trial. |
+| Application server | The Windows or Linux machine running SAP. Server installation commands run there, rather than on your own computer. |
+| Background job | A program SAP runs automatically on a schedule, for example to check for mail regularly. |
 
-Start by testing collection and monitoring with the supplied demonstration. Then agree the real business behavior with your functional consultant and ABAP developer.
+## Before you start: is your mailbox suitable?
 
-## What it does
+**Entering your email address and correct password may not be enough to connect.** Being able to sign in through webmail or Outlook does not mean this project can connect using the same details.
 
-- Reads the sender, recipients, subject, body and attachments from an IMAP mailbox.
-- Calls an ABAP **handler**: the program you write to decide what happens to each mail.
-- Moves successfully handled mail to a folder such as `SAP-Processed`.
-- Shows processing results, mail content and attachments in `ZIMAP_MONITOR`.
-- Keeps failed messages available for a controlled retry and resumes pending moves without deliberately running a completed handler again.
+Ask your email administrator to confirm:
 
-The supplied handler is a demonstration. Creating invoices, extracting values from PDFs or attaching documents to business objects requires your own handler.
+- **IMAP access is allowed for the account.** Your organization may disable or restrict it. For a shared mailbox, the connecting account must also have permission to access that mailbox.
+- **The sign-in method is compatible with this project.** This version connects with a username and password. OAuth, which uses browser authorization or access tokens, is not supported. An account that only accepts OAuth cannot be used with this version.
+- **With two-step verification, the normal password may not work.** Some providers offer a separate app password. Your email team must confirm whether that option is available for your account and approved by your organization; it is not available for every account. Conditions vary by provider; see, for example, [Microsoft's connection requirements](https://support.microsoft.com/en-us/outlook/pop-imap-and-smtp-settings-for-outlook-com) and [Google's app-password explanation](https://support.google.com/mail/answer/185833?hl=en).
+- **The SAP server can reach the mail server.** A connection that works from your computer may be blocked by a firewall from SAP. Basis and the network team check this.
+- **Moving messages is permitted and supported.** Successful messages are moved to another mail folder. The email team must confirm support for the required `UID MOVE` feature.
+
+Use **a separate test mailbox dedicated to this trial** first. Normal processing may mark messages as read and move them to another folder.
+
+### Which settings do you need?
+
+| Setting | Where it comes from and where to use it |
+|---|---|
+| IMAP hostname | Obtain it from the email team and enter it in the SAP profile's **Server** field. It is not your email address or the SAP server name. |
+| Port and connection security | The email team supplies these together. `993 / IMAPS` is a common example; use the values confirmed for your account. |
+| Login username | Use the value supplied by the email team. It may differ from your email address. |
+| Password | Use the password appropriate to the approved sign-in method. Keep it out of support tickets and screenshots. |
+| Folder to read | The actual folder name in the mailbox. The inbox is commonly `INBOX`; confirm its IMAP name rather than using a translated display name. |
+| Processed folder | The mail folder for successfully handled messages, explained below. |
+
+Numbers and names above are examples. Use the real settings for your account; ask the responsible team instead of guessing an unknown value.
+
+### Where do you create `SAP-Processed`?
+
+Create it **inside the email mailbox that SAP will read**, as a **mail folder** like the inbox. It is not a folder to create in SAP or on the server's disk.
+
+For example, your test mailbox could contain:
+
+```text
+INBOX          → Messages to read (inbox)
+SAP-Processed  → Destination for successfully processed messages
+```
+
+Ask your email administrator to create it, or use webmail if you have permission. If you create it in Outlook, it must belong to the account that synchronizes with the mail server; a local archive folder on your computer cannot be used.
+
+`SAP-Processed` is a suggested name. If you choose another name, enter that folder's actual IMAP name/path in the SAP profile's **Processed folder** field. Create the folder first. This project accepts English letters, digits and `. _ / -` in folder names, with no spaces or non-ASCII characters.
+
+## Installation: what order should you follow?
+
+This is a roadmap. The screens and commands are in the [step-by-step installation guide](docs/WALKTHROUGH.md).
+
+1. **Download the project files.** Use **Code → Download ZIP** at the top of this page and unpack the entire archive. Git is not required. Use server and SAP files from the same download.
+2. **Prepare the test mailbox.** Obtain the settings above and create the processed folder.
+3. **Have Basis prepare the server.** Processing runs on the SAP application server. Two helper tools, PowerShell and `curl`, retrieve mail there; no separate integration server is needed. Basis prepares network access and a protected working folder, then gives you its full path. [Server preparation](docs/WALKTHROUGH.md#0-prepare-the-server-basis).
+4. **Install the SAP programs.** Someone with SAP development permission creates `ZIMAP_INSTALL` in the **SE38** program editor, loads the matching source file from this project and runs it. It creates the required SAP programs and tables. [SAP installation steps](docs/WALKTHROUGH.md#1-create-the-installer-program).
+5. **Save a mailbox profile.** In `ZIMAP_CONFIG`, choose a profile name and enter your actual server, user and folder settings. For the first trial, select `ZIMAP_HANDLER_DEMO` as the handler and `MOVE` as the move method. Password source `S` means entering the password in SAP; `O` means Basis saves it on the server. **F8** saves the settings and tests the connection; saved settings alone do not prove the connection works. [Mailbox profile setup](docs/WALKTHROUGH.md#3-set-up-a-mailbox-profile).
+
+For maintained use, your development team should create a **package**, such as `ZIMAP`: a group for managing related SAP development objects. The installer currently creates its objects in the local trial area `$TMP`; saving the installer in a package does not change that. Plan [package and transport steps](docs/WALKTHROUGH.md#2b-before-production-package-and-transport) with Basis and development to move the objects to test and production systems.
+
+## What should you do in the first trial?
+
+1. Send an email with a small PDF or text attachment to the test mailbox.
+2. Open `ZIMAP_INBOUND` through **SE38** in SAP and enter the profile name you saved. Select **List only (no downloads/changes)** and run it. This lists eligible message numbers (`UID`); it does not show content or attachments, or move messages.
+3. If listing succeeds, run the same test profile with `ZIMAP_HANDLER_DEMO`, this time **with List only cleared**. It now retrieves the message and attachments, records the example program's result and moves successful mail to the processed folder.
+4. Open `ZIMAP_MONITOR` to inspect the result and attachments. A completed message has status `S`; it should also appear in the processed folder you selected in the mailbox.
+5. After the trial, work with a developer to add your business rules. Ask Basis to schedule regular runs as a background job on the **same SAP application server** used for installation.
+
+Do not expect the supplied example to create an invoice or purchase order in SAP. The trial checks the mail connection, file retrieval and viewing of results.
+
+The monitor can open PDFs and common images using a suitable application on your computer. Other types, including Excel and the original email file (`.eml`), are downloaded for inspection. Authorized users can select failed messages for another processing attempt.
+
+## Where should you start if the connection fails?
+
+| What you see | Who should check it? |
+|---|---|
+| Correct email address and password, but sign-in is rejected | Email team: IMAP permission, actual login username, access to the mailbox and a supported sign-in method. |
+| Server not found or connection timeout | Basis/network team: actual IMAP hostname, port and network access from the SAP server. |
+| Certificate error | Basis/email team: hostname and trusted certificates. Keep certificate verification enabled. |
+| Folder not found or messages cannot be moved | Email team: does the folder exist in that mailbox, is its name/path correct, and are move permission and `UID MOVE` support available? |
+| SAP permission error | Basis/authorization team: the SAP user's program, file and command permissions. |
+| Listing works but no content appears | **List only** shows message numbers. Use the normal trial with the supplied example to retrieve content. |
+
+When asking for help, share the step and error text, without passwords. Detailed checks are in the [installation guide](docs/WALKTHROUGH.md).
+
+<details>
+<summary>For Basis and developers: technical details and checks</summary>
 
 ## Why read an existing mailbox?
 
-Mail is still a common entry point for supplier invoices, order confirmations and logistics documents. An existing shared mailbox may already be part of the business process, particularly on older systems or in closed networks.
+This project has SAP periodically connect to an existing mailbox and collect messages. SAPconnect/SMTP provides another workflow, where mail is delivered to SAP. The choice depends on your requirements; see [SAP's inbound communication explanation](https://help.sap.com/saphelp_snc700_ehp01/helpdata/en/2b/d9260b4b8a11d1894c0000e8323c4f/content.htm?no_cache=true).
 
-SAP also supports receiving mail through SAPconnect/SMTP. That involves mail being delivered to SAP. This project serves a different workflow: SAP periodically checks an existing mailbox and collects its contents. See SAP's [inbound communication flow](https://help.sap.com/saphelp_snc700_ehp01/helpdata/en/2b/d9260b4b8a11d1894c0000e8323c4f/content.htm?no_cache=true) for the native SMTP route.
-
-The work runs on the Windows or Linux machine where SAP is installed—its **application server**. SAP starts a controlled server command through **SM69**; PowerShell and `curl` connect to the mailbox and prepare the mail as files. A separate middleware server is not required. PowerShell and an IMAPS-capable `curl` must be installed if the server does not already have them.
-
-## Is it suitable for your system?
-
-This project is intended for a classical ABAP system where Basis can install the server files and configure external commands. It can be useful when:
-
-- the business already uses a dedicated mailbox;
-- the mail server permits user-name/password authentication and supports **UID MOVE**;
-- the SAP application server can reach the mail server;
-- a developer can supply the business handler, and Basis can manage permissions and certificates.
-
-The source deliberately uses old ABAP syntax, with a compatibility target of **4.6C–7.5x**. That target is not a certification: old and non-Unicode SAP releases have not been verified. See [what has been verified](#what-has-been-verified).
-
-OAuth is not implemented. An account that requires OAuth cannot be used with this version. The `COPY` fallback is disabled; a server with UID MOVE support is required.
-
-## How it works
-
-| Program | What the person using it does |
-|---|---|
-| `ZIMAP_INSTALL` | Installs or updates the project's SAP objects and SM69 commands. |
-| `ZIMAP_CONFIG` | Defines the mailbox profile, credentials, limits and handler. |
-| `ZIMAP_INBOUND` | Lists eligible messages in test mode, or processes them in a normal run. Usually scheduled as a background job. |
-| `ZIMAP_MONITOR` | Displays results and mail content, downloads attachments and marks failed messages for retry. |
-| `ZIMAP_HANDLER_DEMO` | Shows the handler interface and a deliberate error example. Copy it for your business logic. |
-
-A normal run lists messages, downloads each eligible mail, calls the handler, records the outcome and moves the mail. A successful handler is recorded before the move. If the move or local archiving is interrupted, a later run attempts to finish that step.
-
-This relies on the handler following the transaction contract. Effects outside the SAP transaction need their own duplicate protection; the project does not promise unconditional “exactly once” processing.
-
-## Installation
-
-The [walkthrough](docs/WALKTHROUGH.md) explains every step, the required information and the expected checks. The three main stages are:
-
-### 1. Basis prepares the application server
-
-Windows needs **Windows PowerShell 5.1**; Linux needs **PowerShell 7**. Both need `curl` with `imaps` in its protocol list. From the unpacked project folder:
-
-**Windows — an administrator PowerShell session:**
-
-**This block asks for three values when you run it:** the actual IMAP hostname from the mail team, and the Windows SAP service account and full working-folder path from Basis. Enter your own value at each prompt and press Enter. Blank values stop setup. `-AllowedHosts` specifies the permitted mail server; enter the same hostname in the SAP profile's **Server** field. Do not enter a password or email address there.
-
-**Copy the entire block, including its braces.** Answer the prompts with your own values, without adding quotation marks. Each block asks for the information it needs again.
-
-```powershell
-& {
-  $ImapHostName = (Read-Host 'IMAP hostname from the mail team').Trim()
-  $SapOsAccount = (Read-Host 'Windows SAP service account confirmed by Basis').Trim()
-  $ImapRoot = (Read-Host 'Full working-folder path approved by Basis').Trim()
-  if (@($ImapHostName, $SapOsAccount, $ImapRoot) -contains '') {
-    throw 'Values are required. Obtain them from the responsible team and run again.'
-  }
-  powershell.exe -NoProfile -ExecutionPolicy Bypass -File server\setup-server.ps1 `
-    -AllowedHosts $ImapHostName -SapAccount $SapOsAccount -Root $ImapRoot
-}
-```
-
-**Linux — run in Bash.** This block asks for the actual IMAP hostname, Linux SAP execution user and full folder path approved by Basis. Supply your own system values; blank values stop setup.
-
-```bash
-{
-  read -r -p 'IMAP hostname from the mail team: ' imap_host
-  read -r -p 'Linux SAP execution user confirmed by Basis: ' sap_os_user
-  read -r -p 'Full working-folder path approved by Basis: ' imap_root
-  sudo bash server/setup-server.sh \
-    --allowed-hosts "${imap_host:?IMAP hostname is required}" \
-    --sap-user "${sap_os_user:?SAP OS user is required}" \
-    --root "${imap_root:?Working folder is required}"
-}
-```
-
-The setup installs **both** `imap.ps1` and `mime.ps1`, creates the working folders, restricts access and writes the Basis policy. The default roots are `C:\sapimap` and `/usr/sap/sapimap`. The parent path must meet the setup's ownership and permission checks; use a short, administrator-controlled path.
-
-### 2. A developer installs the SAP objects
-
-Create `ZIMAP_INSTALL` as an executable program in **SE38**, paste the complete [generated source](ZIMAP_INSTALL.abap), activate it and run it. Confirm the server folder and leave the final server check enabled.
-
-Use a customer package such as `ZIMAP` for maintained development. `$TMP` is suitable for a trial; the installer currently generates its objects there even if the installer itself is packaged. Follow the [package and transport procedure](docs/WALKTHROUGH.md#2b-before-production-package-and-transport) with development and Basis before production use.
-
-The installer creates the project's DDIC objects and programs, checks syntax, defines the SM69 commands and checks the server version, protocol and root. Setup settings are saved after successful checks. Updating existing, different sources requires the explicit **Overwrite existing programs** option.
-
-### 3. An administrator defines a mailbox profile
-
-In `ZIMAP_CONFIG`, enter the server, user, folders and handler. Keep certificate verification enabled and use `MOVE`. Supply a password with source `S`, or let Basis manage it with source `O`. **F8** saves a profile revision and tests the connection.
-
-**For source `O`:** the block asks for your own full profile key, Windows SAP service account and the folder used during setup. The key format is `SID_CLIENT_PROFILE`: obtain SID/client from **System → Status** in SAP and the profile name from `ZIMAP_CONFIG`. `A4H_001_INVOICE` only illustrates the format; do not copy it unchanged. The setup tool asks for the password separately afterwards.
-
-```powershell
-& {
-  $ProfileKey = (Read-Host 'Full SID_CLIENT_PROFILE key for this system and client').Trim()
-  $SapOsAccount = (Read-Host 'Windows SAP service account confirmed by Basis').Trim()
-  $ImapRoot = (Read-Host 'Full working-folder path approved by Basis').Trim()
-  if (@($ProfileKey, $SapOsAccount, $ImapRoot) -contains '') {
-    throw 'Values are required. Obtain them from the responsible team and run again.'
-  }
-  powershell.exe -NoProfile -File server\setup-server.ps1 `
-    -SetPassword $ProfileKey -SapAccount $SapOsAccount -Root $ImapRoot
-}
-```
-
-The Linux equivalent and the exact fields are in the [walkthrough](docs/WALKTHROUGH.md#3-set-up-a-mailbox-profile).
-
-## First use
-
-1. Run `ZIMAP_INBOUND` with **List only (no downloads/changes)**. It lists eligible message UIDs; it does not download or preview messages, call the handler, move mail or expire local archives.
-2. In a test mailbox, run it normally with `ZIMAP_HANDLER_DEMO`. This validates retrieval, parsing, logging and moving, without adding real business documents.
-3. Review the results in `ZIMAP_MONITOR`, then connect and test your own handler.
-4. Ask Basis to schedule the job on the **same application server** used for installation. Configuration and monitoring also use files on that host.
-
-Normal downloads may mark messages as read. Successful processing also moves them, so use a mailbox dedicated to this integration.
-
-The monitor opens PDF, PNG, JPG/JPEG, GIF, BMP and TXT files through the associated viewer. Other types, including Excel files and the original `.eml`, are **downloaded only**. Failed messages can be marked for retry by an authorized user.
+The source targets **4.6C–7.5x** compatibility on classical ABAP systems. This is not a certification; compilation and runtime tests on your target SAP release are required.
 
 ## Access and operating boundaries
 
@@ -220,6 +184,8 @@ After changing ABAP sources, regenerate the installer:
 ```powershell
 pwsh -NoProfile -File installer/build.ps1
 ```
+
+</details>
 
 ## Further reading
 

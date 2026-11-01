@@ -37,9 +37,11 @@ Enter transaction codes in SAP GUI's command field. For example, use `SE38`, or 
 
 Open the [GitHub repository](https://github.com/Cheditte/abap-imap-inbound), choose **Code → Download ZIP**, and extract the complete archive. You do not need to install Git for this route. Keep the folder structure: Basis needs `server/` together with `script/`, and the developer needs the root-level `ZIMAP_INSTALL.abap`. Use files from the same version rather than mixing downloads.
 
+**An email address and correct password alone may not be enough.** IMAP access must be allowed and the sign-in method must be compatible with this project. Two-step verification or organizational policy may block a normal password. Confirm with the email team; this version cannot be used where OAuth is required. [Mailbox suitability and folder explanation](../README.md#before-you-start-is-your-mailbox-suitable).
+
 ### A request you can send to the mail team
 
-> Please provide a dedicated test mailbox for SAP IMAP processing, its login name, IMAP hostname, port and encryption mode. It must allow username/password authentication and UID MOVE. Please create a folder named SAP-Processed and share the password through our approved secret-sharing method. For an internal certificate authority, please give Basis the required CA certificates. SAP will read incoming messages and move successfully handled messages to SAP-Processed.
+> Please provide a dedicated test mailbox for SAP IMAP processing, its login name, IMAP hostname, port and encryption mode. It must allow username/password authentication and UID MOVE. Please create a mail folder named SAP-Processed inside this mailbox, like its inbox, rather than on the server disk or in a local Outlook archive. Confirm that IMAP access and a username/password sign-in method compatible with this project are allowed. Share the password through our approved secret-sharing method. For an internal certificate authority, please give Basis the required CA certificates. SAP will read incoming messages and move successfully handled messages to SAP-Processed.
 
 | Setting | Example | What it means |
 |---|---|---|

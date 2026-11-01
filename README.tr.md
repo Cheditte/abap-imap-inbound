@@ -2,160 +2,124 @@
 
 > [English](README.md) | **Türkçe**
 
-SAP'nin gelen mailleri alıp iş sürecinize aktarmasını sağlayan, ayrı bir entegrasyon sunucusu gerektirmeyen bir araç.
+SAP'nin bir e-posta kutusunu kontrol etmesini, gelen iletileri ve eklerini almasını ve işlem sonucunu SAP içinden izlemenizi sağlayan açık kaynak bir proje.
 
-![Proje notu: e-postayla gelen belgeleri toplama ihtiyacı, SAP içinden izleme yaklaşımı ve hazır örnekle ilk deneme](docs/assets/business-need-tr.jpg)
+![E-postayla gelen belgeleri toplama ihtiyacı, SAP içinden izleme ve hazır örnekle ilk deneme](docs/assets/business-need-tr.jpg)
 
-Tedarikçilerin faturalarını gönderdiği ortak bir posta kutusu düşünün. Bir kişi her maili açıyor, PDF'i kaydediyor ve SAP'deki ilgili işleme ekliyor. Bu proje maili toplama adımını otomatikleştirir: SAP posta kutusunu kontrol eder, metni ve ekleri alır, sizin ABAP iş mantığınızı çağırır ve sonucu kaydeder.
+Tedarikçilerinizin faturaları ortak bir e-posta adresine gönderdiğini düşünün. Bir kişi her iletiyi açıyor, PDF'i indiriyor ve SAP'de ilgili işleme ekliyor. Bu proje **e-postayı ve eklerini toplama adımını otomatikleştirmek** için bir temel sağlar.
 
-Bir ekin hangi siparişe bağlanacağı gibi iş kurallarını siz belirlersiniz. Proje; posta kutusuna bağlantıyı, dosyaları hazırlamayı, işleme akışını ve izleme ekranını sağlar.
+Hazır örnekle e-postanın alındığını, eklerinin okunabildiğini ve sonucunun kaydedildiğini deneyebilirsiniz. **Fatura oluşturma, PDF içinden tutar okuma veya belgeyi bir siparişe bağlama için kurumunuza özel geliştirme gerekir.**
 
-**Güncel kaynak:** sürüm **1.1.0**, betik protokolü **2**. Kurulum ve ilk kullanım için [adım adım rehberle](docs/tr/WALKTHROUGH.md) başlayın.
+**Güncel kaynak sürümü: 1.1.0.** Kurulum için [adım adım rehbere](docs/tr/WALKTHROUGH.md) geçin. Bu sürümün gerçek SAP sistemindeki kurulum ve çalışma testleri henüz tamamlanmadı; aşağıdaki [doğrulama durumunu](#neler-doğrulandı) okuyun.
 
-## Size uygun yerden başlayın
+## Kimler kullanabilir, kimden destek gerekir?
 
-Hazır örneği denemek, ayarları yapmak veya sonuçları izlemek için yazılımcı olmanız gerekmez. Bir modül danışmanı Basis desteğiyle kurulumu koordine edebilir. [Adım adım rehber](docs/tr/WALKTHROUGH.md); terimleri, hangi alana ne girileceğini, başarılı sonucun nasıl anlaşılacağını ve hata durumunda kimden destek alınacağını açıklar.
+Hazır örneği denemek, posta kutusu ayarlarını girmek ve sonuçları incelemek için ABAP kodu yazmanız gerekmez. Bir modül danışmanı kurulumu koordine edebilir. Sunucu kurulumu, SAP yetkileri ve kendi iş sürecinizi ekleme adımlarında ilgili ekiplerden destek gerekir.
 
-| Ne yapmak istiyorsunuz? | Nereden başlamalı? |
+| Kişi / ekip | Ne yapar? |
 |---|---|
-| İş sürecime uygun mu anlamak | Aşağıdaki kullanım örnekleri. |
-| Hazır örneği denemek, posta kutusu tanımlamak veya sonuçları izlemek | [Adım adım kurulum ve kullanım](docs/tr/WALKTHROUGH.md). |
-| Sunucuyu, yetkileri ve transport sürecini hazırlamak | [Basis hazırlığı](docs/tr/WALKTHROUGH.md#0-sunucuyu-hazırlayın-basis) ve [paket/transport](docs/tr/WALKTHROUGH.md#2b-canlıya-çıkmadan-önce-paket-ve-transport). |
-| Kendi iş adımını bağlamak | [Handler örneği içeren geliştirici rehberi](docs/tr/TECHNICAL-GUIDE.md). |
+| Modül danışmanı veya süreç sorumlusu | İhtiyacı belirler, deneme iletisini hazırlar, ayarları girer ve sonucu kontrol eder. |
+| E-posta yöneticisi | Posta kutusunu ve klasörlerini hazırlar; IMAP erişimini, giriş yöntemini ve bağlantı bilgilerini doğrular. |
+| Basis / SAP sistem yönetimi | SAP'nin çalıştığı makineyi hazırlar; ağ erişimini, dosya izinlerini ve SAP kullanıcı yetkilerini düzenler. |
+| ABAP geliştiricisi | SAP programlarını kurar; örneğin eki bir siparişe bağlama gibi kuruma özel iş adımını geliştirir. |
 
-## Hangi işlerde kullanılabilir?
+## İlk kez karşılaşabileceğiniz terimler
 
-Tedarikçi faturaları, sipariş teyitleri, sevkiyat belgeleri ve hizmet talepleri e-postayla gelebilir. Proje bu iletileri toplamak ve başlarına ne geldiğini izlemek için ortak bir temel sağlar. Bir belgeyi eklemek, referans doğrulamak veya belirlenmiş bir iş akışını başlatmak için kurumunuza özel kuralların geliştirilmesi gerekir.
+| Terim | Bu projede anlamı |
+|---|---|
+| IMAP | Bir programın posta sunucusundaki iletileri ve klasörleri okumasını sağlayan bağlantı yöntemi. |
+| Profil | Bir posta kutusunun sunucu, kullanıcı, klasör ve işleme ayarlarını SAP'de birlikte kaydettiğiniz tanım. |
+| Handler | Her e-postayla ne yapılacağını belirleyen ABAP programı. İlk denemede hazır `ZIMAP_HANDLER_DEMO` örneği kullanılır. |
+| Uygulama sunucusu | SAP'nin çalıştığı Windows veya Linux makine. Kurulum komutları kendi bilgisayarınızda değil, bu makinede çalıştırılır. |
+| Arka plan işi / job | SAP'nin belirlediğiniz aralıklarla otomatik çalıştırdığı program. Örneğin posta kutusunu düzenli kontrol etmek için kullanılır. |
 
-Önce hazır örnekle toplama ve izlemeyi deneyin. Ardından gerçek iş davranışını modül danışmanı ve ABAP geliştiricisiyle belirleyin.
+## Başlamadan önce: posta kutunuz uygun mu?
 
-## Neler yapar?
+**Kendi e-posta adresinizi ve doğru parolanızı yazmanız bağlantı için tek başına yeterli olmayabilir.** Web postaya veya Outlook'a giriş yapabiliyor olmanız, bu projenin de aynı bilgilerle bağlanabileceği anlamına gelmez.
 
-- IMAP posta kutusundaki gönderen, alıcı, konu, metin ve ekleri okur.
-- Her maili, ne yapılacağına karar veren ABAP programınıza (**handler**) iletir.
-- Başarıyla işlenen maili `SAP-Processed` gibi bir klasöre taşır.
-- İşlem sonuçlarını, mail içeriğini ve ekleri `ZIMAP_MONITOR` içinde gösterir.
-- Hatalı mailleri kontrollü yeniden işlemeye bırakır; yarım kalan taşımayı, tamamlanmış handler'ı bilerek tekrar çağırmadan sürdürür.
+E-posta yöneticinizden şu noktaları doğrulamasını isteyin:
 
-Paketle gelen handler bir örnektir. Fatura oluşturma, PDF içinden değer çıkarma veya iş nesnesine belge ekleme gibi işlemleri kendi handler'ınıza eklersiniz.
+- **Hesabın IMAP erişimine izin verilmeli.** Kurum politikasına göre kapalı veya kısıtlı olabilir. Paylaşılan bir kutuda çalışacaksanız, bağlanan hesabın o kutuya erişim yetkisi de olmalıdır.
+- **Giriş yöntemi bu projeyle uyumlu olmalı.** Bu sürüm kullanıcı adı/parola ile bağlanır; OAuth, yani tarayıcıya yönlendiren veya erişim belirteci kullanan giriş yöntemi desteklenmez. Yalnız OAuth kabul eden bir hesap bu sürümle kullanılamaz.
+- **İki adımlı doğrulamada normal parola yeterli olmayabilir.** Bazı sağlayıcılar uygulama için ayrı parola sunar; bunun hesabınızda kullanılabilir ve kurumunuzca onaylı olup olmadığını e-posta ekibi belirlemelidir. Her hesapta böyle bir seçenek bulunmaz. Sağlayıcıya göre koşullar değişir; örneğin [Microsoft'un bağlantı koşullarına](https://support.microsoft.com/en-us/outlook/pop-imap-and-smtp-settings-for-outlook-com) ve [Google'ın uygulama parolası açıklamasına](https://support.google.com/mail/answer/185833?hl=tr) bakabilirsiniz.
+- **SAP sunucusu posta sunucusuna ulaşabilmeli.** Kendi bilgisayarınızdan çalışan bağlantı, SAP sunucusundan güvenlik duvarı nedeniyle engellenebilir. Bunu Basis ve ağ ekibi kontrol eder.
+- **İletileri taşıma izni ve sunucu desteği olmalı.** Başarılı iletiler başka bir posta klasörüne taşınır. E-posta ekibi sunucunun bunun için gereken `UID MOVE` özelliğini desteklediğini doğrulamalıdır.
+
+İlk denemede **bu iş için ayrılmış bir deneme posta kutusu** kullanın. Normal çalışma iletileri okundu işaretleyebilir ve başka klasöre taşıyabilir.
+
+### Hangi bilgileri almalısınız?
+
+| Bilgi | Nereden alınır, nereye yazılır? |
+|---|---|
+| IMAP sunucu adı | E-posta ekibinden alınır; SAP profilindeki **Server / Sunucu** alanına yazılır. E-posta adresiniz veya SAP sunucunuzun adı değildir. |
+| Port ve bağlantı güvenliği | E-posta ekibi birlikte verir. Örneğin `993 / IMAPS` yaygın bir çifttir; kendi hesabınız için doğrulanan değerleri kullanın. |
+| Giriş kullanıcı adı | E-posta ekibinin verdiği değerdir. E-posta adresinizle aynı olmak zorunda değildir. |
+| Parola | E-posta ekibinin onayladığı giriş yöntemine uygun paroladır. Parolayı talep kaydına veya ekran görüntüsüne koymayın. |
+| Okunacak klasör | Posta kutusundaki gerçek klasör adıdır. Genellikle Gelen Kutusu için `INBOX` kullanılır; görünen Türkçe ad yerine IMAP adını doğrulayın. |
+| İşlenmiş klasörü | Başarılı iletilerin taşınacağı posta klasörüdür; aşağıda açıklanıyor. |
+
+Tablodaki sayılar ve adlar örnektir. Kurulumda kendi hesabınızın gerçek bilgilerini kullanın; bilinmeyen bir değeri tahmin etmek yerine ilgili ekipten alın.
+
+### `SAP-Processed` klasörü nerede oluşturulur?
+
+**SAP'nin okuyacağı e-posta hesabının içinde**, Gelen Kutusu gibi bir **posta klasörü** olarak oluşturulur. SAP'de veya sunucunun diskinde oluşturulacak bir klasör değildir.
+
+Örneğin deneme posta kutunuzda şu iki klasör bulunabilir:
+
+```text
+INBOX          → Okunacak iletiler (Gelen Kutusu)
+SAP-Processed  → Başarıyla işlenen iletilerin taşınacağı klasör
+```
+
+E-posta yöneticinizden oluşturmasını isteyebilir veya yetkiniz varsa web posta ekranından oluşturabilirsiniz. Outlook'ta oluşturuyorsanız posta sunucusuyla eşitlenen hesabın altında olmalıdır; bilgisayarınızdaki yerel arşiv klasörü kullanılamaz.
+
+`SAP-Processed` önerilen addır. Başka bir ad seçerseniz SAP profilindeki **İşlenmiş klasörü** alanına o klasörün gerçek IMAP adını/yolunu yazın. Klasörü önceden oluşturun. Bu projede klasör adları boşluk ve Türkçe karakter içeremez; İngilizce harfler, rakamlar ve `. _ / -` kullanılabilir.
+
+## Kurulum: hangi sırayla ilerleyeceksiniz?
+
+Aşağıdaki liste bir yol haritasıdır. Ekran adımları ve çalıştırılacak komutlar [adım adım kurulum rehberinde](docs/tr/WALKTHROUGH.md) yer alır.
+
+1. **Proje dosyalarını indirin.** Bu sayfanın üstündeki **Code → Download ZIP** ile indirip arşivin tamamını açın. Git kurmanız gerekmez. Sunucu ve SAP dosyalarını aynı indirmeden kullanın.
+2. **Deneme posta kutusunu hazırlatın.** Yukarıdaki bağlantı bilgilerini alın ve işlenmiş klasörünü oluşturun.
+3. **Basis sunucuyu hazırlasın.** İşlem SAP uygulama sunucusunda çalışır. PowerShell ve `curl` adlı yardımcı araçlar burada e-postayı alır; ayrı bir entegrasyon sunucusu gerekmez. Basis ağ erişimini ve korumalı çalışma klasörünü hazırlar, klasörün tam yolunu size verir. [Sunucu hazırlığı](docs/tr/WALKTHROUGH.md#0-sunucuyu-hazırlayın-basis).
+4. **SAP programlarını kurun.** SAP geliştirme yetkisi olan kişi, **SE38** program editöründe `ZIMAP_INSTALL` programını oluşturup projedeki aynı adlı kaynağı yükler ve çalıştırır. Bu program gerekli SAP programlarını ve tablolarını oluşturur. [SAP kurulum adımları](docs/tr/WALKTHROUGH.md#1-kurulum-programını-oluşturun).
+5. **Bir posta profili kaydedin.** `ZIMAP_CONFIG` içinde bir ad seçip gerçek sunucu, kullanıcı ve klasör bilgilerinizi girin. İlk denemede handler olarak `ZIMAP_HANDLER_DEMO`, taşıma yöntemi olarak `MOVE` seçin. Parola kaynağı `S`, parolayı SAP ekranından girmeniz; `O`, Basis'in sunucuda kaydetmesi anlamına gelir. **F8** ayarları kaydeder ve bağlantıyı test eder; yalnız kaydın oluşması başarılı bağlantı demek değildir. [Profil tanımlama](docs/tr/WALKTHROUGH.md#3-posta-kutusu-profilini-tanımlayın).
+
+Kalıcı kullanım için geliştirme ekibiniz `ZIMAP` gibi bir **paket**, yani SAP geliştirme nesnelerini birlikte yöneteceğiniz bir grup oluşturmalıdır. Installer şu anda ürettiği nesneleri `$TMP` adlı yerel deneme alanına koyar; installer'ı pakete kaydetmek tek başına bunu değiştirmez. Test ve canlı sisteme taşıma için [paket ve transport adımlarını](docs/tr/WALKTHROUGH.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) Basis ve geliştiriciyle planlayın.
+
+## İlk denemede ne yapacaksınız?
+
+1. Deneme posta kutusuna küçük bir PDF veya metin eki bulunan e-posta gönderin.
+2. SAP'de **SE38** üzerinden `ZIMAP_INBOUND` programını açın. Kaydettiğiniz profil adını girin. **List only (no downloads/changes)** seçeneğini işaretleyip çalıştırın. Bu adım uygun iletilerin numaralarını (`UID`) listeler; içerik ve ekleri göstermez, e-postaları taşımaz.
+3. Listeleme başarılıysa aynı deneme profilini `ZIMAP_HANDLER_DEMO` ile, bu kez **List only seçeneği kapalı** çalıştırın. Artık ileti ve ekleri gerçekten alınır; örnek programın sonucu kaydedilir ve başarılı ileti işlenmiş klasörüne taşınır.
+4. `ZIMAP_MONITOR` programında sonucu ve ekleri inceleyin. Başarıyla tamamlanan ileti `S` durumunda görünür; posta kutusunda da seçtiğiniz işlenmiş klasöründe bulunmalıdır.
+5. Deneme tamamlandıktan sonra kendi iş kurallarınızı geliştiriciyle ekleyin. Düzenli çalışmayı Basis, kurulum yapılan **aynı SAP uygulama sunucusunda** bir arka plan işi olarak planlasın.
+
+Hazır örnekte SAP'de bir fatura veya sipariş oluşmasını beklemeyin. Bu denemenin amacı posta bağlantısını, dosyaların alınmasını ve sonucu izlemeyi doğrulamaktır.
+
+Monitör, PDF ve yaygın görselleri bilgisayarınızdaki uygun uygulamayla açabilir. Excel ve orijinal e-posta dosyası (`.eml`) dahil diğer türler indirilerek incelenir. Hatalı iletiler, yetkili kullanıcı tarafından yeniden işlenmek üzere seçilebilir.
+
+## Bağlantı kurulmazsa nereden başlamalısınız?
+
+| Gördüğünüz durum | Kimin kontrol etmesi gerekir? |
+|---|---|
+| E-posta adresi ve parola doğru, ama giriş reddediliyor | E-posta ekibi: IMAP izni, gerçek giriş adı, o posta kutusuna erişim ve desteklenen giriş yöntemi. |
+| Sunucu bulunamıyor veya bağlantı zaman aşımına uğruyor | Basis/ağ ekibi: gerçek IMAP sunucu adı, port ve SAP sunucusunun ağ erişimi. |
+| Sertifika hatası var | Basis/e-posta ekibi: sunucu adı ve güvenilen sertifikalar. Sertifika doğrulamasını kapatarak geçmeyin. |
+| Klasör bulunamıyor veya ileti taşınamıyor | E-posta ekibi: klasör aynı posta kutusunda mevcut mu, adı/yolu doğru mu, taşıma izni ve `UID MOVE` desteği var mı? |
+| SAP'de yetki hatası var | Basis/yetkilendirme ekibi: ilgili SAP kullanıcısının program, dosya ve komut yetkileri. |
+| Listeleme başarılı ama içerik görünmüyor | **List only** yalnız ileti numaralarını gösterir. İçerik için hazır örnekle normal denemeyi yapın. |
+
+Destek isterken hangi adımda kaldığınızı ve hata metnini paylaşın; parola paylaşmayın. Ayrıntılı kontroller [kurulum rehberinde](docs/tr/WALKTHROUGH.md) bulunur.
+
+<details>
+<summary>Basis ve geliştiriciler için: teknik ayrıntılar ve kontroller</summary>
 
 ## Mevcut bir posta kutusunu neden okuyalım?
 
-Tedarikçi faturaları, sipariş onayları ve lojistik belgeleri hâlâ sıkça maille gelir. Özellikle eski sistemlerde veya kapalı ağlarda, mevcut ortak posta kutusu zaten iş sürecinin bir parçası olabilir.
+Bu proje, SAP'nin belirli aralıklarla mevcut bir posta kutusuna bağlanıp iletileri almasını sağlar. SAPconnect/SMTP ise e-postaların SAP'ye teslim edildiği başka bir akıştır. Seçim kurumunuzun ihtiyacına bağlıdır; [SAP'nin gelen ileti açıklamasına](https://help.sap.com/saphelp_snc700_ehp01/helpdata/en/2b/d9260b4b8a11d1894c0000e8323c4f/content.htm?no_cache=true) bakabilirsiniz.
 
-SAP, SAPconnect/SMTP üzerinden kendisine iletilen mailleri de alabilir. Bu projedeki akışta ise SAP, mevcut bir posta kutusunu belirli aralıklarla kontrol edip içeriğini getirir. SAP'nin kendi SMTP yolu için [gelen ileti akışına](https://help.sap.com/saphelp_snc700_ehp01/helpdata/en/2b/d9260b4b8a11d1894c0000e8323c4f/content.htm?no_cache=true) bakabilirsiniz.
-
-İş, SAP'nin kurulu olduğu Windows veya Linux makinede—**uygulama sunucusunda**—yapılır. SAP, **SM69** üzerinden izin verilmiş bir sunucu komutunu başlatır; PowerShell ve `curl` posta kutusuna bağlanıp mailleri dosya olarak hazırlar. Ayrı bir middleware sunucusu gerekmez. PowerShell ve IMAPS destekli `curl`, makinede yoksa kurulmalıdır.
-
-## Sisteminize uygun mu?
-
-Proje, Basis'in sunucu dosyalarını kurabildiği ve dış komutları tanımlayabildiği klasik bir ABAP kurulumu için tasarlandı. Şu koşullarda yararlı olabilir:
-
-- İş süreci için ayrılmış bir posta kutusu kullanıyorsunuz.
-- Mail sunucusu kullanıcı adı/şifreyle girişe izin veriyor ve **UID MOVE** destekliyor.
-- SAP uygulama sunucusu mail sunucusuna erişebiliyor.
-- İş mantığını yazacak bir geliştirici, izin ve sertifikaları yönetecek Basis desteği var.
-
-Kaynaklar, **4.6C–7.5x** hedefi için eski ABAP sözdizimiyle yazıldı. Bu bir uyumluluk sertifikası değildir: eski ve Unicode olmayan SAP sürümlerinde henüz doğrulanmadı. Bkz. [neler doğrulandı](#neler-doğrulandı).
-
-OAuth desteği yoktur; OAuth gerektiren hesaplar bu sürümle kullanılamaz. `COPY` alternatifi kapalıdır; sunucunun UID MOVE desteklemesi gerekir.
-
-## Nasıl çalışır?
-
-| Program | Kullanan kişi ne yapar? |
-|---|---|
-| `ZIMAP_INSTALL` | Projenin SAP nesnelerini ve SM69 komutlarını kurar veya günceller. |
-| `ZIMAP_CONFIG` | Posta kutusunu, kimlik bilgilerini, sınırları ve handler'ı tanımlar. |
-| `ZIMAP_INBOUND` | Test modunda uygun mailleri listeler; normal çalışmada işler. Genellikle arka plan job'ı olarak planlanır. |
-| `ZIMAP_MONITOR` | Sonuçları ve mail içeriğini gösterir, ekleri indirir, hatalı mailleri yeniden işlemeye işaretler. |
-| `ZIMAP_HANDLER_DEMO` | Handler arayüzünü ve bilerek hata üreten bir örneği gösterir. Kendi iş mantığınız için kopyalanır. |
-
-Normal çalışmada mailler listelenir, uygun mail indirilir, handler çağrılır, sonuç kaydedilir ve mail taşınır. Handler'ın başarısı taşımadan önce kaydedilir. Taşıma veya yerel arşivleme yarıda kalırsa sonraki çalışma bu adımı tamamlamayı dener.
-
-Bu davranış, handler'ın işlem sözleşmesine uymasına bağlıdır. SAP işlemi dışındaki etkiler için handler'ın kendi tekrar kontrolü gerekir; koşulsuz “tam bir kez işlenir” garantisi verilmez.
-
-## Kurulum
-
-[Adım adım rehber](docs/tr/WALKTHROUGH.md), gerekli bilgileri, ekranları ve beklenen kontrolleri anlatır. Kurulum üç ana aşamadan oluşur:
-
-### 1. Basis uygulama sunucusunu hazırlar
-
-Windows'ta **Windows PowerShell 5.1**, Linux'ta **PowerShell 7** gerekir. Her iki sistemde de `curl` çıktısındaki protokol listesinde `imaps` bulunmalıdır. Paketi açtığınız klasörden:
-
-**Windows — yönetici PowerShell oturumu:**
-
-**Bu komut bloğu çalışırken üç bilgiyi size sorar:** gerçek IMAP sunucu adı (posta ekibi), Windows SAP servis hesabı ve tam çalışma klasörü yolu (Basis). Her sorunun karşısına kendi sisteminizin değerini yazıp Enter basın. Boş bilgiyle kurulum başlamaz. `-AllowedHosts` bağlanılmasına izin verilen posta sunucusudur; aynı adı SAP profilindeki **Server / Sunucu** alanına da girin. Parola veya e-posta adresi bu alana yazılmaz.
-
-**Bloğun tamamını süslü parantezleriyle birlikte kopyalayın.** Sorulara kendi değerlerinizi tırnak eklemeden yazın. Her blok gerekli bilgileri yeniden sorar.
-
-```powershell
-& {
-  $ImapHostName = (Read-Host 'Posta ekibinin verdigi IMAP sunucu adi').Trim()
-  $SapOsAccount = (Read-Host 'Basis tarafindan dogrulanan Windows SAP servis hesabi').Trim()
-  $ImapRoot = (Read-Host 'Basis tarafindan onaylanan tam calisma klasoru yolu').Trim()
-  if (@($ImapHostName, $SapOsAccount, $ImapRoot) -contains '') {
-    throw 'Bilgiler bos birakilamaz. Ilgili ekipten alip tekrar calistirin.'
-  }
-  powershell.exe -NoProfile -ExecutionPolicy Bypass -File server\setup-server.ps1 `
-    -AllowedHosts $ImapHostName -SapAccount $SapOsAccount -Root $ImapRoot
-}
-```
-
-**Linux — Bash içinde çalıştırın.** Bu blok gerçek IMAP sunucusunu, Linux SAP kullanıcısını ve Basis'in onayladığı tam klasör yolunu sorar. Sorulara kendi sisteminizin bilgileriyle yanıt verin; boş değerle kurulum başlamaz.
-
-```bash
-{
-  read -r -p 'Posta ekibinin verdigi IMAP sunucu adi: ' imap_host
-  read -r -p 'Basis tarafindan dogrulanan Linux SAP kullanicisi: ' sap_os_user
-  read -r -p 'Basis tarafindan onaylanan tam calisma klasoru yolu: ' imap_root
-  sudo bash server/setup-server.sh \
-    --allowed-hosts "${imap_host:?IMAP hostname is required}" \
-    --sap-user "${sap_os_user:?SAP OS user is required}" \
-    --root "${imap_root:?Working folder is required}"
-}
-```
-
-Kurulum **hem** `imap.ps1` hem `mime.ps1` dosyasını kopyalar; çalışma klasörlerini oluşturur, erişimi sınırlar ve Basis politikasını yazar. Varsayılan kök dizinler `C:\sapimap` ve `/usr/sap/sapimap`'tir. Üst dizinler kurulumun sahiplik ve izin denetimlerini karşılamalıdır; kısa, yöneticilerin kontrolündeki bir yol kullanın.
-
-### 2. Geliştirici SAP nesnelerini kurar
-
-**SE38**'de `ZIMAP_INSTALL` adında çalıştırılabilir program oluşturun. [Üretilmiş kaynağın](ZIMAP_INSTALL.abap) tamamını yapıştırın, etkinleştirin ve çalıştırın. Sunucu klasörünü kontrol edin; son sunucu testi seçili kalsın.
-
-Kalıcı geliştirme için `ZIMAP` gibi bir müşteri paketi kullanın. `$TMP` denemeye uygundur; installer bir pakete kaydedilse bile ürettiği nesneleri şu anda `$TMP` içine koyar. Canlı kullanımdan önce geliştirme ve Basis ekibiyle [paket ve transport adımlarını](docs/tr/WALKTHROUGH.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) uygulayın.
-
-Kurulum, projenin DDIC nesnelerini ve programlarını oluşturur, sözdizimini denetler, SM69 komutlarını tanımlar; sunucu sürümünü, protokolünü ve kök dizinini kontrol eder. Kurulum ayarları başarılı denetimlerden sonra kaydedilir. Var olan ve farklı kaynakları güncellemek için **Overwrite existing programs** açıkça seçilmelidir.
-
-### 3. Yönetici posta kutusu profilini tanımlar
-
-`ZIMAP_CONFIG` içinde sunucuyu, kullanıcıyı, klasörleri ve handler'ı girin. Sertifika doğrulaması açık kalsın; taşıma yöntemini `MOVE` seçin. Şifreyi `S` kaynağıyla girin veya Basis'in yönettiği `O` kaynağını kullanın. **F8**, yeni profil revizyonunu kaydeder ve bağlantıyı test eder.
-
-**`O` kaynağı için:** Aşağıdaki blok kendi sisteminizin tam profil anahtarını, Windows SAP servis hesabını ve kurulumda kullandığınız klasörü sorar. Anahtar `SID_CLIENT_PROFILE` biçimindedir: SID ve mandantı SAP'de **Sistem → Durum**, profil adını `ZIMAP_CONFIG` ekranından alın. `A4H_001_INVOICE` yalnız biçim örneğidir; aynen kopyalamayın. Parolayı daha sonra kurulum aracı ayrıca sorar.
-
-```powershell
-& {
-  $ProfileKey = (Read-Host 'Bu sistem ve mandant icin tam SID_CLIENT_PROFILE anahtari').Trim()
-  $SapOsAccount = (Read-Host 'Basis tarafindan dogrulanan Windows SAP servis hesabi').Trim()
-  $ImapRoot = (Read-Host 'Basis tarafindan onaylanan tam calisma klasoru yolu').Trim()
-  if (@($ProfileKey, $SapOsAccount, $ImapRoot) -contains '') {
-    throw 'Bilgiler bos birakilamaz. Ilgili ekipten alip tekrar calistirin.'
-  }
-  powershell.exe -NoProfile -File server\setup-server.ps1 `
-    -SetPassword $ProfileKey -SapAccount $SapOsAccount -Root $ImapRoot
-}
-```
-
-Linux karşılığı ve ekran alanlarının açıklamaları [adım adım rehberdedir](docs/tr/WALKTHROUGH.md#3-posta-kutusu-profilini-tanımlayın).
-
-## İlk kullanım
-
-1. `ZIMAP_INBOUND`'u **List only (no downloads/changes)** seçili çalıştırın. Uygun maillerin UID'lerini listeler; maili indirmez veya içeriğini göstermez, handler çağırmaz, mail taşımaz ve yerel arşivi temizlemez.
-2. Test posta kutusunda `ZIMAP_HANDLER_DEMO` ile normal bir çalışma yapın. Böylece gerçek iş belgesi oluşturmadan indirme, ayrıştırma, kayıt ve taşıma akışı denenir.
-3. `ZIMAP_MONITOR`'dan sonuçları inceleyin; ardından kendi handler'ınızı bağlayıp test edin.
-4. Basis, job'ı kurulumun yapıldığı **aynı uygulama sunucusunda** çalışacak şekilde planlasın. Yapılandırma ve izleme de o sunucudaki dosyaları kullanır.
-
-Normal indirme maili okunmuş işaretleyebilir. Başarılı işlem maili başka klasöre de taşır; bu nedenle entegrasyona ayrılmış bir posta kutusu kullanın.
-
-Monitör; PDF, PNG, JPG/JPEG, GIF, BMP ve TXT dosyalarını ilişkili görüntüleyiciyle açar. Excel dosyaları ve orijinal `.eml` dahil diğer türler **yalnızca indirilir**. Yetkili kullanıcı, hatalı mailleri yeniden işlemeye işaretleyebilir.
+Kaynaklar klasik ABAP sistemleri için **4.6C–7.5x** uyumluluğunu hedefler. Bu bir uyumluluk sertifikası değildir; hedef SAP sürümünüzde derleme ve çalışma testi gerekir.
 
 ## Yetkiler ve işletim sınırları
 
@@ -220,6 +184,8 @@ ABAP kaynaklarını değiştirdikten sonra installer'ı yeniden üretin:
 ```powershell
 pwsh -NoProfile -File installer/build.ps1
 ```
+
+</details>
 
 ## Diğer rehberler
 

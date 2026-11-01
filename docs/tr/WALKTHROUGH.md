@@ -37,9 +37,11 @@ Bir geliştirme veya deneme SAP sistemi ve **yalnız bu deneme için ayrılmış
 
 [GitHub deposunu](https://github.com/Cheditte/abap-imap-inbound) açın, **Code → Download ZIP** seçin ve arşivin tamamını bir klasöre çıkartın. Bu yöntem için Git kurmanız gerekmez. Klasör düzenini koruyun: Basis'e `server/` ile `script/` birlikte, geliştiriciye ana klasördeki `ZIMAP_INSTALL.abap` gerekir. Farklı indirmelerin sürümlerini karıştırmayın.
 
+**E-posta adresi ve doğru parola tek başına yeterli olmayabilir.** Hesabın IMAP erişimine izin verilmeli ve giriş yöntemi bu projeyle uyumlu olmalıdır. İki adımlı doğrulama veya kurum politikası normal parolayla bağlantıyı engelleyebilir. Posta ekibinden doğrulama alın; OAuth zorunluysa bu sürüm kullanılamaz. [Posta kutusu uygunluğu ve klasör açıklaması](../../README.tr.md#başlamadan-önce-posta-kutunuz-uygun-mu).
+
 ### E-posta ekibine gönderebileceğiniz talep
 
-> SAP'nin IMAP üzerinden okuyacağı ayrı bir deneme posta kutusu rica ediyoruz. Giriş adı, IMAP sunucu adı, port ve şifreleme türünü paylaşabilir misiniz? Sunucu kullanıcı adı/parola ile girişe ve UID MOVE işlemine izin vermeli. SAP-Processed adlı bir klasör oluşturulmalı. Parolayı kurumun onaylı gizli bilgi paylaşım yöntemiyle iletin. İç sertifika otoritesi kullanılıyorsa gerekli CA sertifikalarını Basis'e verin. SAP gelen iletileri okuyacak, başarıyla işlenenleri SAP-Processed klasörüne taşıyacak.
+> SAP'nin IMAP üzerinden okuyacağı ayrı bir deneme posta kutusu rica ediyoruz. Giriş adı, IMAP sunucu adı, port ve şifreleme türünü paylaşabilir misiniz? Sunucu kullanıcı adı/parola ile girişe ve UID MOVE işlemine izin vermeli. Bu posta kutusunun içinde, Gelen Kutusu gibi SAP-Processed adlı bir posta klasörü oluşturulmalı; sunucu diskinde veya yerel Outlook arşivinde değil. Hesabın IMAP erişimine ve bu projeyle uyumlu kullanıcı adı/parola yöntemine izin verildiğini doğrulayın. Parolayı kurumun onaylı gizli bilgi paylaşım yöntemiyle iletin. İç sertifika otoritesi kullanılıyorsa gerekli CA sertifikalarını Basis'e verin. SAP gelen iletileri okuyacak, başarıyla işlenenleri SAP-Processed klasörüne taşıyacak.
 
 | Bilgi | Örnek | Ne anlama gelir? |
 |---|---|---|
