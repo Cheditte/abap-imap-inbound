@@ -1,0 +1,19 @@
+# Working folders and password files created on the server
+secret/
+conf/
+in/
+done/
+tmp/
+log/
+*.cred
+
+# Local settings and temporary files
+.claude/
+*.log
+.DS_Store
+Thumbs.db
+
+# Development dependencies and isolated local test evidence
+/node_modules/
+/work/
+/outputs/

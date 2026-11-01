@@ -1,0 +1,11 @@
+{
+  "global": {
+    "files": "/src/**/*.abap"
+  },
+  "syntax": {
+    "version": "v702"
+  },
+  "rules": {
+    "parser_error": true
+  }
+}
