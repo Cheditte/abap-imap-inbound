@@ -14,19 +14,26 @@ Imagine suppliers sending invoices or delivery documents to a shared email addre
 - Shows which messages were processed successfully and which encountered errors in SAP.
 - Moves successfully processed messages to a separate folder in the mailbox.
 
-You can try this flow with the supplied example. A developer adds business actions such as creating invoices, reading amounts from PDFs or attaching documents to purchase orders according to your needs.
+You can try this flow with the supplied example. Add business actions such as creating invoices, reading amounts from PDFs or attaching documents to purchase orders according to your needs.
 
-## Who can use it?
+## Who is this guide for?
 
-You do not need to be a developer to try the example, enter mailbox settings or inspect results. A functional consultant or process owner can coordinate setup.
+This guide is for **SAP developers and people who can at least create, save, activate and run programs through SE38**. You need SAP development permissions for these steps. You will install the SAP programs, enter the mailbox settings and run the supplied example yourself.
 
-Setup needs help from **SAP system administration (Basis)** and your **email administrator**. An **ABAP developer** helps install the SAP programs and add your business rules.
+Server and email administration may require separate permissions. If you administer your own system, you can prepare those parts too; otherwise, ask the teams that manage them.
+
+| Preparation | If you have permission | If another team manages it |
+|---|---|---|
+| Machine running SAP | Connect through RDP/SSH and prepare the required tools and project files. | Ask Basis or the server administrator to prepare it. |
+| Email account | Check connection settings and access permissions in the provider panel. | Obtain the settings from the email administrator or provider support. |
+
+The [self-managed setup guide](docs/SELF-MANAGED-SETUP.md) explains server access and mailbox preparation.
 
 ## What should you know before starting?
 
 Use a **separate test mailbox** dedicated to the trial. Processing may mark messages as read and move them to another folder.
 
-**Your email address and correct password may not be enough to connect.** The account must allow IMAP access: permission for another program to read the mailbox. Being able to sign in through Outlook or webmail does not prove this access is available. Ask your email team to confirm that the account can connect with this project. Some accounts require sign-in methods this version does not support; see the separate guide for [detailed connection requirements](docs/TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
+**Your email address and correct password may not be enough to connect.** The account must allow IMAP access: permission for another program to read the mailbox. Being able to sign in through Outlook or webmail does not prove this access is available. If you manage the account, check the provider's connection requirements; otherwise, ask its administrators to confirm them. Some accounts require sign-in methods this version does not support; see the separate guide for [detailed connection requirements](docs/TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
 
 ### Where is mail read from, and where does it go?
 
@@ -37,9 +44,10 @@ Both folders belong to **the same email account**. You do not need to create fol
 
 ## How can you get started?
 
-1. **[Open the step-by-step installation guide](docs/WALKTHROUGH.md).** It explains how to download the files, which team supplies each setting and what to do on the screens.
-2. **Complete setup with your team and try the supplied example.** Send a test email with a small attachment, then inspect the result and attachment in SAP.
-3. **Agree your own business process.** For example, decide with your consultant and developer which purchase order an incoming document should belong to.
+1. **[Open the walkthrough and download the files](docs/WALKTHROUGH.md).** Prepare the server and mailbox yourself where you have permission, or ask the responsible teams.
+2. **Install the SAP programs.** Create, activate and run the installer in SE38. Then save the mailbox settings and test the connection.
+3. **Try the supplied example.** Send a test email with a small attachment and check the result, attachment and destination folder.
+4. **Add your business action.** For example, agree with the process owner which purchase order a document belongs to, then implement it using the [developer guide's examples](docs/TECHNICAL-GUIDE.md).
 
 ## Further reading
 

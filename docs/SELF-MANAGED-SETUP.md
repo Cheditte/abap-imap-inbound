@@ -4,6 +4,8 @@
 
 A separate Basis or email team is not required. If you are **authorized to administer** the machine running SAP and the mail account, you can prepare them yourself. This guide adds project files to an existing SAP installation; it does not install a new SAP server.
 
+You are assumed to have the skills and permissions to create, activate and run programs in SE38; you will perform those SAP steps yourself. This guide covers the additional preparation when you also take responsibility for server and email administration.
+
 Being able to sign in to SAP GUI does not give you Windows/Linux administrator rights. Opening a mailbox in webmail does not give you mail-server administration rights either. If access is missing, involve the machine or email service owner.
 
 **Start with a test system and test mailbox.** Installation and runtime tests for the current 1.1.0 version on an actual SAP system are still pending. [Verification status](TECHNICAL-REFERENCE.md#what-has-been-verified).

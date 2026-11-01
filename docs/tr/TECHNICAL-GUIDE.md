@@ -2,7 +2,7 @@
 
 > [English](../TECHNICAL-GUIDE.md) | **Türkçe** · [README](../../README.tr.md) · [Kurulum rehberi](WALKTHROUGH.md)
 
-Bu bölüm, danışman posta akışını denedikten sonra iş adımını geliştirecek kişi içindir. Ayarlar ve günlük kullanım için kod yazmanız gerekmez; bunlar kurulum rehberindedir.
+Hazır örnekle posta akışını doğruladıktan sonra kendi iş mantığınızı bu rehberdeki arayüzle ekleyebilirsiniz. SE38 üzerinden program oluşturup etkinleştirebildiğiniz ve ABAP geliştirme yetkinizin olduğu varsayılır. Kurulum ve ilk deneme adımları kurulum rehberindedir.
 
 Mevcut bağlantı noktası dışarıya açılmış bir sınıf değil, **`FORM` içeren handler programıdır**. Aşağıdaki işlem sözleşmesine uymak şartıyla handler içinden kendi sınıflarınızı çağırabilirsiniz.
 

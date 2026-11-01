@@ -14,19 +14,26 @@ Tedarikçilerinizin faturaları veya sevkiyat belgelerini ortak bir e-posta adre
 - Hangi iletilerin başarıyla işlendiğini, hangilerinde hata olduğunu SAP'de gösterir.
 - Başarıyla işlenen iletileri posta kutusunda ayrı bir klasöre taşır.
 
-Hazır örnekle bu akışı deneyebilirsiniz. Fatura oluşturma, PDF içinden tutar okuma veya belgeyi bir siparişe bağlama gibi iş adımlarını kurumunuzun ihtiyacına göre bir geliştirici ekler.
+Hazır örnekle bu akışı deneyebilirsiniz. Fatura oluşturma, PDF içinden tutar okuma veya belgeyi bir siparişe bağlama gibi iş adımlarını kendi ihtiyacınıza göre ekleyebilirsiniz.
 
-## Kimler kullanabilir?
+## Bu rehber kimler için?
 
-Hazır örneği denemek, posta kutusu ayarlarını girmek ve sonuçları incelemek için yazılımcı olmanız gerekmez. Bir modül danışmanı veya süreç sorumlusu kurulumu koordine edebilir.
+Bu rehber, **SAP geliştiricileri ve en azından SE38 üzerinden program oluşturabilen, kaydedip etkinleştirebilen ve çalıştırabilen kişiler** içindir. Bu işlemler için SAP geliştirme yetkinizin olması gerekir. SAP programlarının kurulmasını, posta ayarlarını ve hazır örneğin çalıştırılmasını siz yapacaksınız.
 
-Kurulumda **SAP sistem yönetimi ekibinin (Basis)** ve **e-posta yöneticinizin** desteği gerekir. SAP programlarını kurmak ve kendi iş kurallarınızı eklemek için **ABAP geliştiricisi** yardımcı olur.
+Sunucu ve posta yönetimi yetkileri ayrı olabilir. Kendi sisteminizi yönetiyorsanız bu hazırlıkları da siz yapabilirsiniz; başka ekipler yönetiyorsa ilgili adımları onlardan isteyin.
+
+| Hazırlık | Yetki sizdeyse | Başka ekip yönetiyorsa |
+|---|---|---|
+| SAP'nin çalıştığı makine | RDP/SSH ile bağlanıp gerekli araçları ve proje dosyalarını hazırlayın. | Basis veya sunucu yöneticisinden hazırlığı isteyin. |
+| Posta hesabı | Sağlayıcı panelinden bağlantı bilgilerini ve erişim izinlerini kontrol edin. | E-posta yöneticisinden veya sağlayıcı desteğinden bilgileri alın. |
+
+Sunucuya bağlantı ve posta hazırlığı [kendi sistemini yönetenler için rehberde](docs/tr/SELF-MANAGED-SETUP.md) anlatılıyor.
 
 ## Başlamadan önce ne bilmelisiniz?
 
 İlk denemeyi bu iş için ayrılmış bir **deneme posta kutusunda** yapın. İşlem sırasında iletiler okundu işaretlenebilir ve başka klasöre taşınabilir.
 
-**E-posta adresiniz ve doğru parolanız bağlantı için tek başına yeterli olmayabilir.** Hesabın IMAP erişimine, yani başka bir programın posta kutusunu okumasına izin verilmelidir. Outlook'a veya web postaya giriş yapabiliyor olmanız bu iznin bulunduğunu göstermez. E-posta ekibinizden, hesabın bu projeyle bağlantı kurmaya uygun olduğunu doğrulamasını isteyin. Bazı hesapların giriş koşulları mevcut sürümle uyumlu değildir; [ayrıntılı bağlantı koşulları](docs/tr/TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu) ayrı rehberdedir.
+**E-posta adresiniz ve doğru parolanız bağlantı için tek başına yeterli olmayabilir.** Hesabın IMAP erişimine, yani başka bir programın posta kutusunu okumasına izin verilmelidir. Outlook'a veya web postaya giriş yapabiliyor olmanız bu iznin bulunduğunu göstermez. Hesabı yönetiyorsanız sağlayıcının bağlantı koşullarını kontrol edin; başka bir ekip yönetiyorsa onlardan doğrulama alın. Bazı hesapların giriş koşulları mevcut sürümle uyumlu değildir; [ayrıntılı bağlantı koşulları](docs/tr/TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu) ayrı rehberdedir.
 
 ### E-postalar nereden okunur, nereye taşınır?
 
@@ -37,9 +44,10 @@ Her iki klasör de **aynı e-posta hesabının içinde** bulunur. SAP'de veya bi
 
 ## Nasıl başlayabilirsiniz?
 
-1. **[Adım adım kurulum rehberini açın](docs/tr/WALKTHROUGH.md).** Dosyaları nasıl indireceğiniz, kimden hangi bilgiyi alacağınız ve ekranlarda ne yapacağınız burada anlatılır.
-2. **Ekibinizle kurulumu tamamlayıp hazır örneği deneyin.** Küçük bir ek içeren deneme e-postası gönderin; SAP'de sonucunu ve ekini inceleyin.
-3. **Kendi iş sürecinizi belirleyin.** Örneğin gelen belgenin hangi siparişe bağlanacağını danışmanınız ve geliştiricinizle kararlaştırın.
+1. **[Kurulum rehberini açıp dosyaları indirin](docs/tr/WALKTHROUGH.md).** Sunucu ve posta hazırlığını yetkileriniz doğrultusunda kendiniz yapın veya ilgili ekiplerden isteyin.
+2. **SAP kurulumunu yapın.** SE38'de kurulum programını oluşturup etkinleştirin ve çalıştırın. Ardından posta kutusu ayarlarını kaydedip bağlantıyı test edin.
+3. **Hazır örneği deneyin.** Küçük bir ek içeren deneme e-postası gönderin; SAP'deki sonucu, eki ve iletinin taşındığı klasörü kontrol edin.
+4. **Kendi iş adımınızı ekleyin.** Örneğin gelen belgenin hangi siparişe bağlanacağını süreç sorumlusuyla belirleyip [geliştirici rehberindeki örneklerle](docs/tr/TECHNICAL-GUIDE.md) uygulayın.
 
 ## Daha fazla bilgi
 

@@ -4,6 +4,8 @@
 
 Ayrı bir Basis veya e-posta ekibinizin olması şart değildir. SAP'nin çalıştığı makineyi ve posta hesabını yönetmeye **yetkiniz varsa**, bu hazırlıkları kendiniz yapabilirsiniz. Bu rehber, zaten kurulu bir SAP sistemine proje dosyalarını eklemek içindir; yeni SAP sunucusu kurmaz.
 
+SAP tarafında SE38 ile program oluşturma, etkinleştirme ve çalıştırma bilgi ve yetkinizin bulunduğu varsayılır; bu adımları siz yapacaksınız. Bu rehber, ayrıca sunucu ve posta yönetimini üstlenmeniz halinde gereken hazırlıkları anlatır.
+
 SAP GUI'ye giriş yapmak, Windows/Linux makinesinde yönetici yetkisi vermez. Posta kutusunu webden açabilmek de posta sunucusunun yönetim paneline erişim vermez. Gerekli erişiminiz yoksa makinenin veya posta hizmetinin sahibinden destek alın.
 
 **Önce deneme sistemi ve deneme posta kutusu kullanın.** Güncel 1.1.0 sürümünün gerçek SAP sistemindeki kurulum ve çalışma testleri henüz tamamlanmadı. [Doğrulama durumu](TECHNICAL-REFERENCE.md#neler-doğrulandı).

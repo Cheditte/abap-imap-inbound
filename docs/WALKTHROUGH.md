@@ -4,9 +4,9 @@
 
 By the end of this guide, you will be able to view a test email and its attachment from SAP. We will use the supplied example; you can add your own business process afterwards.
 
-A functional consultant or process owner can coordinate setup. **Basis** (SAP system administration) helps prepare the server, your **email administrator** prepares the account, and an **ABAP developer** helps install the SAP programs.
+This guide assumes **you can create, activate and run programs through SE38 and have permission to do so**. You will install the SAP programs, define the mailbox profile and run the example. Prepare the server and mailbox yourself if you have administration permissions, or ask the teams that manage them.
 
-**If you do not have these teams:** You can do the relevant preparation yourself when you administer your own test system. You may need to connect to the machine running SAP through **Remote Desktop (RDP)** on Windows or **SSH** on Linux. For the email account, you may use your provider's administration panel. You need access and management permissions for the relevant server or account. The [self-managed setup guide](SELF-MANAGED-SETUP.md) explains which route to follow.
+**If you will also prepare the server and mailbox yourself:** You may need to connect to the machine running SAP through **Remote Desktop (RDP)** on Windows or **SSH** on Linux. For the email account, you may use your provider's administration panel. You need access and management permissions for the relevant server or account. The [self-managed setup guide](SELF-MANAGED-SETUP.md) explains which route to follow.
 
 **Start with a test SAP system and a test mailbox.** Processing may mark messages as read and move them to another folder. The supplied example does not create invoices or purchase orders.
 
@@ -21,13 +21,13 @@ Installation has two parts:
 | **On the machine running SAP** | Check the helper tools, install anything missing and place the project's server files. | To connect to the email account and retrieve messages and attachments. |
 | **Inside SAP** | Install the project's programs and enter the mailbox settings. | To start processing and view results from SAP screens. |
 
-The computer where you open SAP GUI may be different from the machine running SAP. Basis should prepare the server. You do not need a separate integration server.
+The computer where you open SAP GUI may be different from the machine running SAP. You or the responsible server administrator should prepare it. In this guide, Basis means the person or team taking that responsibility. You do not need a separate integration server.
 
-### Download the files and share them with your team
+### Download the files
 
 Open the [GitHub repository](https://github.com/Cheditte/abap-imap-inbound), choose **Code → Download ZIP** and unpack the entire archive. Git is not required.
 
-Share the same package with Basis and the developer. Keep the folder structure and use files from the same version. Basis will use the server files; the developer will use the root-level `ZIMAP_INSTALL.abap` file.
+Keep the folder structure and use files from the same version. You will use the root-level `ZIMAP_INSTALL.abap` file for the SAP steps. If someone else prepares the server, share the same package with them; they need both the `server` and `script` folders.
 
 ### Prepare the test mailbox
 
@@ -54,23 +54,23 @@ Basis also checks that **the machine running SAP can connect to the mail server*
 
 Without a Basis team, you can perform this step on your own test server if you have administration permissions. The [separate guide](SELF-MANAGED-SETUP.md) explains how to connect, transfer the files and choose the terminal in which to run the commands.
 
-**When can you continue?** Once Basis confirms that the server test passes. Obtain the SAP server to use and the **full path** of the prepared working folder. We will use that same server and folder in the following steps.
+**When can you continue?** If you prepared the server, check that the test passes; if another team prepared it, obtain their confirmation. Record the SAP server to use and the **full path** of the working folder. We will use that same server and folder in the following steps.
 
 ## 2. Create the installer program
 
-**What are we doing?** Preparing a program that creates the SAP programs and tables the project needs. This requires SAP development permission; involve your developer.
+**What are we doing?** Preparing a program that creates the SAP programs and tables the project needs. Perform this step with your own SAP development permissions.
 
-Enter `SE38` in SAP GUI's command field at the top. This opens the program editor. Use `/nSE38` if you are already in another transaction.
+Create the following program in SE38.
 
 1. Enter **`ZIMAP_INSTALL`** as the program name and choose **Create**.
 2. Enter a description and select **Executable program** as the type.
-3. When saving, use a customer package prepared by your developer, for example `ZIMAP`. **Local Object** can be used for a temporary trial only.
+3. When saving, use a customer package you have created or one assigned to the project, for example `ZIMAP`. **Local Object** can be used for a temporary trial only.
 4. Open the downloaded [ZIMAP_INSTALL.abap](../ZIMAP_INSTALL.abap) file and paste its **entire contents** into the SAP editor.
 5. Save, check the syntax and choose **Activate**.
 
 ![Creating the installer in SE38 — earlier demonstration](screenshots/01-se38-create.png)
 
-**When can you continue?** Once the program activates without errors. Have the developer resolve any errors before moving on. Keep the program name as shown.
+**When can you continue?** Once the program activates without errors. Resolve syntax or activation errors before moving on. Keep the program name as shown.
 
 ## 3. Run the installer
 
@@ -82,12 +82,12 @@ Open **`ZIMAP_INSTALL`** in SE38 and choose **Execute (F8)**.
 
 - For a first installation, leave **DDIC objects**, **Programs**, **SM69 commands** and **Server check** selected. These cover tables, programs, server commands and the final check.
 - Enter the **full folder path supplied by Basis** in **Server folder**. Do not assume the example path is right for your system.
-- Leave **Uninstall** cleared. Review the other options with the developer.
+- Leave **Uninstall** cleared. Review the other options.
 - Press **F8** and read the results.
 
-**When can you continue?** Once the selected installation steps and final server check succeed. Share any failure output with Basis and the developer.
+**When can you continue?** Once the selected installation steps and final server check succeed. Review the failed step; involve the responsible team for server access or permission problems outside your control.
 
-**For maintained use:** The installer currently creates its objects in the local area `$TMP`. Saving the installer itself in a package does not change this. The developer must assign the objects to a customer package and plan transport to test and production systems. [Package and transport details](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport).
+**For maintained use:** The installer currently creates its objects in the local area `$TMP`. Saving the installer itself in a package does not change this. Assign the objects to your customer package and plan transport to test and production systems; coordinate transport settings with their administrators where needed. [Package and transport details](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport).
 
 ## 4. Set up a mailbox profile
 
@@ -155,7 +155,7 @@ PDFs and common images can open in a suitable application. Download other attach
 
 - **Sign-in or folder error:** Ask the email team to check connection details, IMAP access and the selected folder names.
 - **Connection, certificate or SAP permission error:** Ask Basis for help. Keep certificate verification enabled.
-- **The example or your business program fails:** Review the error with the developer. The supplied example deliberately fails for subjects containing `TEST-ERROR`.
+- **The example or your business program fails:** Review the error and the relevant program. The supplied example deliberately fails for subjects containing `TEST-ERROR`.
 
 Share the error text and the step you reached, without passwords. Authorized users can mark failed messages for another attempt. Do not delete log records or server files to force reprocessing. [Retry details](TECHNICAL-REFERENCE.md#retention-and-retry-details).
 
@@ -163,8 +163,8 @@ Share the error text and the step you reached, without passwords. Authorized use
 
 **What are we doing?** After the trial succeeds, having the mailbox checked automatically at agreed intervals.
 
-Basis creates a **background job** for `ZIMAP_INBOUND`. It must use the correct profile, have list-only cleared and run on the **same SAP machine** prepared for this installation. Basis also tests with the user that will run the job.
+If you have SM36 permission, create a **background job** for `ZIMAP_INBOUND`; otherwise ask Basis to schedule it. It must use the correct profile, have list-only cleared and run on the **same SAP machine** prepared for this installation. Test with the user that will run the job, or have the responsible team do so.
 
-Agree the real business action with the consultant and developer. For example, linking an attachment to a purchase order is added through the connection point in the [developer guide](TECHNICAL-GUIDE.md). Before production use, validate business rules, permissions and package/transport steps in your test system.
+Agree the business action with the process owner and implement it. For example, linking an attachment to a purchase order is added through the connection point in the [developer guide](TECHNICAL-GUIDE.md). Before production use, validate business rules, permissions and package/transport steps in your test system.
 
 **If you are updating an existing installation,** follow the [upgrade procedure](TECHNICAL-REFERENCE.md#8-update-an-existing-installation) rather than directly repeating the first-install steps. Server commands and detailed checks are in the [technical reference](TECHNICAL-REFERENCE.md).

@@ -2,7 +2,7 @@
 
 > **English** | [Türkçe](tr/TECHNICAL-GUIDE.md) · [README](../README.md) · [Installation walkthrough](WALKTHROUGH.md)
 
-This section is for the developer implementing the business action after a consultant has tested the mailbox flow. Configuration and daily use do not require writing this code; use the walkthrough for those tasks.
+After verifying the mail flow with the supplied example, use this interface to add your own business logic. This guide assumes you can create and activate programs in SE38 and have ABAP development permissions. Use the walkthrough for installation and the first trial.
 
 The current integration point is a **handler program with a `FORM`**, rather than a public ABAP class. You can call your own classes from inside that handler, provided they respect the transaction contract below.
 

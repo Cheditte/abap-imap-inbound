@@ -4,6 +4,8 @@
 
 This file is for Basis and email teams preparing installation, and developers who want the details. It describes **1.1.0 sources and script protocol 2**. Use the [walkthrough](WALKTHROUGH.md) for installation in order, and the [developer guide](TECHNICAL-GUIDE.md) to add your business logic.
 
+For the SAP steps, you are assumed to be able to create, activate and run programs in SE38. Here, **Basis / server administrator** means the person or team responsible for the server; this can be you if you hold the necessary permissions. The same distinction applies to email administration. [Preparation when you hold those permissions](SELF-MANAGED-SETUP.md).
+
 ## Find the detail you need
 
 - [Mailbox suitability](#before-you-start-is-your-mailbox-suitable)
@@ -66,11 +68,11 @@ This is a roadmap. The screens and commands are in the [step-by-step installatio
 
 1. **Download the project files.** Use **Code → Download ZIP** on the repository home page and unpack the entire archive. Git is not required. Use server and SAP files from the same download.
 2. **Prepare the test mailbox.** Obtain the settings above and select an existing mailbox folder for processed messages.
-3. **Have Basis prepare the server.** Processing runs on the SAP application server. Two helper tools, PowerShell and `curl`, retrieve mail there; no separate integration server is needed. Basis prepares network access and a protected working folder, then gives you its full path. [Server preparation](WALKTHROUGH.md#1-prepare-the-server-basis).
-4. **Install the SAP programs.** Someone with SAP development permission creates `ZIMAP_INSTALL` in the **SE38** program editor, loads the matching source file from this project and runs it. It creates the required SAP programs and tables. [SAP installation steps](WALKTHROUGH.md#2-create-the-installer-program).
+3. **Prepare the server or ask its administrator.** Processing runs on the SAP application server. Two helper tools, PowerShell and `curl`, retrieve mail there; no separate integration server is needed. Basis prepares network access and a protected working folder, then gives you its full path. [Server preparation](WALKTHROUGH.md#1-prepare-the-server-basis).
+4. **Install the SAP programs.** Create `ZIMAP_INSTALL` in **SE38**, load the matching source file from this project, activate it and run it. It creates the required SAP programs and tables. [SAP installation steps](WALKTHROUGH.md#2-create-the-installer-program).
 5. **Save a mailbox profile.** In `ZIMAP_CONFIG`, choose a profile name and enter your actual server, user and folder settings. For the first trial, select `ZIMAP_HANDLER_DEMO` as the handler and `MOVE` as the move method. Password source `S` means entering the password in SAP; `O` means Basis saves it on the server. **F8** saves the settings and tests the connection; saved settings alone do not prove the connection works. [Mailbox profile setup](WALKTHROUGH.md#4-set-up-a-mailbox-profile).
 
-For maintained use, your development team should create a **package**, such as `ZIMAP`: a group for managing related SAP development objects. The installer currently creates its objects in the local trial area `$TMP`; saving the installer in a package does not change that. Plan [package and transport steps](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport) with Basis and development to move the objects to test and production systems.
+For maintained use, create a customer package such as `ZIMAP` or use one assigned to the project. The installer currently creates its objects in the local trial area `$TMP`; saving the installer in a package does not change that. Plan [package and transport steps](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport) with Basis and development to move the objects to test and production systems.
 
 ## What should you do in the first trial?
 
@@ -78,7 +80,7 @@ For maintained use, your development team should create a **package**, such as `
 2. Open `ZIMAP_INBOUND` through **SE38** in SAP and enter the profile name you saved. Select **List only (no downloads/changes)** and run it. This lists eligible message numbers (`UID`); it does not show content or attachments, or move messages.
 3. If listing succeeds, run the same test profile with `ZIMAP_HANDLER_DEMO`, this time **with List only cleared**. It now retrieves the message and attachments, records the example program's result and moves successful mail to the processed folder.
 4. Open `ZIMAP_MONITOR` to inspect the result and attachments. A completed message has status `S`; it should also appear in the processed folder you selected in the mailbox.
-5. After the trial, work with a developer to add your business rules. Ask Basis to schedule regular runs as a background job on the **same SAP application server** used for installation.
+5. After the trial, add your business rules. Ask Basis to schedule regular runs as a background job on the **same SAP application server** used for installation.
 
 Do not expect the supplied example to create an invoice or purchase order in SAP. The trial checks the mail connection, file retrieval and viewing of results.
 
@@ -370,7 +372,7 @@ Log records can outlive their local files. Retention expires eligible completed 
 
 1. Send a message with `TEST-ERROR` in the subject; run normally with the demo handler.
 2. Inspect the intentional error in the monitor.
-3. Have a developer correct the cause or select an approved test handler accepting that message. Marking retry does not change the demo's rule.
+3. Correct the cause in the relevant program or select an approved test handler accepting that message. Marking retry does not change the demo's rule.
 4. An authorized monitor user selects the retry action. The record becomes `R`; run processing normally again.
 
 Retry requires change access to the log. The processor also offers **retry errors** for an intentional retry of selected `E` messages. `H` uses move recovery. Do not delete log rows or server files to force another attempt.
@@ -408,4 +410,4 @@ Ask Basis to schedule `ZIMAP_INBOUND` through **SM36**, using a variant for the 
 
 Use the installation's application server. Test with the actual restricted job user; a developer's successful foreground run is insufficient. Basis checks external-command, file, table and handler-specific permissions. See the [role outline](TECHNICAL-REFERENCE.md#access-and-operating-boundaries).
 
-Before handling real business mail, have an ABAP developer implement and validate the business rules. The [developer guide](TECHNICAL-GUIDE.md) explains the interface. Keep the demo for demonstrations.
+Before handling real business mail, implement and validate your business rules. The [developer guide](TECHNICAL-GUIDE.md) explains the interface. Keep the demo for demonstrations.

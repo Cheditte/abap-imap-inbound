@@ -4,9 +4,9 @@
 
 Bu rehberin sonunda bir deneme e-postasını ve ekini SAP içinden görebileceksiniz. Hazır örneği kullanacağız; kendi iş sürecinizi daha sonra ekleyebilirsiniz.
 
-Bir modül danışmanı veya süreç sorumlusu kurulumu koordine edebilir. **Basis** (SAP sistem yönetimi) sunucu hazırlığında, **e-posta yöneticisi** posta hesabında, **ABAP geliştiricisi** SAP programlarının kurulmasında yardımcı olur.
+Bu rehber, **SE38 üzerinden program oluşturma, etkinleştirme ve çalıştırma bilgisine ve yetkisine sahip olduğunuzu** varsayar. SAP programlarını siz kuracak, posta profilini tanımlayacak ve hazır örneği çalıştıracaksınız. Sunucu ve posta hazırlığını ise yönetim yetkiniz varsa kendiniz yapabilir, başka ekipler yönetiyorsa onlardan isteyebilirsiniz.
 
-**Bu ekipler yoksa:** Kendi deneme sisteminizi yönetiyorsanız ilgili hazırlıkları siz de yapabilirsiniz. SAP'nin çalıştığı makineye Windows'ta **Uzak Masaüstü (RDP)**, Linux'ta **SSH** ile bağlanmanız gerekebilir. Posta hesabı için de sağlayıcınızın yönetim panelini kullanabilirsiniz. Bunun için ilgili sunucuya veya hesaba erişim ve yönetim yetkiniz olmalı. [Ekip desteği olmadan kurulum rehberi](SELF-MANAGED-SETUP.md), hangi durumda hangi yolu izleyeceğinizi anlatır.
+**Sunucu ve posta işlemlerini de siz yapacaksanız:** SAP'nin çalıştığı makineye Windows'ta **Uzak Masaüstü (RDP)**, Linux'ta **SSH** ile bağlanmanız gerekebilir. Posta hesabı için de sağlayıcınızın yönetim panelini kullanabilirsiniz. Bunun için ilgili sunucuya veya hesaba erişim ve yönetim yetkiniz olmalı. [Ekip desteği olmadan kurulum rehberi](SELF-MANAGED-SETUP.md), hangi durumda hangi yolu izleyeceğinizi anlatır.
 
 **Önce bir deneme SAP sistemi ve deneme posta kutusu kullanın.** İşlem sırasında e-postalar okundu işaretlenebilir ve başka klasöre taşınabilir. Hazır örnek fatura veya sipariş oluşturmaz.
 
@@ -21,13 +21,13 @@ Kurulumun iki parçası var:
 | **SAP'nin çalıştığı makinede** | Gerekli yardımcı araçları kontrol edip eksik olanları kuruyor, projenin sunucu dosyalarını yerleştiriyoruz. | Posta hesabına bağlanıp iletileri ve eklerini almak için. |
 | **SAP içinde** | Projenin programlarını kuruyor ve posta kutusu bilgilerini giriyoruz. | İşlemi SAP'den başlatmak ve sonuçları SAP ekranında görmek için. |
 
-SAP GUI'yi açtığınız bilgisayarla SAP'nin çalıştığı makine farklı olabilir. Sunucu hazırlığını Basis yapmalıdır. Ayrıca bir entegrasyon sunucusu kurmanız gerekmez.
+SAP GUI'yi açtığınız bilgisayarla SAP'nin çalıştığı makine farklı olabilir. Sunucu hazırlığını siz veya ilgili sunucu yöneticisi yapmalıdır. Bu rehberde Basis, bu sorumluluğu üstlenen kişi veya ekibi ifade eder. Ayrıca bir entegrasyon sunucusu kurmanız gerekmez.
 
-### Dosyaları indirin ve ekiple paylaşın
+### Dosyaları indirin
 
 [GitHub deposunu](https://github.com/Cheditte/abap-imap-inbound) açın, **Code → Download ZIP** seçin ve arşivin tamamını bir klasöre çıkartın. Git kurmanız gerekmez.
 
-Aynı paketi Basis ve geliştiriciyle paylaşın. Klasör yapısını koruyun; farklı sürümlerden dosyaları karıştırmayın. Basis sunucu dosyalarını, geliştirici ana klasördeki `ZIMAP_INSTALL.abap` dosyasını kullanacak.
+Klasör yapısını koruyun; farklı sürümlerden dosyaları karıştırmayın. SAP adımlarında ana klasördeki `ZIMAP_INSTALL.abap` dosyasını kullanacaksınız. Sunucu hazırlığını başka biri yapacaksa aynı paketi onunla paylaşın; `server` ve `script` klasörleri birlikte gerekir.
 
 ### Deneme posta kutusunu hazırlayın
 
@@ -54,23 +54,23 @@ Basis ayrıca **SAP'nin çalıştığı makineden posta sunucusuna bağlantı ku
 
 Basis ekibiniz yoksa bu adımı, yönetim yetkiniz bulunan kendi deneme sunucunuzda siz uygulayabilirsiniz. Sunucuya nasıl bağlanacağınız, dosyaları nereye aktaracağınız ve komutları nerede çalıştıracağınız [ayrı rehberde](SELF-MANAGED-SETUP.md) açıklanıyor.
 
-**Ne zaman devam edebilirsiniz?** Basis sunucu testinin başarılı olduğunu doğruladığında. Basis'ten kullanılacak SAP sunucusunu ve hazırlanan çalışma klasörünün **tam yolunu** alın. Sonraki adımlarda aynı sunucuyu ve klasörü kullanacağız.
+**Ne zaman devam edebilirsiniz?** Sunucuyu siz hazırladıysanız testin başarılı olduğunu kontrol edin; başka ekip hazırladıysa bu sonucu onlardan alın. Kullanılacak SAP sunucusunu ve çalışma klasörünün **tam yolunu** not edin. Sonraki adımlarda aynı sunucuyu ve klasörü kullanacağız.
 
 ## 2. Kurulum programını oluşturun
 
-**Ne yapıyoruz?** SAP'nin gerekli programlarını ve tablolarını oluşturacak kurulum programını hazırlıyoruz. Bu adım SAP geliştirme yetkisi gerektirir; geliştirici desteği alın.
+**Ne yapıyoruz?** SAP'nin gerekli programlarını ve tablolarını oluşturacak kurulum programını hazırlıyoruz. Bu adımı kendi SAP geliştirme yetkinizle uygulayın.
 
-SAP GUI'nin üstteki komut alanına `SE38` yazın. Bu, program editörünü açar. Başka bir ekranın içindeyseniz `/nSE38` kullanabilirsiniz.
+SE38 üzerinden aşağıdaki programı oluşturun.
 
 1. Program adı olarak **`ZIMAP_INSTALL`** yazıp **Create / Oluştur** seçin.
 2. Açıklama girin; tür olarak **Executable program / Çalıştırılabilir program** seçin.
-3. Kaydederken geliştiricinizin oluşturduğu müşteri paketini kullanın; örneğin `ZIMAP`. Yalnız geçici denemede **Local Object / Yerel Nesne** seçilebilir.
+3. Kaydederken kendi oluşturduğunuz veya projeye ayrılmış müşteri paketini kullanın; örneğin `ZIMAP`. Yalnız geçici denemede **Local Object / Yerel Nesne** seçilebilir.
 4. İndirdiğiniz [ZIMAP_INSTALL.abap](../../ZIMAP_INSTALL.abap) dosyasının **tamamını** açıp SAP editörüne yapıştırın.
 5. Kaydedin, sözdizimi kontrolünü yapın ve **Activate / Etkinleştir** seçin.
 
 ![SE38'de kurulum programını oluşturma — önceki demo](../screenshots/01-se38-create.png)
 
-**Ne zaman devam edebilirsiniz?** Program hata vermeden etkinleştiğinde. Hata varsa geliştirici çözmeden sonraki adıma geçmeyin. Program adını aynen kullanın.
+**Ne zaman devam edebilirsiniz?** Program hata vermeden etkinleştiğinde. Sözdizimi veya etkinleştirme hatası varsa çözmeden sonraki adıma geçmeyin. Program adını aynen kullanın.
 
 ## 3. Kurulum programını çalıştırın
 
@@ -82,12 +82,12 @@ SE38'de **`ZIMAP_INSTALL`** açıp **Execute / Çalıştır (F8)** seçin.
 
 - İlk kurulumda **DDIC objects**, **Programs**, **SM69 commands** ve **Server check** seçili kalsın. Bunlar tabloları, programları, sunucu komutlarını ve son kontrolü kapsar.
 - **Server folder** alanına Basis'in verdiği **tam klasör yolunu** girin. Ekrandaki örnek yolun size uygun olduğunu varsaymayın.
-- **Uninstall / Kaldır** seçilmesin. Diğer seçenekleri geliştiriciyle kontrol edin.
+- **Uninstall / Kaldır** seçilmesin. Diğer seçenekleri kontrol edin.
 - **F8** ile çalıştırın ve sonuç listesini okuyun.
 
-**Ne zaman devam edebilirsiniz?** Seçilen kurulum adımları ve son sunucu kontrolü başarılı olduğunda. Bir adım hata verirse çıktıyı Basis/geliştiriciyle paylaşın.
+**Ne zaman devam edebilirsiniz?** Seçilen kurulum adımları ve son sunucu kontrolü başarılı olduğunda. Hata veren adımın çıktısını inceleyin; sunucu erişimi veya yetki sorunu başka bir ekibin sorumluluğundaysa onlara iletin.
 
-**Kalıcı kullanım için:** Kurulum programı ürettiği nesneleri şu anda `$TMP` adlı yerel alana koyar. Programın kendisini pakete kaydetmek bunu değiştirmez. Geliştirici, nesneleri müşteri paketine almalı ve test/canlı sisteme taşıma sürecini planlamalıdır. [Paket ve taşıma ayrıntıları](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport).
+**Kalıcı kullanım için:** Kurulum programı ürettiği nesneleri şu anda `$TMP` adlı yerel alana koyar. Programın kendisini pakete kaydetmek bunu değiştirmez. Nesneleri müşteri paketinize alıp test/canlı sisteme taşıma sürecini planlayın; transport ayarları başka ekipteyse onlarla koordine edin. [Paket ve taşıma ayrıntıları](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport).
 
 ## 4. Posta kutusu profilini tanımlayın
 
@@ -155,7 +155,7 @@ PDF ve yaygın görseller uygun uygulamayla açılabilir. Excel gibi diğer ekle
 
 - **Giriş veya klasör hatası:** E-posta ekibine bağlantı bilgilerini, IMAP iznini ve seçilen klasör adlarını kontrol ettirin.
 - **Bağlantı, sertifika veya SAP yetki hatası:** Basis'ten destek alın; sertifika doğrulamasını kapatarak geçmeyin.
-- **Örnek veya kendi iş programınız hata veriyorsa:** Geliştiriciyle hata açıklamasını inceleyin. Hazır örnek, konusu `TEST-ERROR` içeren iletilerde bilerek hata verir.
+- **Örnek veya kendi iş programınız hata veriyorsa:** Hata açıklamasını ve ilgili programı inceleyin. Hazır örnek, konusu `TEST-ERROR` içeren iletilerde bilerek hata verir.
 
 Hata metnini ve kaldığınız adımı paylaşın; parola paylaşmayın. Yetkili kullanıcı hatalı iletileri yeniden denemeye alabilir. Log veya sunucu dosyalarını silerek tekrar işlemeyi denemeyin. [Yeniden deneme ayrıntıları](TECHNICAL-REFERENCE.md#saklama-ve-yeniden-deneme-ayrıntıları).
 
@@ -163,8 +163,8 @@ Hata metnini ve kaldığınız adımı paylaşın; parola paylaşmayın. Yetkili
 
 **Ne yapıyoruz?** Başarılı denemeden sonra posta kontrolünün elle başlatılmadan, belirlenen aralıklarla çalışmasını sağlıyoruz.
 
-Basis, `ZIMAP_INBOUND` için bir **arka plan işi** oluşturur. Doğru profil kullanılmalı, yalnız listeleme kapalı olmalı ve iş hazırladığımız **aynı SAP makinesinde** çalışmalıdır. Basis bu işi çalıştıracak kullanıcıyla da deneme yapar.
+SM36 yetkiniz varsa `ZIMAP_INBOUND` için bir **arka plan işi** oluşturun; bu yetki başka ekipteyse Basis'ten planlamasını isteyin. Doğru profil kullanılmalı, yalnız listeleme kapalı olmalı ve iş hazırladığımız **aynı SAP makinesinde** çalışmalıdır. İşi çalıştıracak kullanıcıyla da deneme yapın veya ilgili ekibe yaptırın.
 
-Gerçek iş adımını danışman ve geliştiriciyle belirleyin. Örneğin eki bir siparişe bağlama işlemi [geliştirici rehberindeki](TECHNICAL-GUIDE.md) bağlantı noktasıyla eklenir. Canlı kullanımdan önce iş kurallarını, yetkileri ve paketle taşıma sürecini test sisteminizde doğrulayın.
+Gerçek iş adımını süreç sorumlusuyla belirleyip uygulayın. Örneğin eki bir siparişe bağlama işlemi [geliştirici rehberindeki](TECHNICAL-GUIDE.md) bağlantı noktasıyla eklenir. Canlı kullanımdan önce iş kurallarını, yetkileri ve paketle taşıma sürecini test sisteminizde doğrulayın.
 
 **Mevcut kurulumu güncelliyorsanız** ilk kurulum adımlarını doğrudan tekrarlamak yerine [güncelleme yolunu](TECHNICAL-REFERENCE.md#8-mevcut-kurulumu-güncelleyin) izleyin. Sunucu komutları ve ayrıntılı kontroller [teknik başvuru rehberindedir](TECHNICAL-REFERENCE.md).

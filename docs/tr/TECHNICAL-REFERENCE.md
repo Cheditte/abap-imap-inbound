@@ -4,6 +4,8 @@
 
 Bu dosya, kurulumu hazırlayan Basis ve e-posta ekipleri ile ayrıntıları incelemek isteyen geliştiriciler içindir. **1.1.0 kaynaklarını ve betik protokolü 2'yi** anlatır. Sırayla kurulum yapmak için [adım adım rehberi](WALKTHROUGH.md), kendi iş mantığınızı eklemek için [geliştirici rehberini](TECHNICAL-GUIDE.md) kullanın.
 
+SAP adımlarında okuyucunun SE38 ile program oluşturup etkinleştirebildiği ve çalıştırabildiği varsayılır. Bu rehberde **Basis / sunucu yöneticisi**, sunucunun yönetim sorumluluğunu üstlenen kişi veya ekibi ifade eder; gerekli yetkilere sahipseniz bu kişi siz olabilirsiniz. Posta yönetimi için de aynı ayrım geçerlidir. [Yetkiler sizdeyse hazırlık adımları](SELF-MANAGED-SETUP.md).
+
 ## Aradığınız ayrıntıya geçin
 
 - [Posta hesabının uygunluğu](#başlamadan-önce-posta-kutunuz-uygun-mu)
@@ -65,12 +67,12 @@ Klasör adları boşluk veya Türkçe karakter içeremez; İngilizce harfler, ra
 Aşağıdaki liste bir yol haritasıdır. Ekran adımları ve çalıştırılacak komutlar [adım adım kurulum rehberinde](WALKTHROUGH.md) yer alır.
 
 1. **Proje dosyalarını indirin.** Deponun ana sayfasındaki **Code → Download ZIP** ile indirip arşivin tamamını açın. Git kurmanız gerekmez. Sunucu ve SAP dosyalarını aynı indirmeden kullanın.
-2. **Deneme posta kutusunu hazırlatın.** Yukarıdaki bağlantı bilgilerini alın ve işlenen iletiler için posta kutusundaki mevcut bir klasörü seçin.
-3. **Basis sunucuyu hazırlasın.** İşlem SAP uygulama sunucusunda çalışır. PowerShell ve `curl` adlı yardımcı araçlar burada e-postayı alır; ayrı bir entegrasyon sunucusu gerekmez. Basis ağ erişimini ve korumalı çalışma klasörünü hazırlar, klasörün tam yolunu size verir. [Sunucu hazırlığı](WALKTHROUGH.md#1-sunucuyu-hazırlayın-basis).
-4. **SAP programlarını kurun.** SAP geliştirme yetkisi olan kişi, **SE38** program editöründe `ZIMAP_INSTALL` programını oluşturup projedeki aynı adlı kaynağı yükler ve çalıştırır. Bu program gerekli SAP programlarını ve tablolarını oluşturur. [SAP kurulum adımları](WALKTHROUGH.md#2-kurulum-programını-oluşturun).
+2. **Deneme posta kutusunu hazırlayın veya yöneticisinden isteyin.** Yukarıdaki bağlantı bilgilerini alın ve işlenen iletiler için posta kutusundaki mevcut bir klasörü seçin.
+3. **Sunucuyu hazırlayın veya yöneticisine hazırlatın.** İşlem SAP uygulama sunucusunda çalışır. PowerShell ve `curl` adlı yardımcı araçlar burada e-postayı alır; ayrı bir entegrasyon sunucusu gerekmez. Basis ağ erişimini ve korumalı çalışma klasörünü hazırlar, klasörün tam yolunu size verir. [Sunucu hazırlığı](WALKTHROUGH.md#1-sunucuyu-hazırlayın-basis).
+4. **SAP programlarını kurun.** **SE38** içinde `ZIMAP_INSTALL` programını oluşturup projedeki aynı adlı kaynağı yükleyin, etkinleştirin ve çalıştırın. Bu program gerekli SAP programlarını ve tablolarını oluşturur. [SAP kurulum adımları](WALKTHROUGH.md#2-kurulum-programını-oluşturun).
 5. **Bir posta profili kaydedin.** `ZIMAP_CONFIG` içinde bir ad seçip gerçek sunucu, kullanıcı ve klasör bilgilerinizi girin. İlk denemede handler olarak `ZIMAP_HANDLER_DEMO`, taşıma yöntemi olarak `MOVE` seçin. Parola kaynağı `S`, parolayı SAP ekranından girmeniz; `O`, Basis'in sunucuda kaydetmesi anlamına gelir. **F8** ayarları kaydeder ve bağlantıyı test eder; yalnız kaydın oluşması başarılı bağlantı demek değildir. [Profil tanımlama](WALKTHROUGH.md#4-posta-kutusu-profilini-tanımlayın).
 
-Kalıcı kullanım için geliştirme ekibiniz `ZIMAP` gibi bir **paket**, yani SAP geliştirme nesnelerini birlikte yöneteceğiniz bir grup oluşturmalıdır. Installer şu anda ürettiği nesneleri `$TMP` adlı yerel deneme alanına koyar; installer'ı pakete kaydetmek tek başına bunu değiştirmez. Test ve canlı sisteme taşıma için [paket ve transport adımlarını](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) Basis ve geliştiriciyle planlayın.
+Kalıcı kullanım için `ZIMAP` gibi bir müşteri paketi oluşturun veya projeye ayrılmış paketi kullanın. Installer şu anda ürettiği nesneleri `$TMP` adlı yerel deneme alanına koyar; installer'ı pakete kaydetmek tek başına bunu değiştirmez. Test ve canlı sisteme taşıma için [paket ve transport adımlarını](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) Basis ve geliştiriciyle planlayın.
 
 ## İlk denemede ne yapacaksınız?
 
@@ -78,7 +80,7 @@ Kalıcı kullanım için geliştirme ekibiniz `ZIMAP` gibi bir **paket**, yani S
 2. SAP'de **SE38** üzerinden `ZIMAP_INBOUND` programını açın. Kaydettiğiniz profil adını girin. **List only (no downloads/changes)** seçeneğini işaretleyip çalıştırın. Bu adım uygun iletilerin numaralarını (`UID`) listeler; içerik ve ekleri göstermez, e-postaları taşımaz.
 3. Listeleme başarılıysa aynı deneme profilini `ZIMAP_HANDLER_DEMO` ile, bu kez **List only seçeneği kapalı** çalıştırın. Artık ileti ve ekleri gerçekten alınır; örnek programın sonucu kaydedilir ve başarılı ileti işlenmiş klasörüne taşınır.
 4. `ZIMAP_MONITOR` programında sonucu ve ekleri inceleyin. Başarıyla tamamlanan ileti `S` durumunda görünür; posta kutusunda da seçtiğiniz işlenmiş klasöründe bulunmalıdır.
-5. Deneme tamamlandıktan sonra kendi iş kurallarınızı geliştiriciyle ekleyin. Düzenli çalışmayı Basis, kurulum yapılan **aynı SAP uygulama sunucusunda** bir arka plan işi olarak planlasın.
+5. Deneme tamamlandıktan sonra kendi iş kurallarınızı ekleyin. Düzenli çalışmayı Basis, kurulum yapılan **aynı SAP uygulama sunucusunda** bir arka plan işi olarak planlasın.
 
 Hazır örnekte SAP'de bir fatura veya sipariş oluşmasını beklemeyin. Bu denemenin amacı posta bağlantısını, dosyaların alınmasını ve sonucu izlemeyi doğrulamaktır.
 
@@ -173,7 +175,7 @@ Kurulum tek SAP uygulama sunucusuna bağlıdır; ayarlar, işleme ve izleme ayn�
 
 **Komutları nasıl kullanacaksınız?** İşletim sisteminize uygun bloğun tamamını, açılış ve kapanış süslü parantezleriyle birlikte kopyalayın. Sorulduğunda yalnız kendi değerinizi yazıp Enter basın; yanıtın etrafına tırnak veya köşeli parantez eklemeyin. Sunucu/port posta ekibinden, SAP hesabı ve klasör Basis'ten alınır. Her blok bilgileri tekrar sorar; önceki terminal değişkenlerine bağlı değildir. `ZIMAP_INSTALL`, `ZIMAP_CONFIG`, `ZIMAP_INBOUND`, `ZIMAP_MONITOR` ve `ZIMAP_HANDLER_DEMO` gerçek program adlarıdır ve değiştirilmez.
 
-**Komutları SAP uygulama sunucusunda çalıştırın; danışmanın bilgisayarında değil.** Güncel deponun `server` ve `script` klasörlerini birlikte kullanın. Kurulum hem `imap.ps1` hem `mime.ps1` dosyasını yerleştirir.
+**Komutları SAP uygulama sunucusunda çalıştırın; SAP GUI kullandığınız bilgisayar farklı olabilir.** Güncel deponun `server` ve `script` klasörlerini birlikte kullanın. Kurulum hem `imap.ps1` hem `mime.ps1` dosyasını yerleştirir.
 
 Bağlantıyı o sunucudan kontrol edin. Windows örneği:
 
@@ -370,7 +372,7 @@ Log kayıtları dosyalardan daha uzun süre kalabilir. Saklama süresi tamamlanm
 
 1. Konusunda `TEST-ERROR` bulunan ileti gönderip demo handler ile normal çalıştırın.
 2. Bilerek oluşan hatayı monitörde inceleyin.
-3. Bir geliştiriciyle nedeni düzeltin veya bu iletiyi kabul eden onaylı deneme handler'ını seçin. Yeniden deneme işareti demonun kuralını değiştirmez.
+3. İlgili programdaki nedeni düzeltin veya bu iletiyi kabul eden onaylı deneme handler'ını seçin. Yeniden deneme işareti demonun kuralını değiştirmez.
 4. Yetkili monitör kullanıcısı yeniden deneme işlemini seçer. Kayıt `R` olur; normal işleme çalıştırın.
 
 Yeniden deneme log değiştirme yetkisi gerektirir. İşleme ekranındaki **retry errors** seçeneği de seçilen `E` iletilerini bilerek tekrar denemek içindir. `H`, taşıma kurtarmasıyla ele alınır. Tekrar çalıştırmak için log satırlarını veya sunucu dosyalarını silmeyin.
@@ -408,4 +410,4 @@ Basis'ten **SM36** ile `ZIMAP_INBOUND` job'ı oluşturmasını isteyin. Varyantt
 
 Kurulumun uygulama sunucusunu kullanın. Gerçek, kısıtlı job kullanıcısıyla test edin; geliştirici hesabında önden çalışması yeterli değildir. Basis harici komut, dosya, tablo ve handler'a özel yetkileri kontrol eder. [Rol özeti](TECHNICAL-REFERENCE.md#yetkiler-ve-işletim-sınırları) teknik başvuru rehberindedir.
 
-Gerçek iş postalarından önce ABAP geliştiricisi iş kurallarını uygulayıp doğrulamalıdır. Arayüz [geliştirici rehberinde](TECHNICAL-GUIDE.md) anlatılır. Hazır demoyu gösterim amacıyla kullanın.
+Gerçek iş postalarından önce iş kurallarınızı uygulayıp doğrulayın. Arayüz [geliştirici rehberinde](TECHNICAL-GUIDE.md) anlatılır. Hazır demoyu gösterim amacıyla kullanın.
