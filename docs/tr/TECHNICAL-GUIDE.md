@@ -14,7 +14,7 @@ Mevcut bağlantı noktası dışarıya açılmış bir sınıf değil, **`FORM` 
 4. `ZIMAP_CONFIG` içindeki **Handler program** alanına programınızı, **Handler FORM** alanına `HANDLE_MAIL` girin. Kaydedip bağlantı sonucunu kontrol edin.
 5. İşlemeyi zamanlamadan önce yetkilendirilmiş job kullanıcısıyla test edip monitörü inceleyin.
 
-Installer kendi demo handler'ını içerir; özel kopyanızı içermez. İş kodunuzu ayrı program/pakette tutup transport'a ekleyin. [Paket ve transport adımına](WALKTHROUGH.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) bakın.
+Installer kendi demo handler'ını içerir; özel kopyanızı içermez. İş kodunuzu ayrı program/pakette tutup transport'a ekleyin. [Paket ve transport adımına](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) bakın.
 
 ## 2. Girdileri ve sonucu tanıyın
 
@@ -147,7 +147,7 @@ Bu örnek yalnız uygun UID'leri listeler. Bilerek normal işleme için `p_test`
 - Profil anahtarı örneği: `A4H_001_INVOICE`. SAP `conf/KEY_REVISION.conf` yayımlar. `S` kaynağı `secret/KEY_CREDREV.cred`, `O` kaynağı `secret/KEY.cred` kullanır. Revizyon ve parola işaretçilerini elle değiştirmeyin.
 - `bin`, `imap.ps1`, `mime.ps1` ve Basis'in yönettiği `policy.psd1` içerir. SAP'nin çalıştırılabilir/politika dosyalarına yazma erişimi olmamalıdır. Parola dosyaları OS izinleriyle korunan düz metindir.
 - Girdi/arşiv verisi seçilen kökün altında ayrılmış posta klasörlerindedir. Handler'a sabit kök yazmayın; verilen yolları ve ortak yardımcıları kullanın.
-- SAP nesneleri ve iki sunucu modülünü uyumlu protokol-2 bütünü olarak kurun. Eski arşivler ve güncellemeler için [geçiş adımlarını](WALKTHROUGH.md#8-mevcut-kurulumu-güncelleyin) izleyin.
+- SAP nesneleri ve iki sunucu modülünü uyumlu protokol-2 bütünü olarak kurun. Eski arşivler ve güncellemeler için [geçiş adımlarını](TECHNICAL-REFERENCE.md#8-mevcut-kurulumu-güncelleyin) izleyin.
 - Ayar, işleme ve izleme tek sunucuya bağlıdır. Yeni handler'ı uygun `S_DATASET` ve iş yetkisi tasarımına dahil edin. [Rol özetine](TECHNICAL-REFERENCE.md#yetkiler-ve-işletim-sınırları) bakın.
 
 Kaynak modern ABAP sözdiziminden kaçınır, ASCII kullanır ve ABAP satırlarını 72 sütunda sınırlar. Eski SAP uyumluluğu hedeftir; doğrulanmış sürüm sertifikası değildir. Eklemeleri uyumlu tutup gerçek hedef sistemde derleyin.

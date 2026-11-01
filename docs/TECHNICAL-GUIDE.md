@@ -14,7 +14,7 @@ The current integration point is a **handler program with a `FORM`**, rather tha
 4. In `ZIMAP_CONFIG`, enter your program in **Handler program** and `HANDLE_MAIL` in **Handler FORM**. Save and check the connection result.
 5. Test with an authorized job user and inspect the monitor before scheduling business processing.
 
-The installer contains the demonstration handler, not your custom copy. Keep custom business code in its own program/package and include it in your transport. See [package and transport](WALKTHROUGH.md#2b-before-production-package-and-transport).
+The installer contains the demonstration handler, not your custom copy. Keep custom business code in its own program/package and include it in your transport. See [package and transport](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport).
 
 ## 2. Understand the inputs and result
 
@@ -147,7 +147,7 @@ This example only lists eligible UIDs. Clear `p_test` for an intentional normal 
 - Profile key example: `A4H_001_INVOICE`. SAP publishes `conf/KEY_REVISION.conf`; source `S` references `secret/KEY_CREDREV.cred`, while source `O` uses `secret/KEY.cred`. Do not hand-edit revision numbers or credential pointers.
 - `bin` contains `imap.ps1`, `mime.ps1` and Basis-owned `policy.psd1`. SAP must not have write access to executable/policy files. Credential files contain plain text protected by OS permissions.
 - Input/archive data lives under the chosen root in scoped mail directories. Do not hard-code that root in the handler; use supplied paths and shared helpers.
-- Install SAP objects and both server modules as a matching protocol-2 set. For upgrades and pending old archives, follow the [upgrade procedure](WALKTHROUGH.md#8-update-an-existing-installation).
+- Install SAP objects and both server modules as a matching protocol-2 set. For upgrades and pending old archives, follow the [upgrade procedure](TECHNICAL-REFERENCE.md#8-update-an-existing-installation).
 - Processing, configuration and monitoring are pinned to one application-server host. Include the new handler program in the appropriate `S_DATASET` and business authorization design. See the [role outline](TECHNICAL-REFERENCE.md#access-and-operating-boundaries).
 
 The source avoids modern ABAP syntax, uses ASCII and limits ABAP source to 72 columns. Compatibility with older SAP is a target, not a verified release certification. Keep additions compatible and compile on the actual target system.

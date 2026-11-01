@@ -4,6 +4,17 @@
 
 Bu dosya, kurulumu hazırlayan Basis ve e-posta ekipleri ile ayrıntıları incelemek isteyen geliştiriciler içindir. **1.1.0 kaynaklarını ve betik protokolü 2'yi** anlatır. Sırayla kurulum yapmak için [adım adım rehberi](WALKTHROUGH.md), kendi iş mantığınızı eklemek için [geliştirici rehberini](TECHNICAL-GUIDE.md) kullanın.
 
+## Aradığınız ayrıntıya geçin
+
+- [Posta hesabının uygunluğu](#başlamadan-önce-posta-kutunuz-uygun-mu)
+- [Sunucu kurulum komutları](#sunucu-kurulumu-komutlar-ve-kontroller)
+- [SAP kurulum seçenekleri](#sap-kurulum-seçenekleri-ve-kontrolleri)
+- [Profil alanları ve parola yönetimi](#profil-alanları-ve-sunucuda-parola-yönetimi)
+- [Paket ve sistemler arası taşıma](#2b-canlıya-çıkmadan-önce-paket-ve-transport)
+- [Saklama ve yeniden deneme](#saklama-ve-yeniden-deneme-ayrıntıları)
+- [Mevcut sürümü güncelleme](#8-mevcut-kurulumu-güncelleyin)
+- [Test durumu](#neler-doğrulandı)
+
 ## İlk kez karşılaşabileceğiniz terimler
 
 | Terim | Bu projede anlamı |
@@ -54,12 +65,12 @@ Klasör adları boşluk veya Türkçe karakter içeremez; İngilizce harfler, ra
 Aşağıdaki liste bir yol haritasıdır. Ekran adımları ve çalıştırılacak komutlar [adım adım kurulum rehberinde](WALKTHROUGH.md) yer alır.
 
 1. **Proje dosyalarını indirin.** Deponun ana sayfasındaki **Code → Download ZIP** ile indirip arşivin tamamını açın. Git kurmanız gerekmez. Sunucu ve SAP dosyalarını aynı indirmeden kullanın.
-2. **Deneme posta kutusunu hazırlatın.** Yukarıdaki bağlantı bilgilerini alın ve işlenmiş klasörünü oluşturun.
-3. **Basis sunucuyu hazırlasın.** İşlem SAP uygulama sunucusunda çalışır. PowerShell ve `curl` adlı yardımcı araçlar burada e-postayı alır; ayrı bir entegrasyon sunucusu gerekmez. Basis ağ erişimini ve korumalı çalışma klasörünü hazırlar, klasörün tam yolunu size verir. [Sunucu hazırlığı](WALKTHROUGH.md#0-sunucuyu-hazırlayın-basis).
-4. **SAP programlarını kurun.** SAP geliştirme yetkisi olan kişi, **SE38** program editöründe `ZIMAP_INSTALL` programını oluşturup projedeki aynı adlı kaynağı yükler ve çalıştırır. Bu program gerekli SAP programlarını ve tablolarını oluşturur. [SAP kurulum adımları](WALKTHROUGH.md#1-kurulum-programını-oluşturun).
-5. **Bir posta profili kaydedin.** `ZIMAP_CONFIG` içinde bir ad seçip gerçek sunucu, kullanıcı ve klasör bilgilerinizi girin. İlk denemede handler olarak `ZIMAP_HANDLER_DEMO`, taşıma yöntemi olarak `MOVE` seçin. Parola kaynağı `S`, parolayı SAP ekranından girmeniz; `O`, Basis'in sunucuda kaydetmesi anlamına gelir. **F8** ayarları kaydeder ve bağlantıyı test eder; yalnız kaydın oluşması başarılı bağlantı demek değildir. [Profil tanımlama](WALKTHROUGH.md#3-posta-kutusu-profilini-tanımlayın).
+2. **Deneme posta kutusunu hazırlatın.** Yukarıdaki bağlantı bilgilerini alın ve işlenen iletiler için posta kutusundaki mevcut bir klasörü seçin.
+3. **Basis sunucuyu hazırlasın.** İşlem SAP uygulama sunucusunda çalışır. PowerShell ve `curl` adlı yardımcı araçlar burada e-postayı alır; ayrı bir entegrasyon sunucusu gerekmez. Basis ağ erişimini ve korumalı çalışma klasörünü hazırlar, klasörün tam yolunu size verir. [Sunucu hazırlığı](WALKTHROUGH.md#1-sunucuyu-hazırlayın-basis).
+4. **SAP programlarını kurun.** SAP geliştirme yetkisi olan kişi, **SE38** program editöründe `ZIMAP_INSTALL` programını oluşturup projedeki aynı adlı kaynağı yükler ve çalıştırır. Bu program gerekli SAP programlarını ve tablolarını oluşturur. [SAP kurulum adımları](WALKTHROUGH.md#2-kurulum-programını-oluşturun).
+5. **Bir posta profili kaydedin.** `ZIMAP_CONFIG` içinde bir ad seçip gerçek sunucu, kullanıcı ve klasör bilgilerinizi girin. İlk denemede handler olarak `ZIMAP_HANDLER_DEMO`, taşıma yöntemi olarak `MOVE` seçin. Parola kaynağı `S`, parolayı SAP ekranından girmeniz; `O`, Basis'in sunucuda kaydetmesi anlamına gelir. **F8** ayarları kaydeder ve bağlantıyı test eder; yalnız kaydın oluşması başarılı bağlantı demek değildir. [Profil tanımlama](WALKTHROUGH.md#4-posta-kutusu-profilini-tanımlayın).
 
-Kalıcı kullanım için geliştirme ekibiniz `ZIMAP` gibi bir **paket**, yani SAP geliştirme nesnelerini birlikte yöneteceğiniz bir grup oluşturmalıdır. Installer şu anda ürettiği nesneleri `$TMP` adlı yerel deneme alanına koyar; installer'ı pakete kaydetmek tek başına bunu değiştirmez. Test ve canlı sisteme taşıma için [paket ve transport adımlarını](WALKTHROUGH.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) Basis ve geliştiriciyle planlayın.
+Kalıcı kullanım için geliştirme ekibiniz `ZIMAP` gibi bir **paket**, yani SAP geliştirme nesnelerini birlikte yöneteceğiniz bir grup oluşturmalıdır. Installer şu anda ürettiği nesneleri `$TMP` adlı yerel deneme alanına koyar; installer'ı pakete kaydetmek tek başına bunu değiştirmez. Test ve canlı sisteme taşıma için [paket ve transport adımlarını](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) Basis ve geliştiriciyle planlayın.
 
 ## İlk denemede ne yapacaksınız?
 
@@ -134,7 +145,7 @@ Kontroller elle çalıştırılır; depoda otomatik CI iş akışı bulunmaz. Ay
 
 ## Mevcut kurulumu güncelleme
 
-Dosyaları değiştirmeden önce [güncelleme adımlarını](WALKTHROUGH.md#8-mevcut-kurulumu-güncelleyin) okuyun. 1.1.0; betik protokolünü, profil adlandırmasını ve revizyonlu dosya yapısını değiştirir.
+Dosyaları değiştirmeden önce [güncelleme adımlarını](TECHNICAL-REFERENCE.md#8-mevcut-kurulumu-güncelleyin) okuyun. 1.1.0; betik protokolünü, profil adlandırmasını ve revizyonlu dosya yapısını değiştirir.
 
 SAP kaynaklarıyla **iki sunucu modülünü birlikte** güncelleyin. Profilleri yeniden kaydedin; `S` şifrelerini yeniden girin. Basis'in yönettiği kimlik bilgileri tam sistem/client/profil anahtarını kullanır. Eski mail dizinleri korunur, **otomatik taşınmaz**. Bekleyen `H` kayıtları ve dosyaları için kontrollü geçiş planı gerekir.
 
@@ -155,3 +166,246 @@ ABAP kaynaklarını değiştirdikten sonra installer'ı yeniden üretin:
 ```powershell
 pwsh -NoProfile -File installer/build.ps1
 ```
+
+## Sunucu kurulumu: komutlar ve kontroller
+
+Kurulum tek SAP uygulama sunucusuna bağlıdır; ayarlar, işleme ve izleme aynı sunucuda çalışmalıdır. Basis sunucuya özel SAP bağlantısını sağlamalıdır. Proje programları ve SM69 komutları mandantlar arasında ortaktır; değişiklikleri diğer sahiplerle koordine edin.
+
+**Komutları nasıl kullanacaksınız?** İşletim sisteminize uygun bloğun tamamını, açılış ve kapanış süslü parantezleriyle birlikte kopyalayın. Sorulduğunda yalnız kendi değerinizi yazıp Enter basın; yanıtın etrafına tırnak veya köşeli parantez eklemeyin. Sunucu/port posta ekibinden, SAP hesabı ve klasör Basis'ten alınır. Her blok bilgileri tekrar sorar; önceki terminal değişkenlerine bağlı değildir. `ZIMAP_INSTALL`, `ZIMAP_CONFIG`, `ZIMAP_INBOUND`, `ZIMAP_MONITOR` ve `ZIMAP_HANDLER_DEMO` gerçek program adlarıdır ve değiştirilmez.
+
+**Komutları SAP uygulama sunucusunda çalıştırın; danışmanın bilgisayarında değil.** Güncel deponun `server` ve `script` klasörlerini birlikte kullanın. Kurulum hem `imap.ps1` hem `mime.ps1` dosyasını yerleştirir.
+
+Bağlantıyı o sunucudan kontrol edin. Windows örneği:
+
+**Bu komut bloğu gerçek sunucu adını ve portu çalışırken sorar.** Posta ekibinin verdiği değerleri yazıp Enter basın; e-posta adresinizi veya SAP sunucunuzun adını yazmayın. Boş değerle bağlantı testi başlamaz. Kurulumdaki `-AllowedHosts` / `--allowed-hosts` ve SAP profilindeki **Server / Sunucu** alanı için de aynı IMAP sunucu adını kullanın.
+
+```powershell
+& {
+  $ImapHostName = (Read-Host 'Posta ekibinin verdigi IMAP sunucu adi').Trim()
+  $ImapPort = (Read-Host 'Posta ekibinin verdigi IMAP portu').Trim()
+  if (@($ImapHostName, $ImapPort) -contains '') {
+    throw 'Bilgiler bos birakilamaz. Ilgili ekipten alip tekrar calistirin.'
+  }
+  Test-NetConnection -ComputerName $ImapHostName -Port ([int]$ImapPort)
+}
+```
+
+`TcpTestSucceeded : True`, TCP bağlantısını gösterir; girişin veya sertifikanın doğru olduğunu göstermez. Başarısızsa sunucu/ağ ekibi DNS, yönlendirme, güvenlik duvarı ve posta servisini kontrol etmelidir. Gereken bağlantı SAP sunucusundan IMAP portuna dışarı yönlüdür.
+
+### Windows
+
+PowerShell 5.1 veya üzeri ve `curl.exe --version` çıktısında `imaps` bulunan bir curl gerekir. Windows PowerShell'de `curl.exe` yazın; `curl` başka bir komutu ifade edebilir.
+
+Depo klasöründen, yönetici PowerShell oturumunda aşağıdaki bloğu çalıştırın. Sorulduğunda posta ekibinin IMAP sunucusunu, Basis'in doğruladığı Windows SAP hesabını ve tam çalışma klasörünü girin. Boş yanıtla kurulum başlamaz.
+
+```powershell
+& {
+  $ImapHostName = (Read-Host 'Posta ekibinin verdigi IMAP sunucu adi').Trim()
+  $SapOsAccount = (Read-Host 'Basis tarafindan dogrulanan Windows SAP servis hesabi').Trim()
+  $ImapRoot = (Read-Host 'Basis tarafindan onaylanan tam calisma klasoru yolu').Trim()
+  if (@($ImapHostName, $SapOsAccount, $ImapRoot) -contains '') {
+    throw 'Bilgiler bos birakilamaz. Ilgili ekipten alip tekrar calistirin.'
+  }
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File server\setup-server.ps1 `
+    -AllowedHosts $ImapHostName -SapAccount $SapOsAccount -Root $ImapRoot
+}
+```
+
+Hesap sorusuna Basis'in doğruladığı tam servis hesabını yazın; `DOMAIN\SAPServiceA4H` yalnız biçim örneğidir. Birden fazla SAP örneği bulunan makinelerde hesabı açıkça vermek belirsizliği önler. curl farklı bir konumdaysa Basis `-CurlPath` parametresine sunucudaki gerçek `curl.exe` dosyasının tam yolunu vermelidir; yol boşluk içeriyorsa tırnak içine alınır.
+
+Varsayılan kök klasör `C:\sapimap`. Yukarıdaki blok klasör yolunu ayrıca sorar; Basis hangi yolu onayladıysa onu girin. Öz test, parola kaydetme ve SAP kurulumunda aynı yolu kullanın. Kısa yol seçin: SAP kök alanı 60 karakterdir; eski harici komut arayüzlerinin toplam parametre sınırı da vardır. Kontrolü geçmek için üst klasör izinlerini gevşetmeyin.
+
+Öz testi çalıştırın. Klasör sorusuna kurulumda kullandığınız tam yolu tekrar girin:
+
+```powershell
+& {
+  $ImapRoot = (Read-Host 'Basis tarafindan onaylanan tam calisma klasoru yolu').Trim()
+  if (@($ImapRoot) -contains '') {
+    throw 'Bilgiler bos birakilamaz. Ilgili ekipten alip tekrar calistirin.'
+  }
+  powershell.exe -NoProfile -File (Join-Path $ImapRoot 'bin\imap.ps1') test
+}
+```
+
+Başarılı çıktı `PROTOCOL 2`, `VERSION 1.1.0` ve seçilen kökü belirtir; `OK` ile biter. Yönetici hesabıyla bu test yararlıdır; ileride SAP kurulum programının testi gerçek SAP çalışma hesabıyla da geçmelidir.
+
+### Linux
+
+PowerShell (`pwsh`) ve IMAPS destekli curl kurun. Oluşturulan SM69 komutu `/usr/bin/pwsh` bekler. SAP'nin gerçek çalışma kullanıcısını doğrulayın; `a4hadm` örnektir.
+
+Depo klasöründen Bash içinde aşağıdaki bloğu çalıştırın. Sunucu adı posta ekibinden, Linux SAP kullanıcısı ve tam çalışma klasörü Basis'ten alınır; her soruya kendi değerinizle yanıt verin.
+
+```bash
+{
+  read -r -p 'Posta ekibinin verdigi IMAP sunucu adi: ' imap_host
+  read -r -p 'Basis tarafindan dogrulanan Linux SAP kullanicisi: ' sap_os_user
+  read -r -p 'Basis tarafindan onaylanan tam calisma klasoru yolu: ' imap_root
+  sudo bash server/setup-server.sh \
+    --allowed-hosts "${imap_host:?IMAP hostname is required}" \
+    --sap-user "${sap_os_user:?SAP OS user is required}" \
+    --root "${imap_root:?Working folder is required}"
+}
+```
+
+Varsayılan kök `/usr/sap/sapimap`. Üst klasörlerden biri root dışındaki kullanıcı/gruplar tarafından yazılabiliyorsa kurulum yolu reddeder. Basis, uygun olduğunda `--root /opt/sapimap` gibi üst klasörleri korumalı, onaylı bir yer seçip her adımda aynı yolu kullanmalıdır. Kontrolü geçmek için mevcut SAP klasörlerinin sahipliğini değiştirmeyin.
+
+Seçilen kökü SAP'nin çalışma kullanıcısıyla test edin. İki soruya önceki kurulumdaki Linux kullanıcı adı ve tam klasör yoluyla yanıt verin:
+
+```bash
+{
+  read -r -p 'Basis tarafindan dogrulanan Linux SAP kullanicisi: ' sap_os_user
+  read -r -p 'Basis tarafindan onaylanan tam calisma klasoru yolu: ' imap_root
+  sudo -u "${sap_os_user:?SAP OS user is required}" /usr/bin/pwsh \
+    -NoProfile -File "${imap_root:?Working folder is required}/bin/imap.ps1" test
+}
+```
+
+Çıktı protokol `2`, sürüm `1.1.0` ve seçilen kökü belirtip `OK` ile bitmelidir. Bu yerel ön koşulları kontrol eder; SAP kurulumu ve posta bağlantısı sonraki adımlardadır.
+
+### Sertifika ve danışmana teslim
+
+TLS sertifika doğrulamasını açık tutun. Basis kullanılan curl sürümünün güven deposunu veya `bin/policy.psd1` içindeki `CaCert` üzerinden onaylı CA dosyasını hazırlamalıdır. Windows Schannel ve diğer curl TLS altyapılarının güven mekanizması farklı olabilir.
+
+Basis, danışmana kök klasörü, seçilen SAP sunucusunu ve öz testin başarılı olduğunu iletir. Bu teslim bilgisinde parola bulunmaz.
+
+## SAP kurulum seçenekleri ve kontrolleri
+
+**SE38** içinde `ZIMAP_INSTALL` girip **Execute / Çalıştır (F8)** seçin.
+
+![Önceki 1.0 demosunun kurulum ekranı](../screenshots/02-install-screen.png)
+
+Geliştirme sistemindeki ilk kurulum için:
+
+| Seçenek | Ne seçilir / ne yapar? |
+|---|---|
+| DDIC objects | Seçili. Projenin tablolarını, yapılarını, veri elemanlarını ve domain'lerini oluşturur. |
+| Programs | Seçili. Ayar, işleme, izleme, include ve örnek handler programlarını oluşturur. |
+| SM69 commands | Seçili. SAP'nin scripti başlatacağı komutları oluşturur. |
+| Server check | Seçili ve zorunlu. SAP'nin beklenen script sürümünü ve kökü çalıştırabildiğini kontrol eder. |
+| Overwrite programs | Yedekleme/inceleme sonrası planlı güncellemede kullanın; yerel değişiklikleri değiştirebilir. |
+| Server folder | Basis'in verdiği kök; örneğin `C:\sapimap\` veya `/usr/sap/sapimap/`. |
+| I/O mode / code page | Geliştirici başka seçim önermedikçe otomatik bırakın. Eski sistemlerin dosya okuma biçimini etkiler. |
+| Uninstall | Seçmeyin. Mandantlar arası ortak nesneleri kaldırır; profil sıfırlama değildir. |
+
+Çalıştırın ve sonuç listesinin tamamını okuyun. Seçili adımlar ve son sunucu kontrolü başarılıysa devam edin. Hata varsa çıktıyı Basis/geliştirme ekibine verin.
+
+Yalnız SM69/sunucu adımları seçilse de geliştirme yetkileri kontrol edilir. Kurulum uygun durumlarda yedeklenen program/metin ve SM69 kayıtlarını geri alır; tam veritabanı işlemi veya sistem yedeği değildir. Başarısız güncellemede DDIC değişikliklerini ve yeni nesneleri gözden geçirin.
+
+## 2b. Canlıya çıkmadan önce: paket ve transport
+
+`$TMP` deneme için uygundur; nesneleri normal paket transport sürecine girmez. Kalıcı kullanım için geliştirme ve Basis ekibiyle kurumunuzun müşteri paketini ve taşıma sürecini kullanın.
+
+1. **Geliştirme sisteminde**, **SE21** veya **SE80** üzerinden `ZIMAP` gibi bir paket oluşturun. Transport katmanını Basis belirlesin.
+2. Burada kurup test edin. Mevcut installer ürettiği nesneleri `$TMP` içine koyar.
+3. Proje nesnelerini listeleyin: installer, program/include'lar, tablo/yapılar, veri elemanları, domain'ler ve kendi handler'ınız. `ZIMAP*` ile eşleşen ilgisiz nesneleri körlemesine seçmeyin.
+4. **SE03 → Change Object Directory Entries** veya uygun **SE80 → Reassign** işlemiyle projeye ait nesneleri pakete atayın ve transport talebinde toplayın. Talep yalnız installer'ı değil, tanımları ve bağımlılıkları da içermelidir.
+5. **Test sistemine** aktarın, o sistemin sunucusunu ve yerel ayarlarını hazırlayın, ilk kullanım kontrollerini tekrarlayın. Ardından onaylı canlıya taşıma sürecini izleyin.
+
+**Bu paket/transport yolu projeyle uçtan uca henüz denenmedi.** Güvenmeden önce kendi sistem zincirinizde doğrulayın.
+
+ABAP nesnelerinin transport'u PowerShell'i, işletim sistemi dosyalarını, klasör izinlerini veya parolaları kurmaz. Basis her hedefte SM69 yollarını/yetkilerini incelemeli; profil ve parolaları ilgili sistem/mandant için hazırlamalıdır.
+
+Yalnız sunucu modunun değişikliğe kapalı canlıda çalışacağını varsaymayın: mevcut installer geliştirme yetkisini ve kaynak tutarlılığını yine kontrol eder. Hedef sistem kurulumunu önceden kararlaştırıp test edin; rehber canlı değişiklik kontrollerinin gevşetilmesini gerektirmez.
+
+SAP kaynakları: [Nesne dizini ve paket değiştirme](https://help.sap.com/docs/SAP_NETWEAVER_700/109ce05a6c531014b4e8fe6b0570a984/5738e06c4eb711d182bf0000e829fbfe.html), [harici komutların bakımı](https://help.sap.com/docs/SAP_NETWEAVER_AS_ABAP_752/b17bd20044a44edb9aa7830ee52ffac3/c43a607b505211d189550000e829fbbd.html?locale=en-US&state=PRODUCTION&version=7.52.latest).
+
+## Profil alanları ve sunucuda parola yönetimi
+
+| Alan | İlk deneme örneği | Açıklama |
+|---|---|---|
+| Profil / aktif | `INVOICE` / seçili | Ayarların adı; aktif profiller işlenebilir. |
+| Sunucu / port | Kendi IMAP sunucunuz / portunuz | İkisini de posta ekibinden alın; örnek adresi kopyalamayın. |
+| Güvenlik / sertifika doğrula | Posta ekibinin verdiği tür / seçili | `IMAPS` veya `STARTTLS` seçimi portla uyumlu olmalıdır. Doğrulamayı açık tutun. |
+| Kullanıcı | Kendi posta giriş adınız | Posta ekibinin verdiği giriş adını yazın; örnek e-posta adresini kullanmayın. |
+| Parola kaynağı | `S` veya `O` | `S`: SAP'de girilir. `O`: Basis sunucuda saklar. |
+| Okunacak klasör | Varsayılan `INBOX` | Gelen Kutusu okunur. Başka bir klasörü okumak istiyorsanız aynı posta kutusundaki o klasörün gerçek IMAP adını/yolunu girin; yalnız seçilen klasör okunur. |
+| İşlenmiş klasörü | Seçtiğiniz posta klasörünün adı | Mevcut bir klasörü kullanabilirsiniz. Başlangıçtaki `SAP-Processed` değerini seçtiğiniz klasörün gerçek IMAP adı/yoluyla değiştirin. |
+| Taşıma modu | `MOVE` | UID MOVE desteği gerekir. |
+| Handler programı | `ZIMAP_HANDLER_DEMO` | Hazır örnek; iş belgesi oluşturmaz. |
+| En çok ileti | `50` | Bir çalıştırmadaki örnek üst sınır. |
+| En çok boyut | `20` | İleti başına örnek MiB sınırı; sunucu politikası daha düşük olabilir. |
+| Zaman aşımı | `120` | Örnek ağ zaman aşımı, saniye. |
+| Saklama süresi | `30` | Tamamlanmış yerel arşivler için gün; SAP logunu veya uzaktaki postayı silmez. |
+
+### Parolayı SAP'de girin veya Basis'e bırakın
+
+**`S` kaynağında** parolayı SAP'de girersiniz. SAP tablosuna değil, işletim sistemi izinleriyle korunan düz metin parola dosyasına yazılır. Bu giriş için normal varyant kaydetme ve yazdırma kapatılır. Gerekli SAP koruma API'si yoksa yeni parola girişi kapalıdır; `O` kullanın. Yeni parolayı arka plan varyantıyla girmeyin.
+
+**`O` kaynağında** Basis'e tam **`SID_MANDANT_PROFIL`** anahtarını verin. Sistem `A4H`, mandant `001`, profil `INVOICE` ise anahtar **`A4H_001_INVOICE`** olur. SID ve mandantı **Sistem → Durum / System → Status** altında görebilirsiniz.
+
+Basis sunucuda depo klasöründen işletim sistemine uygun bloğu çalıştırır. Önce gerçek tam profil anahtarı, SAP işletim sistemi hesabı ve kurulumdaki tam klasör yolu sorulur. `A4H_001_INVOICE` değerini aynen kopyalamayın; kendi SID/mandant/profilinizden oluşturun. Parolayı kurulum aracı daha sonra ayrıca sorar; komuta yazmayın.
+
+```powershell
+& {
+  $ProfileKey = (Read-Host 'Bu sistem ve mandant icin tam SID_CLIENT_PROFILE anahtari').Trim()
+  $SapOsAccount = (Read-Host 'Basis tarafindan dogrulanan Windows SAP servis hesabi').Trim()
+  $ImapRoot = (Read-Host 'Basis tarafindan onaylanan tam calisma klasoru yolu').Trim()
+  if (@($ProfileKey, $SapOsAccount, $ImapRoot) -contains '') {
+    throw 'Bilgiler bos birakilamaz. Ilgili ekipten alip tekrar calistirin.'
+  }
+  powershell.exe -NoProfile -File server\setup-server.ps1 `
+    -SetPassword $ProfileKey -SapAccount $SapOsAccount -Root $ImapRoot
+}
+```
+
+```bash
+{
+  read -r -p 'Bu sistem ve mandant icin tam SID_CLIENT_PROFILE anahtari: ' profile_key
+  read -r -p 'Basis tarafindan dogrulanan Linux SAP kullanicisi: ' sap_os_user
+  read -r -p 'Basis tarafindan onaylanan tam calisma klasoru yolu: ' imap_root
+  sudo bash server/setup-server.sh \
+    --set-password "${profile_key:?Full profile key is required}" \
+    --sap-user "${sap_os_user:?SAP OS user is required}" \
+    --root "${imap_root:?Working folder is required}"
+}
+```
+
+Sunucudaki parola dosyası `USER` içeriyorsa boş olmalı veya profildeki kullanıcıyla tam eşleşmelidir. SAP'nin işletim sistemi hesabı ve ayrıcalıklı yöneticiler bu dosyalara erişebilir; koruma dosya izinleridir, parola kasası değildir.
+
+## Saklama ve yeniden deneme ayrıntıları
+
+Log kayıtları dosyalardan daha uzun süre kalabilir. Saklama süresi tamamlanmış yerel arşivleri temizler; `ZIMAP_LOG` veya uzak işlenmiş klasörünü temizlemez. Bunların saklama süresini veri sahipleriyle ayrıca belirleyin.
+
+### Hata ve yeniden deneme alıştırması
+
+1. Konusunda `TEST-ERROR` bulunan ileti gönderip demo handler ile normal çalıştırın.
+2. Bilerek oluşan hatayı monitörde inceleyin.
+3. Bir geliştiriciyle nedeni düzeltin veya bu iletiyi kabul eden onaylı deneme handler'ını seçin. Yeniden deneme işareti demonun kuralını değiştirmez.
+4. Yetkili monitör kullanıcısı yeniden deneme işlemini seçer. Kayıt `R` olur; normal işleme çalıştırın.
+
+Yeniden deneme log değiştirme yetkisi gerektirir. İşleme ekranındaki **retry errors** seçeneği de seçilen `E` iletilerini bilerek tekrar denemek içindir. `H`, taşıma kurtarmasıyla ele alınır. Tekrar çalıştırmak için log satırlarını veya sunucu dosyalarını silmeyin.
+
+## 7. Teknik başvuru: SAP hangi komutları çalıştırır?
+
+Bu isteğe bağlı bölüm Basis/geliştirme ekibinin teşhisi içindir; canlı postaya elle komut çalıştırma talimatı değildir.
+
+| SM69 adı | Script işlemi ve sıralı parametreleri |
+|---|---|
+| `ZIMAP_TEST` | `test`; profil testi için isteğe bağlı `KEY REVISION`. |
+| `ZIMAP_LIST` | `list KEY REVISION`; normal SAP çalışması tamamlanmış yerel arşiv temizliği için `PURGE` ekler. Diğer durumda listeleme salt okunurdur. |
+| `ZIMAP_FETCH` | `fetch KEY UID UIDVALIDITY REVISION` |
+| `ZIMAP_DONE` | `done KEY UID UIDVALIDITY REVISION` |
+
+`KEY`, SID/mandant/profil içerir. Revizyonları SAP yönetir; elle değiştirmeyin. MIME testlerinin ayrı yerel giriş noktası vardır; üretim SM69 komutu değildir.
+
+## 8. Mevcut kurulumu güncelleyin
+
+1.1.0 script protokolünü, profil dosya adlarını ve revizyon saklamasını değiştirir. 1.0 güncellemesini önce geliştirme/testte planlayın.
+
+1. Zamanlanmış işlemeyi durdurun; ortak kurulumu kullanan mandantlarla koordine edin. SAP nesneleri/ayarları/logları, politika, parolalar ve posta klasörlerini onaylı yöntemle yedekleyin.
+2. Bekleyen `H` kayıtlarını Basis/geliştirme ekibiyle inceleyin. Eski, sistem/mandant ayrımı olmayan klasörler korunur; **otomatik taşınmaz**. Devam etmeden kayıt/dosya eşleştirmesini planlayın; silerek veya tamamlanmış iş mantığını tekrar çalıştırarak geçmeyin.
+3. Aynı sürümden **hem** `imap.ps1` **hem** `mime.ps1` yerleştirin; politikayı koruyup gözden geçirin. SAP nesne ve komutlarını test edilmiş paket/transport süreciyle güncelleyin. SAP ve script protokol `2` kullanmalıdır.
+4. Sunucuyu, rolleri ve profilleri kontrol edin. Profilleri tekrar kaydedip `S` parolalarını yeniden girin. `O` parolalarını tam `SID_MANDANT_PROFIL` anahtarıyla oluşturun.
+5. Sunucu, bağlantı, salt okunur liste, normal demo, hata/tekrar deneme ve bekleyen taşıma kurtarma kontrollerini yapın. Job kullanıcısı ve iş handler'ını doğrulayıp job'ları yeniden açın.
+
+Posta geçmişi olan profil başka kutuya yönlendirilemez veya silinemez. Posta kimliği değişecekse profili pasifleştirip yenisini oluşturun.
+
+[Doğrulama sınırları](TECHNICAL-REFERENCE.md#neler-doğrulandı) ve [geliştirici rehberine](TECHNICAL-GUIDE.md) bakın. Diğer başvuru belgelerinde eski 1.0 örnekleri bulunabilir; güncel kurulum yolu bu rehberdir.
+
+## Arka plan işi planlama (Basis)
+
+Basis'ten **SM36** ile `ZIMAP_INBOUND` job'ı oluşturmasını isteyin. Varyantta doğru profil seçili, **yalnız listeleme kapalı** olmalıdır. Sıklığı operasyon ekibiyle belirleyin.
+
+Kurulumun uygulama sunucusunu kullanın. Gerçek, kısıtlı job kullanıcısıyla test edin; geliştirici hesabında önden çalışması yeterli değildir. Basis harici komut, dosya, tablo ve handler'a özel yetkileri kontrol eder. [Rol özeti](TECHNICAL-REFERENCE.md#yetkiler-ve-işletim-sınırları) teknik başvuru rehberindedir.
+
+Gerçek iş postalarından önce ABAP geliştiricisi iş kurallarını uygulayıp doğrulamalıdır. Arayüz [geliştirici rehberinde](TECHNICAL-GUIDE.md) anlatılır. Hazır demoyu gösterim amacıyla kullanın.

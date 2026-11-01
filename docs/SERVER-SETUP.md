@@ -1,7 +1,7 @@
 # Server setup (for Basis)
 > **English** | [Türkçe](tr/SERVER-SETUP.md)
 
-> **Historical reference:** this page contains 1.0 examples. For current 1.1.0 paths, both script modules, scoped credentials and permissions, follow the [Basis section of the walkthrough](WALKTHROUGH.md#0-prepare-the-server-basis). Do not use the older commands below as the current installation procedure.
+> **Historical reference:** this page contains 1.0 examples. For current 1.1.0 paths, both script modules, scoped credentials and permissions, follow the [Basis section of the walkthrough](WALKTHROUGH.md#1-prepare-the-server-basis). Do not use the older commands below as the current installation procedure.
 
 SAP itself never talks to the mail server. A small PowerShell script on the **machine SAP is installed on** (in SAP terms, the *application server*) does: SAP starts it through SM69 commands, the script talks IMAP with `curl`, and leaves each mail as plain files that SAP reads. This page explains where the script goes, which account needs which permissions, and what to check.
 

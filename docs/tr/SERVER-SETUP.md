@@ -1,7 +1,7 @@
 # Sunucu kurulumu (Basis için)
 > [English](../SERVER-SETUP.md) | **Türkçe**
 
-> **Önceki sürüme ait başvuru:** Bu sayfa 1.0 örnekleri içerir. Güncel 1.1.0 yolları, iki script modülü, sistem/mandant ayrımlı parolalar ve izinler için [kurulum rehberinin Basis bölümünü](WALKTHROUGH.md#0-sunucuyu-hazırlayın-basis) izleyin. Aşağıdaki eski komutları güncel kurulum talimatı olarak kullanmayın.
+> **Önceki sürüme ait başvuru:** Bu sayfa 1.0 örnekleri içerir. Güncel 1.1.0 yolları, iki script modülü, sistem/mandant ayrımlı parolalar ve izinler için [kurulum rehberinin Basis bölümünü](WALKTHROUGH.md#1-sunucuyu-hazırlayın-basis) izleyin. Aşağıdaki eski komutları güncel kurulum talimatı olarak kullanmayın.
 
 SAP mail sunucusuyla hiçbir zaman kendisi konuşmaz. Konuşan, **SAP'nin kurulu olduğu makinedeki** küçük bir PowerShell betiğidir (SAP dokümanlarında bu makineye *uygulama sunucusu*, yani *application server* denir). SAP betiği SM69 komutlarıyla başlatır, betik `curl` ile IMAP üzerinden mail sunucusuyla konuşur ve her maili SAP'nin okuyacağı düz dosyalar olarak bırakır. Bu sayfa betiğin nereye konacağını, hangi hesaba hangi izinlerin verileceğini ve nelerin kontrol edileceğini anlatır.
 
