@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Setup guide / Kurulum rehberi
+    url: https://github.com/Cheditte/abap-imap-inbound/blob/main/docs/WALKTHROUGH.md
+    about: Step-by-step setup, authorizations and first mail.
