@@ -1,7 +1,7 @@
 # Google Cloud üzerinde demo ortamı
 > [English](../../cloud/GCP-DEMO.md) | **Türkçe**
 
-Öğrenme ve ekran görüntüleri için geçici demo ortamı. Kaynak oluşturmadan hesabınızın maliyet ve deneme kredisi koşullarını kontrol edin. Güncel SAP 0.9.0 çalışma zamanı hedef sistemde doğrulanmayı bekliyor.
+Öğrenme ve ekran görüntüleri için geçici demo ortamı. Kaynak oluşturmadan hesabınızın maliyet ve deneme kredisi koşullarını kontrol edin. Güncel SAP 0.9.1 çalışma zamanı hedef sistemde doğrulanmayı bekliyor.
 
 ```
 Windows (SAP GUI) ──SSH tüneli──► Google Cloud VM (Ubuntu 24.04)
@@ -77,7 +77,7 @@ SAP Logon → yeni bağlantı: application server `127.0.0.1`, instance number `
 
 [SAP kurulum adımları](WALKTHROUGH.md#31-kurulum-programını-oluşturun) içindeki geliştirici adımlarını izleyin. Bu demoda sunucu ana klasörü `/usr/sap/sapimap`'tir; `ZCHE_IMAP_INSTALL`, Linux ve Unicode olduğunu kendisi anlar.
 
-`ZCHE_IMAP_CONFIG`'te demo posta kutusu şöyledir: server `greenmail`, port `3993`, IMAPS, sertifika kontrolü kapalı, kullanıcı `sap@demo.local`, şifre `sapdemo` (yalnızca GreenMail test değerleri).
+`ZCHE_IMAP_CONFIG`'te demo posta kutusu şöyledir: server `greenmail`, port `3993`, IMAPS, sertifika kontrolü kapalı, kullanıcı `sap@demo.local`, parola kaynağı `S`, şifre `sapdemo` (yalnızca GreenMail test değerleri; ekranın varsayılanı `O` kaynağıdır).
 
 ## 6. Ekran görüntüleri
 
@@ -90,11 +90,11 @@ SAP Logon → yeni bağlantı: application server `127.0.0.1`, instance number `
 | 5 | `ZCHE_IMAP_MONITOR` | Liste, mail ayrıntıları, bilgisayarda açılmış bir PDF ve bir görsel |
 | 6 | Hata senaryosu | Konusunda `TEST-ERROR` geçen bir mail: durum `E`, sonra yeniden işleme |
 | 7 | SM37 | Periyodik job ve spool çıktısı |
-| 8 | Windows PowerShell | `test\run-tests.ps1` ve `test\run-imap-tests.ps1` çıktısı |
+| 8 | PowerShell | `test/run-tests.ps1` çıktısı; `test/run-imap-tests.ps1` testini GreenMail portlarına erişilebilen VM üzerinde çalıştırın |
 
 Ekran görüntülerinde gerçek sunucu, müşteri ya da kişi adı olmamalı; demo `demo.local` kullanır.
 
-Ekran görüntülerinin altına bir not ekleyin: *"Run on ABAP Platform Trial 2025 (Linux, Unicode). Old non-Unicode releases use the LEGACY include and need to be verified separately."* (Not, ekran görüntüleriyle birlikte yayımlanacağı için İngilizce bırakıldı. Anlamı: ABAP Platform Trial 2025 (Linux, Unicode) üzerinde çalıştırıldı; Unicode olmayan eski sürümler LEGACY include'unu kullanır ve ayrıca doğrulanmalıdır.)
+Ekran görüntülerinin altına bir not ekleyin: *"Run on ABAP Platform Trial 2025 (Linux, Unicode). Older and non-Unicode releases need to be verified separately."* (Not, ekran görüntüleriyle birlikte yayımlanacağı için İngilizce bırakıldı. Anlamı: ABAP Platform Trial 2025 (Linux, Unicode) üzerinde çalıştırıldı; daha eski ve Unicode olmayan sürümler ayrıca doğrulanmalıdır.)
 
 ## 7. Kapatma
 

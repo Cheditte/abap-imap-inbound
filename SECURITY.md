@@ -2,7 +2,7 @@
 
 ## Provision before activation / Aktivasyondan önce
 
-In SU20 create authorization field `ZCHE_PROF` (CHAR20, matching the profile key). In SU21 create customer object `ZCHE_IMAP` with `ZCHE_PROF` and standard `ACTVT`. Assign explicit profile values through PFCG; a missing object or grant fails closed.
+In SU20 create authorization field `ZCHE_PROF` with data element `ZCHE_IMAP_PROFID` (created by the installer; CHAR20, the profile name such as `INVOICE`). In SU21 create customer object `ZCHE_IMAP` with `ZCHE_PROF` and standard `ACTVT`. Assign explicit profile values through PFCG; a missing object or grant fails closed.
 
 | Activity | Permission / İzin |
 |---|---|
@@ -10,11 +10,23 @@ In SU20 create authorization field `ZCHE_PROF` (CHAR20, matching the profile key
 | `02` | Configure/delete a profile; explicitly reprocess failed mail. / Profil bakımı ve hatalı maili yeniden işleme. |
 | `16` | Run the inbound job for that profile. / Profilin gelen posta işini çalıştırma. |
 
-The installer disables table maintenance and assigns `TDDAT` group `ZCHI`. Grant `S_TABU_DIS` only for the required table activities. Maintenance flags do not stop privileged SQL/debugging; do not grant production users generic table update or debug-change access. Root, handler prefix and retry limits are installer-owned parameters.
+The installer disables table maintenance and assigns `TDDAT` group `ZCHI`. Grant `S_TABU_DIS` only for the required table activities. Maintenance flags do not stop privileged SQL/debugging; do not grant production users generic table update or debug-change access. Root, handler prefix (`HANDLER_PREFIX`, default `ZCHE_IMAP_HANDLER_`) and retry limit (`MAX_ATTEMPTS`, default `3`) are installer-owned parameters. The installer writes the defaults once and keeps existing values on a rerun.
 
 Tablo bakımı kapalıdır; `ZCHI` tablo grubu kullanılır. Yetkili geliştiricinin doğrudan SQL/debug erişimi ayrıca sınırlandırılmalıdır. Kök klasör ve handler izin listesi profil ekranından değişmez.
 
 Set program authorization group `ZCHI` in SE38 attributes for CONFIG, INBOUND and MONITOR. Create matching SE93 report transactions `ZCHE_IMAP_CONFIG`, `ZCHE_IMAP_INBOUND`, `ZCHE_IMAP_MONITOR`; grant scoped `S_TCODE` and `S_PROGRAM`. These role/transaction steps are explicit administrator setup, not automatic role provisioning.
+
+## SAP commands / SAP komutları
+
+The programs start fixed SM69 commands through `SXPG_COMMAND_EXECUTE`, which checks `S_LOG_COM` (fields `COMMAND`, `OPSYSTEM`, `HOST`). Grant only the commands each user needs; without this grant the connection test fails with error `SXPG1` (no permission).
+
+| User | `S_LOG_COM` commands |
+|---|---|
+| CONFIG user | `ZCHE_IMAP_TEST` |
+| INBOUND / job user | `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE` |
+| Installer | All `ZCHE_IMAP_*` commands, plus SM69 maintenance |
+
+Programlar sabit SM69 komutlarını `SXPG_COMMAND_EXECUTE` ile çalıştırır; bu da `S_LOG_COM` yetkisini denetler. Her kullanıcıya yalnızca gereken komutları verin; bu yetki yoksa bağlantı testi `SXPG1` (yetki yok) hatasıyla durur.
 
 ## File access / Dosya erişimi
 
@@ -37,7 +49,7 @@ Only programs matching the installer-owned `HANDLER_PREFIX` (default `ZCHE_IMAP_
 
 `MAX_ATTEMPTS` defaults to 3 failed attempts. Ordinary runs skip E; retry mode respects the cap. Authorized monitor reprocessing changes E to R and explicitly permits another attempt. Inbox messages are retained, not silently deleted or automatically quarantined; operators review capped failures.
 
-Failed local caches receive `failed.utc` only after E is committed. The helper removes that marker before a successful cache reuse can reach a handler. `PURGE` expires marked failed caches after `InCacheRetentionDays` (default 30). H/move-recovery caches have no failed marker and are retained. The original inbox mail remains available for an explicit retry. Unmarked caches and unknown files/links are not deleted. Completed archives use the profile's existing retention setting.
+Failed local caches receive `failed.utc` only after E is committed. The helper removes that marker before a successful cache reuse can reach a handler. `PURGE` expires marked failed caches after `InCacheRetentionDays` (default 30; to change it, add the key to `bin/policy.psd1`). H/move-recovery caches have no failed marker and are retained. The original inbox mail remains available for an explicit retry. Unmarked caches and unknown files/links are not deleted. Completed archives use the profile's existing retention setting.
 
 Türkçe özet: üç hata sınırı otomatik tekrarları durdurur; monitörde yetkili yeniden işleme açık bir operatör kararıdır. Hatalı önbellek 30 gün sonra temizlenebilir, posta kutusundaki özgün mail korunur. Commit edilmiş işin bekleyen taşıması temizliğe dahil edilmez.
 
