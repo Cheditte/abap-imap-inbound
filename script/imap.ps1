@@ -38,7 +38,7 @@ if ($RequestArgs.Count -gt 2) { $Arg2 = [string]$RequestArgs[2] }
 if ($RequestArgs.Count -gt 3) { $Arg3 = [string]$RequestArgs[3] }
 if ($RequestArgs.Count -gt 4) { $Arg4 = [string]$RequestArgs[4] }
 
-$Version = '0.9.1'
+$Version = '0.9.2'
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 

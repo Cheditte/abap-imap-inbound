@@ -1,12 +1,18 @@
 # Changelog
 
+## 0.9.2 — release candidate
+
+- Fix: a failed profile save (for example "Mail identity in use") could be reported as successful. The success flag is now set only after the profile is saved.
+- The profile value help lists only profiles the user may display (`ZCHE_IMAP` activity `03`).
+- The processing log shows a profile's description only after the run authorization check (`16`).
+
+Upgrade from 0.9.x: stop scheduled processing and back up as in [update an existing installation](docs/TECHNICAL-REFERENCE.md#8-update-an-existing-installation). Copy the new `imap.ps1` and `mime.ps1` to the server's `bin` folder (the script version must match). In SE38, replace the source of `ZCHE_IMAP_INSTALL` with the new file and activate it. Run it with **Programs**, **Overwrite existing programs (update)** and **Server check** selected.
+
 ## 0.9.1 — release candidate
 
 - Fix: 0.9.0 could not save a profile or process mail. The installer now writes the handler prefix (`ZCHE_IMAP_HANDLER_`) and retry limit (`3`) on first run and keeps existing values on a rerun.
 - Server setup checks for curl 8.0.0 or newer at the start; Linux setup accepts `--curl-path`.
 - Guides: authorization step with `S_LOG_COM` and `S_DATASET`, curl 8 requirement, handler template without the duplicate include, retry limit, setup commands for elevated sessions.
-
-Upgrade from 0.9.0: copy the new `script` files to the server (the script version must match), then rerun `ZCHE_IMAP_INSTALL` with Programs and Server check selected.
 
 ## 0.9.0 — release candidate
 
@@ -17,5 +23,3 @@ Upgrade from 0.9.0: copy the new `script` files to the server (the script versio
 - Retire old credentials after successful publication; default to Basis-managed credentials.
 - Bound retries and failed-cache retention while preserving committed move recovery.
 - Add local regression checks, cross-platform CI and concise English/Turkish onboarding.
-
-Tag/release publication follows PR approval; SAP acceptance was excluded by the operator.

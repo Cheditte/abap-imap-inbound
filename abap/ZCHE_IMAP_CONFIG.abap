@@ -193,6 +193,7 @@ ENDFORM.
 *---------------------------------------------------------------
 FORM f4_profile USING iv_field TYPE c.
   DATA: lt_f4  TYPE STANDARD TABLE OF ty_f4,
+        ls_f4  TYPE ty_f4,
         lt_ret TYPE STANDARD TABLE OF ddshretval,
         ls_ret TYPE ddshretval,
         lv_auth(1) TYPE c.
@@ -204,7 +205,15 @@ FORM f4_profile USING iv_field TYPE c.
     EXIT.
   ENDIF.
   SELECT profile descr host FROM zche_imap_profile INTO TABLE lt_f4.
-  IF sy-subrc <> 0.
+* Offer only profiles the user may display (ZCHE_IMAP 03).
+  LOOP AT lt_f4 INTO ls_f4.
+    PERFORM profile_auth USING ls_f4-profile '03'
+                         CHANGING lv_auth.
+    IF lv_auth IS INITIAL.
+      DELETE lt_f4.
+    ENDIF.
+  ENDLOOP.
+  IF lt_f4 IS INITIAL.
     PERFORM show_msg USING 'S' 'No profiles yet.'.
     EXIT.
   ENDIF.
@@ -338,7 +347,8 @@ FORM save_profile_locked CHANGING cv_ok TYPE c cv_msg TYPE c.
         lv_source(100) TYPE c,
         lv_target(100) TYPE c,
         lv_mlen TYPE i,
-        lv_dlen TYPE i.
+        lv_dlen TYPE i,
+        lv_allowed(1) TYPE c.
 
   CLEAR: cv_ok, cv_msg.
   IF p_crsrc = 'S' AND NOT p_pwd IS INITIAL.
@@ -409,8 +419,9 @@ FORM save_profile_locked CHANGING cv_ok TYPE c cv_msg TYPE c.
   IF p_hform IS INITIAL.
     p_hform = 'HANDLE_MAIL'.
   ENDIF.
-  PERFORM handler_allowed USING p_hprog p_hform CHANGING cv_ok.
-  IF cv_ok IS INITIAL.
+* cv_ok stays empty until the profile is really saved.
+  PERFORM handler_allowed USING p_hprog p_hform CHANGING lv_allowed.
+  IF lv_allowed IS INITIAL.
     cv_msg = 'Handler rejected by server-owned prefix policy'.
     EXIT.
   ENDIF.

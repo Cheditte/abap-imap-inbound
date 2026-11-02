@@ -1,6 +1,6 @@
 * Project: abap-imap-inbound
 *---------------------------------------------------------------
-* ZCHE_IMAP_INSTALL - abap-imap-inbound installer (v0.9.1)
+* ZCHE_IMAP_INSTALL - abap-imap-inbound installer (v0.9.2)
 *
 * Usage: in SE38 create an executable program named ZCHE_IMAP_INSTALL
 * (local object, $TMP), paste this whole file, activate it and
@@ -106,7 +106,7 @@ DATA: gt_src    TYPE STANDARD TABLE OF abapsource,
       gv_newinb(1) TYPE c,
       gv_same   TYPE i.
 
-CONSTANTS gc_version(10) TYPE c VALUE '0.9.1'.
+CONSTANTS gc_version(10) TYPE c VALUE '0.9.2'.
 
 * Embedded source lines: src adds a new line, cnt continues the
 * last line (for lines longer than 72 characters). def adds a
@@ -2331,7 +2331,7 @@ FORM fill_common.
   src 'TYPES: ty_t_uid TYPE STANDARD TABLE OF ty_uid'.
   src '                WITH DEFAULT KEY.'.
   src ''.
-  src 'CONSTANTS: gc_version(10) TYPE c VALUE ''0.9.1''.'.
+  src 'CONSTANTS: gc_version(10) TYPE c VALUE ''0.9.2''.'.
   src ''.
   src 'DATA: gv_root(200)  TYPE c,'.
   src '      gv_sep(1)     TYPE c,'.
@@ -2633,7 +2633,7 @@ FORM fill_common.
   src '  ENDIF.'.
   src '  IF NOT cv_ok IS INITIAL AND lv_protocol <> 1.'.
   src '    CLEAR cv_ok.'.
-  src '    cv_msg = ''ERR CFG Script protocol mismatch; install v0.9.1'.
+  src '    cv_msg = ''ERR CFG Script protocol mismatch; install v0.9.2'.
   cnt '''.'.
   src '  ENDIF.'.
   src 'ENDFORM.'.
@@ -3260,17 +3260,18 @@ FORM fill_inbound.
   src '        ls_pending  TYPE zche_imap_log.'.
   src ''.
   src '  SKIP.'.
-  src '  FORMAT COLOR COL_HEADING.'.
-  src '  WRITE: / ''Profile:'', is_prof-profile, is_prof-descr(60).'.
-  src '  FORMAT COLOR OFF.'.
-  src ''.
-  src '* Configuration and job share this lock across every commit.'.
+  src '* The description is shown only after the authorization check.'.
   src '  PERFORM profile_auth USING is_prof-profile ''16'''.
   src '                       CHANGING lv_ok.'.
   src '  IF lv_ok IS INITIAL.'.
   src '    WRITE: / ''Not authorized for profile:'', is_prof-profile.'.
   src '    EXIT.'.
   src '  ENDIF.'.
+  src '  FORMAT COLOR COL_HEADING.'.
+  src '  WRITE: / ''Profile:'', is_prof-profile, is_prof-descr(60).'.
+  src '  FORMAT COLOR OFF.'.
+  src ''.
+  src '* Configuration and job share this lock across every commit.'.
   src '  PERFORM profile_lock USING is_prof-profile CHANGING lv_ok.'.
   src '  IF lv_ok IS INITIAL.'.
   src '    WRITE: / ''  Profile in use or lock unavailable, skipped.'''.
@@ -3867,6 +3868,7 @@ FORM fill_config.
   cnt '-'.
   src 'FORM f4_profile USING iv_field TYPE c.'.
   src '  DATA: lt_f4  TYPE STANDARD TABLE OF ty_f4,'.
+  src '        ls_f4  TYPE ty_f4,'.
   src '        lt_ret TYPE STANDARD TABLE OF ddshretval,'.
   src '        ls_ret TYPE ddshretval,'.
   src '        lv_auth(1) TYPE c.'.
@@ -3880,7 +3882,15 @@ FORM fill_config.
   src '  ENDIF.'.
   src '  SELECT profile descr host FROM zche_imap_profile INTO TABLE l'.
   cnt 't_f4.'.
-  src '  IF sy-subrc <> 0.'.
+  src '* Offer only profiles the user may display (ZCHE_IMAP 03).'.
+  src '  LOOP AT lt_f4 INTO ls_f4.'.
+  src '    PERFORM profile_auth USING ls_f4-profile ''03'''.
+  src '                         CHANGING lv_auth.'.
+  src '    IF lv_auth IS INITIAL.'.
+  src '      DELETE lt_f4.'.
+  src '    ENDIF.'.
+  src '  ENDLOOP.'.
+  src '  IF lt_f4 IS INITIAL.'.
   src '    PERFORM show_msg USING ''S'' ''No profiles yet.''.'.
   src '    EXIT.'.
   src '  ENDIF.'.
@@ -4021,7 +4031,8 @@ FORM fill_config.
   src '        lv_source(100) TYPE c,'.
   src '        lv_target(100) TYPE c,'.
   src '        lv_mlen TYPE i,'.
-  src '        lv_dlen TYPE i.'.
+  src '        lv_dlen TYPE i,'.
+  src '        lv_allowed(1) TYPE c.'.
   src ''.
   src '  CLEAR: cv_ok, cv_msg.'.
   src '  IF p_crsrc = ''S'' AND NOT p_pwd IS INITIAL.'.
@@ -4099,8 +4110,10 @@ FORM fill_config.
   src '  IF p_hform IS INITIAL.'.
   src '    p_hform = ''HANDLE_MAIL''.'.
   src '  ENDIF.'.
-  src '  PERFORM handler_allowed USING p_hprog p_hform CHANGING cv_ok.'.
-  src '  IF cv_ok IS INITIAL.'.
+  src '* cv_ok stays empty until the profile is really saved.'.
+  src '  PERFORM handler_allowed USING p_hprog p_hform CHANGING lv_all'.
+  cnt 'owed.'.
+  src '  IF lv_allowed IS INITIAL.'.
   src '    cv_msg = ''Handler rejected by server-owned prefix policy'''.
   cnt '.'.
   src '    EXIT.'.
