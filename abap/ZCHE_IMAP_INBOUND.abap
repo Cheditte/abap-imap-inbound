@@ -100,17 +100,18 @@ FORM run_profile USING is_prof TYPE zche_imap_profile.
         ls_pending  TYPE zche_imap_log.
 
   SKIP.
-  FORMAT COLOR COL_HEADING.
-  WRITE: / 'Profile:', is_prof-profile, is_prof-descr(60).
-  FORMAT COLOR OFF.
-
-* Configuration and job share this lock across every commit.
+* The description is shown only after the authorization check.
   PERFORM profile_auth USING is_prof-profile '16'
                        CHANGING lv_ok.
   IF lv_ok IS INITIAL.
     WRITE: / 'Not authorized for profile:', is_prof-profile.
     EXIT.
   ENDIF.
+  FORMAT COLOR COL_HEADING.
+  WRITE: / 'Profile:', is_prof-profile, is_prof-descr(60).
+  FORMAT COLOR OFF.
+
+* Configuration and job share this lock across every commit.
   PERFORM profile_lock USING is_prof-profile CHANGING lv_ok.
   IF lv_ok IS INITIAL.
     WRITE: / '  Profile in use or lock unavailable, skipped.'.

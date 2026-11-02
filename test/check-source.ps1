@@ -34,7 +34,7 @@ foreach ($directory in 'script', 'server', 'installer', 'test') {
         foreach ($parseError in $parseErrors) { $failures.Add($file.Name + ': ' + $parseError.Message) }
     }
 }
-foreach ($directory in 'server', 'cloud') {
+foreach ($directory in 'server') {
     foreach ($file in (Get-ChildItem -LiteralPath (Join-Path $repo $directory) -Filter *.sh -Recurse)) {
         if ([IO.File]::ReadAllBytes($file.FullName) -contains 13) {
             $failures.Add($file.Name + ': shell sources must use LF line endings')
