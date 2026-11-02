@@ -1,1 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="426" viewBox="0 0 720 426" role="img" aria-labelledby="title"><title id="title">Email and attachment use (en)</title><defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#456b96"/></marker></defs><rect width="720" height="426" fill="#fff"/><g font-family="Arial, Helvetica, sans-serif" text-anchor="middle" fill="#183c68"><rect x="185" y="20" width="350" height="92" rx="12" fill="#edf4fc" stroke="#6e94bc" stroke-width="2"/><text x="360" y="59" font-size="24" font-weight="700">Mail server</text><text x="360" y="94" font-size="20" fill="#405b78">Emails and attachments</text><path d="M360 112 V159" fill="none" stroke="#456b96" stroke-width="2.5" marker-end="url(#arrow)"/><rect x="260" y="165" width="200" height="62" rx="12" fill="#edf4fc" stroke="#6e94bc" stroke-width="2"/><text x="360" y="205" font-size="24" font-weight="700">SAP</text><path d="M360 227 V255 H185 V294" fill="none" stroke="#456b96" stroke-width="2.5" marker-end="url(#arrow)"/><path d="M360 227 V255 H535 V294" fill="none" stroke="#456b96" stroke-width="2.5" marker-end="url(#arrow)"/><rect x="30" y="300" width="310" height="106" rx="12" fill="#edf4fc" stroke="#6e94bc" stroke-width="2"/><text x="185" y="346" font-size="24" font-weight="700">View the emails</text><text x="185" y="381" font-size="20" fill="#405b78">and read them</text><rect x="380" y="300" width="310" height="106" rx="12" fill="#edf4fc" stroke="#6e94bc" stroke-width="2"/><text x="535" y="346" font-size="24" font-weight="700">Process attachments</text><text x="535" y="381" font-size="20" fill="#405b78">With your ABAP code</text></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="660" viewBox="0 0 1440 660" role="img" aria-labelledby="title desc">
+<title id="title">From a mailbox to SAP</title><desc id="desc">From a mailbox to SAP. ABAP IMAP Inbound.</desc>
+<rect x="0" y="0" width="1440" height="660" rx="0" fill="#F4F7FA"/>
+<rect x="56" y="44" width="30" height="4" rx="2" fill="#087F8C"/>
+<text x="100" y="53" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">HOW YOU USE IT</text>
+<text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="600" fill="#183448">Your mailbox, inside SAP.</text>
+<text x="56" y="169" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#536A7B">Read the message, open its attachment and add your own business action.</text>
+<rect x="56" y="245" width="340" height="256" rx="18" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<rect x="86" y="278" width="44" height="30" rx="4" fill="none" stroke="#087F8C" stroke-width="2"/>
+<polyline points="88,281 108,295 128,281" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="86" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="31" font-weight="600" fill="#183448">Mailbox</text>
+<text x="86" y="419" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#536A7B">Messages</text>
+<text x="86" y="453" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#536A7B">and attachments</text>
+<polyline points="414,373 514,373" fill="none" stroke="#087F8C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="506,366 514,373 506,380" fill="none" stroke="#087F8C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="534" y="282" width="302" height="182" rx="18" fill="#102639"/>
+<text x="622" y="362" font-family="Segoe UI, Arial, sans-serif" font-size="53" font-weight="600" fill="#FFFFFF">SAP</text>
+<text x="580" y="411" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="400" fill="#BFD5E1">Mail monitor</text>
+<polyline points="855,373 895,373 895,284 930,284" fill="none" stroke="#087F8C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="855,373 895,373 895,461 930,461" fill="none" stroke="#087F8C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="950" y="216" width="434" height="136" rx="16" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<rect x="976" y="240" width="44" height="30" rx="4" fill="none" stroke="#087F8C" stroke-width="2"/>
+<polyline points="978,243 998,257 1018,243" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1036" y="267" font-family="Segoe UI, Arial, sans-serif" font-size="29" font-weight="600" fill="#183448">Read the message</text>
+<text x="976" y="319" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#536A7B">Headers, sender and body</text>
+<rect x="950" y="393" width="434" height="136" rx="16" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<polyline points="982,417 1005,417 1016,428 1016,455 982,455 982,417" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1005,417 1005,428 1016,428" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="990,438 1007,438" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="990,445 1007,445" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1036" y="444" font-family="Segoe UI, Arial, sans-serif" font-size="29" font-weight="600" fill="#183448">Open the attachment</text>
+<text x="976" y="496" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#536A7B">PDFs, images and other files</text>
+<rect x="56" y="552" width="1328" height="52" rx="10" fill="#E6F4F4"/>
+<text x="80" y="587" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="600" fill="#087F8C">Connect attachments to your business process with your own ABAP code.</text>
+<text x="56" y="633" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#536A7B">Cheditte / abap-imap-inbound</text>
+<text x="1234" y="633" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">ABAP / IMAP</text>
+</svg>

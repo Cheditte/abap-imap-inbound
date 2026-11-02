@@ -45,6 +45,10 @@ Varsayılan okuma klasörü **Gelen Kutusu (`INBOX`)**. İsterseniz başka bir k
 
 [SE38 kurulumundan SM36 job tanımına kadar görsellerle ilerleyin](docs/tr/WALKTHROUGH.md#kurulum).
 
+![A4H mail monitöründe ileti gövdesi ve PDF ile JPG eklerinin bağlantıları](docs/screenshots/sap-monitor-details.png)
+
+A4H denemesinde bu mail işlendi, gövdesi görüntülendi ve JPG eki açıldı. [Adımlar ve ekran görüntüleri](docs/tr/WALKTHROUGH.md#ilk-mail). Görseller, sürüm etiketi 0.9.3'e yükseltilmeden önceki düzeltilmiş kaynağa ait; [kaynak ve deneme bilgisi](docs/screenshots/README.md).
+
 Normal işleme maili okundu işaretleyebilir ve taşıyabilir. İlk kullanım için **deneme sistemi ve ayrı bir deneme posta kutusu** seçin.
 
 ## Durum ve ayrıntılar

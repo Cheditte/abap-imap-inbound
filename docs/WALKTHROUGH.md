@@ -92,6 +92,10 @@ If you hold administrator access, follow the [RDP/SSH and file transfer guide](S
 
 Execute `ZCHE_IMAP_INSTALL` with **F8**:
 
+![Installer options for the local A4H demonstration](screenshots/sap-install-options.png)
+
+The image uses `/usr/sap/sapimap/`, the folder prepared for this demonstration. Enter the actual folder prepared on your SAP host.
+
 | Option | First installation |
 |---|---|
 | DDIC, Programs, SM69 commands, Server check | Selected. Prepares tables, programs, commands and the final check. |
@@ -101,6 +105,10 @@ Execute `ZCHE_IMAP_INSTALL` with **F8**:
 | Uninstall | **Cleared.** |
 
 Execute with F8 and read the whole result list. **Continue when:** installation and the final host check succeed. Resolve a failed step before continuing.
+
+![Installation complete after program syntax checks and the server setup check](screenshots/sap-install-complete.png)
+
+**Read the result:** the four main program syntax checks and the server check succeeded, ending with `Installation complete.` This A4H/001 run uses the correction at commit `9447cbd`, before the version label was raised to 0.9.3; the screen still identifies itself as 0.9.2. [Screenshot context](screenshots/README.md).
 
 Generated objects go into `$TMP`; putting the installer itself in a package does not change this. For maintained use, reassign the objects to your customer package and prepare transport. [Package and transport](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport).
 
@@ -117,9 +125,13 @@ The programs use standard SAP authorizations: `S_TABU_DIS` for table group `ZCHI
 
 A **profile** is the saved name for connection and processing settings. Open **SE38 → `ZCHE_IMAP_CONFIG` → F8**. F8 **inside the configuration screen saves settings and checks connectivity**.
 
+![DEMO mailbox profile before the first connection test](screenshots/sap-profile-demo.png)
+
+`greenmail`, port `3993` and `sap@demo.local` belong to the local demonstration. Replace them with your mailbox's actual settings. The example uses password source `S`; use `O` when the password is managed on the host.
+
 | Field | First use |
 |---|---|
-| Profile / Active | Your chosen name, for example `MAIL_DEMO`; Active selected. Use this name in later steps. |
+| Profile / Active | Your chosen name, for example `DEMO`; Active selected. Use this name in later steps. |
 | Server, Port, Security | Actual values from the mail administrator; certificate verification selected. |
 | User / Password source | Actual login; default `O` means the administrator prepares the password on the host. |
 | Folder to read | `INBOX` or the actual alternative source folder. |
@@ -130,6 +142,21 @@ A **profile** is the saved name for connection and processing settings. Open **S
 For source `O`, the administrator [prepares the host credential](TECHNICAL-REFERENCE.md#profile-fields-and-server-managed-passwords) with the actual `SID_CLIENT_PROFILE` key. Source `S` is SAP-screen password entry with different protection/grant requirements. Saved passwords are not displayed again.
 
 [Remaining fields explained](SCREEN-GUIDE.md#profile). **Continue when:** settings are saved and the connection check succeeds for the intended account.
+
+![Connection successful for DEMO: login and both mail folders checked](screenshots/sap-connection-success.png)
+
+**Read the result:** `LOGIN`, `INBOX` and `PROCESSED` passed. `INBOX: 0 mails` means the mailbox was empty at that moment; it is not a connection error.
+
+**Local test setting:** the owner cleared **Verify certificate** to connect to GreenMail's self-signed test certificate. Keep verification enabled for a real mailbox and prepare a trusted certificate chain on the SAP host. This image demonstrates test connectivity; it does not verify certificate trust.
+
+<details>
+<summary>If the connection stops at a certificate error</summary>
+
+![The first connection attempt rejected GreenMail's self-signed certificate](screenshots/sap-connection-tls-error.png)
+
+The first attempt reached the host and port but failed certificate verification. Have the host administrator configure trust for the mail server's certificate chain. In this isolated GreenMail trial, the owner then cleared **Verify certificate**; the successful connection above uses that test exception.
+
+</details>
 
 <a id="list-only"></a>
 <a id="4-test-the-three-parts-together"></a>
@@ -155,13 +182,36 @@ For source `O`, the administrator [prepares the host credential](TECHNICAL-REFER
 
 **Normal mail processing starts now.** Mail and attachments are retrieved; the example attempts to read attachments. Successful mail moves to the destination and may be marked as read. The example does not create an invoice or purchase order.
 
+![DEMO selected for normal processing, with List only and Retry failed mails cleared](screenshots/sap-inbound-selection.png)
+
+**On this screen:** `List only` is cleared for Path B. For Path A, select it before running. Limit your first normal run to one dedicated test message through the profile's **Mails per run** setting.
+
+![One test mail completed with a PDF and a JPG attachment; Processed 1, Failed 0](screenshots/sap-process-one-mail.png)
+
+**Read the result:** UID `2` completed; the PDF and JPG were listed, and the run reported `Processed: 1`, `Failed: 0`. Continue to the monitor to open the body and files, then check the destination folder in the mailbox.
+
 ### B2. Verify in the monitor
 
 1. Open **SE38 → `ZCHE_IMAP_MONITOR` → F8** to reach its selection screen.
 2. Choose your profile and a date range covering the run; execute with F8.
-3. Double-click the mail row to read headers, body and attachment details.
-4. Open/download an attachment. PDF, text and supported images can open in an appropriate viewer; other file types download only.
-5. Check the mailbox: successful mail should be in your chosen destination.
+
+   ![Initial monitor filters before entering the DEMO profile](screenshots/sap-monitor-selection.png)
+
+   **On this screen:** enter `DEMO` for this example and include the date shown in SAP's processing log. The capture shows the initial filters, with Profile still blank.
+
+3. Read the result list. This example contains two historical mails, both **Done**, with zero errors. The preceding single-message run is UID `2`.
+
+   ![Monitor list with two Done messages and no errors](screenshots/sap-monitor-list.png)
+
+4. Double-click UID `2` to read its headers, body and attachment details.
+
+   ![UID 2 details with the mail body and PDF and JPG attachment links](screenshots/sap-monitor-details.png)
+
+5. Double-click an attachment's **Open** line. The JPG in this example opened in the desktop viewer. PDF, text and supported images can open in an appropriate viewer; other file types download only. **Original mail** downloads the EML without automatically opening it.
+
+   ![JPG attachment open in the desktop viewer beside its SAP mail details](screenshots/sap-monitor-image-open.png)
+
+6. Check the mailbox: successful mail should be in your chosen destination. This folder check and opening the PDF are not shown in the supplied captures.
 
 | Status | Meaning and next step |
 |---|---|
