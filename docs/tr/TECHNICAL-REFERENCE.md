@@ -15,7 +15,7 @@ SAP adımlarında okuyucunun SE38 ile program oluşturup etkinleştirebildiği v
 - [Paket ve sistemler arası taşıma](#2b-canlıya-çıkmadan-önce-paket-ve-transport)
 - [Saklama ve yeniden deneme](#saklama-ve-yeniden-deneme-ayrıntıları)
 - [Mevcut sürümü güncelleme](#8-mevcut-kurulumu-güncelleyin)
-- [Test durumu](#neler-doğrulandı)
+- [Test durumu](../../VALIDATION.md)
 
 ## İlk kez karşılaşabileceğiniz terimler
 
@@ -69,8 +69,8 @@ Aşağıdaki liste bir yol haritasıdır. Ekran adımları ve çalıştırılaca
 1. **Proje dosyalarını indirin.** Deponun ana sayfasındaki **Code → Download ZIP** ile indirip arşivin tamamını açın. Git kurmanız gerekmez. Sunucu ve SAP dosyalarını aynı indirmeden kullanın.
 2. **Deneme posta kutusunu hazırlayın veya yöneticisinden isteyin.** Yukarıdaki bağlantı bilgilerini alın ve işlenen iletiler için posta kutusundaki mevcut bir klasörü seçin.
 3. **Sunucuyu hazırlayın veya yöneticisine hazırlatın.** İşlem SAP uygulama sunucusunda çalışır. PowerShell ve `curl` adlı yardımcı araçlar burada e-postayı alır; ayrı bir entegrasyon sunucusu gerekmez. Basis ağ erişimini ve korumalı çalışma klasörünü hazırlar, klasörün tam yolunu size verir. [Sunucu hazırlığı](WALKTHROUGH.md#2-sapnin-kurulu-olduğu-makineyi-hazırlayın).
-4. **SAP programlarını kurun.** **SE38** içinde `ZCHE_IMAP_INSTALL` programını oluşturup projedeki aynı adlı kaynağı yükleyin, etkinleştirin ve çalıştırın. Bu program gerekli SAP programlarını ve tablolarını oluşturur. [SAP kurulum adımları](WALKTHROUGH.md#31-kurulum-programını-oluşturun).
-5. **Bir posta profili kaydedin.** `ZCHE_IMAP_CONFIG` içinde bir ad seçip gerçek sunucu, kullanıcı ve klasör bilgilerinizi girin. İlk denemede handler olarak `ZCHE_IMAP_HANDLER_DEMO`, taşıma yöntemi olarak `MOVE` seçin. Parola kaynağı `S`, parolayı SAP ekranından girmeniz; `O`, Basis'in sunucuda kaydetmesi anlamına gelir. **F8** ayarları kaydeder ve bağlantıyı test eder; yalnız kaydın oluşması başarılı bağlantı demek değildir. [Profil tanımlama](WALKTHROUGH.md#33-posta-kutusu-profilini-tanımlayın).
+4. **SAP programlarını kurun.** **SE38** içinde `ZCHE_IMAP_INSTALL` programını oluşturup projedeki aynı adlı kaynağı yükleyin, etkinleştirin ve çalıştırın. Bu program gerekli SAP programlarını ve tablolarını oluşturur. [SAP kurulum adımları](WALKTHROUGH.md#31-kurulum-programını-oluşturun). Ardından `ZCHE_IMAP` yetki nesnesini ve rolü oluşturun; bunlar olmadan programlar yetki mesajıyla durur. [Yetki adımı](WALKTHROUGH.md#33-yetki-nesnesini-ve-rolü-oluşturun).
+5. **Bir posta profili kaydedin.** `ZCHE_IMAP_CONFIG` içinde bir ad seçip gerçek sunucu, kullanıcı ve klasör bilgilerinizi girin. İlk denemede handler olarak `ZCHE_IMAP_HANDLER_DEMO`, taşıma yöntemi olarak `MOVE` seçin. Parola kaynağı `S`, parolayı SAP ekranından girmeniz; `O`, Basis'in sunucuda kaydetmesi anlamına gelir. **F8** ayarları kaydeder ve bağlantıyı test eder; yalnız kaydın oluşması başarılı bağlantı demek değildir. [Profil tanımlama](WALKTHROUGH.md#34-posta-kutusu-profilini-tanımlayın).
 
 Kalıcı kullanım için `ZCHE_IMAP` gibi bir müşteri paketi oluşturun veya projeye ayrılmış paketi kullanın. Installer şu anda ürettiği nesneleri `$TMP` adlı yerel deneme alanına koyar; installer'ı pakete kaydetmek tek başına bunu değiştirmez. Test ve canlı sisteme taşıma için [paket ve transport adımlarını](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) Basis ve geliştiriciyle planlayın.
 
@@ -136,7 +136,7 @@ HTML dönüşümü en fazla 2.097.152 UTF-16 karakteri, 20.000 etiket ve etiket 
 
 ## Validation / Doğrulama
 
-See [current validation](../../VALIDATION.md).
+Güncel durum için [doğrulama kaydına](../../VALIDATION.md) bakın.
 
 ## Mevcut kurulumu güncelleme
 

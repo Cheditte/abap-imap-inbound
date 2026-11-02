@@ -4,7 +4,7 @@
 
 Read e-mails and attachments from an IMAP mailbox into SAP with ABAP, PowerShell and curl. No PI/PO or separate integration server is required; the scripts run on the SAP application host.
 
-**For IMAP servers supporting a password or app password and UID MOVE. Microsoft 365 / Exchange Online is not supported:** this project does not implement OAuth. See the sibling [abap-graph project](https://github.com/Cheditte/abap-graph) for the Microsoft Graph approach (availability depends on publication). [Microsoft authentication guidance](https://learn.microsoft.com/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online).
+**For IMAP servers supporting a password or app password and UID MOVE. Microsoft 365 / Exchange Online is not supported:** this project does not implement OAuth. A separate Microsoft Graph project, abap-graph, is being prepared for that case. [Microsoft authentication guidance](https://learn.microsoft.com/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online).
 
 ## Start with three preparations
 
@@ -35,7 +35,7 @@ Installation is **copy/paste from one installer**. [abapGit](ABAPGIT.md) is an o
 | Windows host | Windows PowerShell 5.1 or PowerShell 7; curl 8.0.0+. |
 | Linux host | PowerShell 7.4+; curl 8.0.0+. |
 | Mail server | IMAP with TLS and UID MOVE; password/app-password authentication. |
-| Verification | [One current validation record](VALIDATION.md), including unexecuted SAP checks. |
+| Verification | The earlier `ZIMAP_` edition read mail and opened attachments on SAP A4H. 0.9.0 has not yet run in SAP; feedback welcome. [Validation record](VALIDATION.md). |
 
 curl 7.55.1 is deliberately rejected, not certified. Downloads must match the UID's declared RFC822.SIZE; size equality alone cannot prove identity. GreenMail tests exercise nonconsecutive UIDs and message contents.
 

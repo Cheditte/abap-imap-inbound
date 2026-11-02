@@ -12,6 +12,7 @@ This record applies to the 0.9.0 release candidate. SAP tests and renewed SAP sc
 | Windows parser and IMAP helper | Local PowerShell 7 + disposable GreenMail 2.1.14 | 2026-11-02 | Passed locally. |
 | Windows PowerShell 5.1 | Local Windows parser, codepage and retention regressions | 2026-11-02 | Passed locally and on Windows CI. |
 | Linux helper | Linux CI + disposable GreenMail 2.1.14 | 2026-11-02 | Passed on Linux CI with GreenMail 2.1.14. |
+| Earlier edition in SAP | A4H (SAP_BASIS 7.58), `ZIMAP_` objects before the rename | before 2026-11-02 | Owner processed mail, viewed it in the monitor and opened attachments. Does not cover the 0.9.0 changes. |
 | Old curl 7.55.1 | Unsupported | 2026-11-02 | Rejected by version guard; no compatibility claim. |
 
 The DDIC fixtures are development-only and must never be installed into SAP. Real authorization enforcement, database LUWs, installer APIs and file permissions still require SAP acceptance before production use.

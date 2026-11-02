@@ -22,7 +22,7 @@ RDP/SSH ile kendiniz bağlanacaksanız [kendi sistemini yönetenler için rehber
 
 **Deneme SAP sistemi ve deneme posta kutusu kullanın.** Normal işlem iletileri okundu işaretleyebilir ve başka klasöre taşıyabilir. Hazır örnek fatura oluşturmaz.
 
-Bu rehber 0.9.0 kaynakları içindir; güncel sürümün gerçek SAP kabul testleri henüz tamamlanmadı. Görseller önceki 1.0 demosundandır, alanlar farklı olabilir. [Test durumu](TECHNICAL-REFERENCE.md#neler-doğrulandı).
+Bu rehber 0.9.0 kaynakları içindir; güncel sürümün gerçek SAP kabul testleri henüz tamamlanmadı. [Test durumu](../../VALIDATION.md).
 
 ### Dosyaları indirin
 
@@ -102,7 +102,19 @@ SE38'de **`ZCHE_IMAP_INSTALL`** açıp **Execute / Çalıştır (F8)** seçin.
 
 **Kalıcı kullanım için:** Kurulum programı ürettiği nesneleri şu anda `$TMP` adlı yerel alana koyar. Programın kendisini pakete kaydetmek bunu değiştirmez. Nesneleri müşteri paketinize alıp test/canlı sisteme taşıma sürecini planlayın; transport ayarları başka ekipteyse onlarla koordine edin. [Paket ve taşıma ayrıntıları](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport).
 
-### 3.3. Posta kutusu profilini tanımlayın
+### 3.3. Yetki nesnesini ve rolü oluşturun
+
+**Ne yapıyoruz?** Kullanıcınızın programları çalıştırabilmesini sağlıyoruz. Her program, profil bazında `ZCHE_IMAP` yetki nesnesini kontrol eder; bu yetki yoksa deneme için bile yetki mesajıyla durur.
+
+1. **SU20:** `ZCHE_PROF` yetki alanını oluşturun (tip CHAR, uzunluk 20).
+2. **SU21:** `ZCHE_PROF` ve `ACTVT` alanlarıyla `ZCHE_IMAP` yetki nesnesini oluşturun. `02`, `03` ve `16` aktivitelerine izin verin.
+3. **PFCG:** Bir role `ZCHE_IMAP` nesnesini profil adınızla (örneğin `INVOICE`) ve gereken aktivitelerle ekleyin: görüntüleme için `03`, profil bakımı ve yeniden işleme için `02`, işlemeyi çalıştırmak için `16`. `ZCHI` tablo grubu için `S_TABU_DIS` ekleyin. Rolü kendi kullanıcınıza ve arka plan işini çalıştıran kullanıcıya atayın.
+
+Bu nesneleri yetki ekibiniz de oluşturabilir. Aktivitelerin, dosya izinlerinin ve işlem kodlarının ayrıntısı [yetki rehberinde](../../SECURITY.md).
+
+**Ne zaman devam edebilirsiniz?** Rol kullanıcınıza atandığında. Yeni yetki görünmüyorsa oturumu kapatıp yeniden açın.
+
+### 3.4. Posta kutusu profilini tanımlayın
 
 **Ne yapıyoruz?** Hangi posta hesabına bağlanacağımızı ve hangi klasördeki iletileri okuyacağımızı SAP'ye söylüyoruz. Bu ayarların birlikte kaydedilmiş haline **profil** denir.
 
