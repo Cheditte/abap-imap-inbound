@@ -235,7 +235,8 @@ function Read-Profile([string]$Name, [string]$Revision) {
     } elseif ($c['CREDSRC'] -cne 'O') { Stop-WithError 'CFG' 'invalid credential source' }
     $credPath = Join-Path (Join-Path $Policy.WorkDir 'secret') $credName
     if (-not (Test-Path $credPath)) { Stop-WithError 'CFG' 'password not set (ZCHE_IMAP_CONFIG > Password)' }
-    $cr = Read-KeyValueFile $credPath $p.Codepage
+    $credentialCodepage = if ($c['CREDSRC'] -ceq 'S') { $p.Codepage } else { 65001 }
+    $cr = Read-KeyValueFile $credPath $credentialCodepage
     if ($cr.ContainsKey('USER') -and ([string]$cr['USER']).Trim() -cne $p.User) {
         Stop-WithError 'CFG' 'credential user differs from the profile user'
     }

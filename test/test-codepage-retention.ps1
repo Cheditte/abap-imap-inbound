@@ -4,7 +4,7 @@ $repo = Split-Path $PSScriptRoot -Parent
 $root = Join-Path (Join-Path $repo 'work') ('test-policy-' + [Guid]::NewGuid().ToString('N'))
 [IO.Directory]::CreateDirectory($root) | Out-Null
 $ast = [Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'script/imap.ps1'), [ref]$null, [ref]$null)
-foreach ($name in 'Read-KeyValueFile','Assert-ManagedPath','Get-WorkPath','Get-Int','Remove-OldInboxCache','Remove-FailedCache') {
+foreach ($name in 'Read-KeyValueFile','Assert-ManagedPath','Get-WorkPath','Get-Int','Remove-OldInboxCache','Remove-FailedCache','Read-Profile','Assert-Revision') {
     $node = $ast.Find({ param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name }, $true)
     if (-not $node) { throw "Missing production helper: $name" }
     . ([scriptblock]::Create($node.Extent.Text))
@@ -47,3 +47,21 @@ $rejected = $false
 try { Remove-FailedCache $unsafe } catch { $rejected = $true }
 if (-not $rejected -or -not (Test-Path -LiteralPath $unsafe)) { throw 'Retention escaped its input directory' }
 Write-Host '  ok    retention refuses paths outside the current profile cache'
+
+function Stop-WithError([string]$Code, [string]$Text) { throw ($Code + ': ' + $Text) }
+$Policy.AllowedHosts = @('mail.example.invalid')
+$Policy.MaxMailBytes = 52428800
+$Policy.TimeoutSecMax = 600
+$Policy.RetentionDaysMax = 365
+foreach ($dir in 'conf','secret') { [IO.Directory]::CreateDirectory((Join-Path $root $dir)) | Out-Null }
+$key = 'TST_001_POLICY'
+$revision = '0000000001'
+[IO.File]::WriteAllLines((Join-Path $root "conf/${key}_$revision.conf"), @(
+    "PROFILE=$key", "REVISION=$revision", 'CREDSRC=O',
+    'HOST=mail.example.invalid', 'PORT=993', 'SECURITY=IMAPS', 'VERIFY=X',
+    'USER=fixture@example.invalid', 'MAILBOX=INBOX', 'DONEBOX=Processed',
+    'MOVEMODE=MOVE', 'CODEPAGE=1251'), $cp)
+[IO.File]::WriteAllText((Join-Path $root "secret/$key.cred"), ('PASSWORD=' + $text), [Text.UTF8Encoding]::new($false))
+$profile = Read-Profile $key $revision
+if ($profile.Password -cne $text) { throw 'Basis UTF-8 credential decoded with SAP codepage' }
+Write-Host '  ok    Basis UTF-8 credentials are independent of SAP display codepage'

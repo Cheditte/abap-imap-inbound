@@ -25,7 +25,7 @@ Set program authorization group `ZCHI` in SE38 attributes for CONFIG, INBOUND an
 | SAP service account | OS access to required work files; helper reads credentials. `bin/` scripts and policy must be administrator-owned and read-only to this account. |
 | Other users | No secret-path read access, including CG3Y/generic file download. |
 
-Production default is Basis-managed credentials, source **O** (the existing protocol value; not B). The job never reads the credential through ABAP. Passwords remain plaintext files protected by OS and SAP authorizations. curl receives the password over stdin (`--config -`); neither password nor mail content is passed as a command argument.
+Production default is Basis-managed credentials, source **O** (the existing protocol value; not B). Basis-managed credential files are UTF-8, independent of the SAP display codepage; screen-managed credential files use the declared SAP codepage. The job never reads the credential through ABAP. Passwords remain plaintext files protected by OS and SAP authorizations. curl receives the password over stdin (`--config -`); neither password nor mail content is passed as a command argument.
 
 Üretim varsayılanı Basis’in yönettiği **O** kaynağıdır. Parolalar şifreli kasa değildir; dosya izinleriyle korunur. Konfigürasyon kullanıcısına gizli klasörde okuma yetkisi verilmez. Ekran parolası kullanılıyorsa yeni profil commit edildikten sonra önceki revizyon silinir; silme izni yoksa açık bir temizlik uyarısı gösterilir. Başarısız yayınlamadan kalan yetim dosyaları Basis, etkin `CREDREV` değerleriyle karşılaştırarak temizler.
 

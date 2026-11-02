@@ -1,6 +1,6 @@
 # Validation / Doğrulama
 
-This record applies to the 0.9.0 release candidate. SAP tests and renewed SAP screenshots are excluded by the operator's instruction on 2 November 2026. Historical screenshots do not validate this candidate; they are no longer embedded in the guides.
+This record applies to the 0.9.0 release candidate. SAP tests and renewed SAP screenshots are excluded by the operator's instruction on 2 November 2026. Historical screenshots do not validate this candidate; they were removed from the current tree.
 
 | Check / Kontrol | System and version | Date | Result |
 |---|---|---|---|
@@ -11,7 +11,7 @@ This record applies to the 0.9.0 release candidate. SAP tests and renewed SAP sc
 | ABAP syntax and installer build | abaplint 2.120.92 v700; limited DDIC stand-ins | 2026-11-02 | Local check passed; does not validate SAP API signatures/runtime. |
 | Windows parser and IMAP helper | Local PowerShell 7 + disposable GreenMail 2.1.14 | 2026-11-02 | Passed locally. |
 | Windows PowerShell 5.1 | Local Windows parser, codepage and retention regressions | 2026-11-02 | Passed locally; CI also configured. |
-| Linux helper | Linux CI + disposable GreenMail 2.1.14 | 2026-11-02 | Pending CI. |
+| Linux helper | Linux CI + disposable GreenMail 2.1.14 | 2026-11-02 | Passed on Linux CI with GreenMail 2.1.14. |
 | Old curl 7.55.1 | Unsupported | 2026-11-02 | Rejected by version guard; no compatibility claim. |
 
 The DDIC fixtures are development-only and must never be installed into SAP. Real authorization enforcement, database LUWs, installer APIs and file permissions still require SAP acceptance before production use.
