@@ -70,7 +70,7 @@ FORM main.
 
   ULINE.
   IF NOT p_test IS INITIAL.
-    WRITE: / 'Test mode. Eligible mails:', gv_read.
+    WRITE: / 'List only. Eligible mails:', gv_read.
   ELSE.
     WRITE: / 'Processed:', gv_done, '  Failed:', gv_fail.
   ENDIF.

@@ -1,26 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="470" viewBox="0 0 1440 470" role="img" aria-labelledby="title desc">
-<title id="title">SAP tarafında dört adım.</title><desc id="desc">SAP tarafında dört adım.. ABAP IMAP Inbound.</desc>
+<title id="title">SAP tarafında üç adım.</title><desc id="desc">SAP tarafında üç adım.. ABAP IMAP Inbound.</desc>
 <rect x="0" y="0" width="1440" height="470" rx="0" fill="#F4F7FA"/>
 <rect x="56" y="44" width="30" height="4" rx="2" fill="#087F8C"/>
 <text x="100" y="53" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">ADIM ADIM</text>
-<text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="600" fill="#183448">SAP tarafında dört adım.</text>
+<text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="600" fill="#183448">SAP tarafında üç adım.</text>
 <text x="56" y="169" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#536A7B">SE38’de program oluşturup çalıştırabilen kullanıcı bu adımları takip edebilir.</text>
-<rect x="56.0" y="210" width="314.0" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<rect x="56.0" y="210" width="426.6666666666667" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
 <text x="78.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">01</text>
 <text x="78.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Programı oluştur</text>
 <text x="78.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">SE38 / INSTALL</text>
-<rect x="394.0" y="210" width="314.0" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<text x="416.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">02</text>
-<text x="416.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Kurucuyu çalıştır</text>
-<text x="416.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">SAP nesneleri</text>
-<rect x="732.0" y="210" width="314.0" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<text x="754.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">03</text>
-<text x="754.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Yetkileri kontrol et</text>
-<text x="754.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">Tablo, komut, dosya</text>
-<rect x="1070.0" y="210" width="314.0" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<text x="1092.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">04</text>
-<text x="1092.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Profili kaydet</text>
-<text x="1092.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">CONFIG / bağlantı</text>
+<rect x="506.6666666666667" y="210" width="426.6666666666667" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<text x="528.6666666666667" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">02</text>
+<text x="528.6666666666667" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Kurucuyu çalıştır</text>
+<text x="528.6666666666667" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">SAP nesneleri</text>
+<rect x="957.3333333333334" y="210" width="426.6666666666667" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<text x="979.3333333333334" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">03</text>
+<text x="979.3333333333334" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Profili kaydet</text>
+<text x="979.3333333333334" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">CONFIG / bağlantı</text>
 <text x="56" y="443" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#536A7B">Profil bazında ek yetkilendirme isteğe bağlıdır; ayrıntılar güvenlik rehberindedir.</text>
 <text x="1234" y="443" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">ABAP / IMAP</text>
 </svg>

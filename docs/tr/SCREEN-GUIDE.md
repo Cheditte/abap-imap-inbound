@@ -19,7 +19,7 @@
 | Security | Bağlantının şifreleme yöntemi. | Verilen porta uygun `IMAPS` veya `STARTTLS`. Şifrelenmemiş bağlantıyı ilk çözüm olarak seçmeyin. |
 | Verify certificate | Doğru, güvenilir sunucuyla bağlantıyı kontrol eder. | **İşaretli kalsın.** Hata varsa sunucu adı/sertifika güveni düzeltilir. |
 | User | Posta hesabının giriş adı. | Yöneticinin verdiği kullanıcı; her zaman e-posta adresiyle aynı olmayabilir. |
-| Password source | Parolanın nereden sağlanacağı. | Varsayılan `O`: yönetici sunucuda hazırlar. `S`: izin verilen koşullarda SAP ekranından girilir. |
+| Password source | Parolanın nereden sağlanacağı. | Varsayılan `O`: yönetici sunucuda hazırlar. SAP ekranından girmek için `S` yazıp Enter'a basın; parola alanı görünür. |
 | Password | `S` için yeni parola girişi. | `O` seçiliyken boş/pasif kalır. Kayıtlı parola geri okunmaz; değeri görüntülere veya varyanta koymayın. |
 | Folder to read | Okunacak posta klasörü. | Varsayılan `INBOX`. Başka klasör istiyorsanız onun gerçek IMAP adını yazın. |
 | Processed folder | Başarılı iletilerin taşınacağı yer. | Aynı hesapta **farklı, mevcut klasör**. `SAP-Processed` yalnız başlangıç örneği. |

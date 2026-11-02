@@ -19,7 +19,7 @@ A **profile** stores one set of connection and processing settings. `MAIL_DEMO` 
 | Security | Connection encryption. | `IMAPS` or `STARTTLS` to match the port. Do not use an unencrypted connection as a first fix. |
 | Verify certificate | Checks the identity and trust of the remote server. | **Keep selected.** Resolve hostname/certificate trust errors. |
 | User | Mailbox sign-in name. | Actual login from the administrator; it may differ from the email address. |
-| Password source | How the password is supplied. | Default `O`: administrator prepares it on the host. `S`: SAP-screen entry where permitted/protected. |
+| Password source | How the password is supplied. | Default `O`: administrator prepares it on the host. To enter it in SAP, type `S` and press Enter to show the password field. |
 | Password | New password for source `S`. | Blank/disabled for `O`. Saved passwords are not read back; do not include them in screenshots or variants. |
 | Folder to read | Source mail folder. | Default `INBOX`, or the actual IMAP name of another folder. |
 | Processed folder | Destination for successful mail. | **A different existing folder** in the same account. `SAP-Processed` is only an initial example. |

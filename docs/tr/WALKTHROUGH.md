@@ -12,7 +12,7 @@ Bu rehberde önce posta hesabını, SAP sunucusunu ve SAP programlarını hazır
 
 | Hedef | İzlenecek yol | Bittiğini nasıl anlarsınız? |
 |---|---|---|
-| İlk kez kurmak | [Üç hazırlık](#hazirlik), ardından [SAP kurulumu](#kurulum) | Programlar ve yetkiler hazır; profil bağlantısı başarılı. |
+| İlk kez kurmak | [Üç hazırlık](#hazirlik), ardından [SAP kurulumu](#kurulum) | SAP nesneleri hazır; [posta profili](#33-posta-profilini-kaydedin) başarıyla bağlanıyor. |
 | Bağlantıyı kontrol etmek | [Yol A — Listeleme](#listeleme) | İleti numaraları veya boş kutu sonucu görülür; içerik indirilmez. |
 | Mail ve ekini açmak | [Yol B — İlk mail](#ilk-mail) | Monitörde mail/ek açılır; başarılı mail hedef klasördedir. |
 | Kendi iş adımımı eklemek | [Geliştirici rehberi](TECHNICAL-GUIDE.md) | Hazır örnek yerine kendi doğrulanmış ABAP işleminiz kullanılır. |
@@ -20,7 +20,7 @@ Bu rehberde önce posta hesabını, SAP sunucusunu ve SAP programlarını hazır
 
 Rehber `v0.9.3` sürümünü anlatır. [Doğrulama kaydı](../../VALIDATION.md).
 
-SAP ekran örneklerinde menüler İngilizcedir; adımlarda Türkçe karşılıkları da verilir. Görseller SE38 ve SM36 hazırlık ekranlarını gösterir. [Görsellerin kapsamı](../screenshots/README.md).
+Ekran görüntüleri A4H/001'deki gerçek kurulum ve GreenMail denemesinden alınmıştır; kurulum sonucunda v0.9.3 görünür.
 
 <a id="hazirlik"></a>
 ## Başlamadan önce üç hazırlık
@@ -66,99 +66,79 @@ Yönetim yetkiniz varsa [RDP/SSH ve dosya aktarımı rehberini](SELF-MANAGED-SET
 <a id="kurulum"></a>
 ## 3. SAP ERP içindeki kurulumu yapın
 
-![SAP kurulumu: programı oluşturma, installer, yetkiler ve posta profili](../assets/diagrams/sap-steps-tr.svg)
+![SAP kurulumu: programı oluşturma, kurulumu çalıştırma ve posta profili](../assets/diagrams/sap-steps-tr.svg)
 
 ### 3.1. Kurulum programını oluşturun
 
 1. **SE38**'de program adına `ZCHE_IMAP_INSTALL` yazıp **Create / Oluştur** seçin.
-
-   ![SE38 başlangıç ekranında ZCHE_IMAP_INSTALL adı ve Create düğmesi](../screenshots/sap-se38-installer-entry.png)
-
-   **Bu ekranda:** program adını yazdıktan sonra **Create** ile özellikler penceresine geçin.
-
-2. Açıklama girin; **Type / Tür** alanında **Executable program / Çalıştırılabilir program** seçin.
-
-   ![Program özelliklerinin başlangıç penceresi; Title ve Type henüz boş](../screenshots/sap-program-attributes.png)
-
-   **Bu ekranda:** **Title** alanına örneğin “IMAP kurulumu” yazın; boş görünen **Type** alanından **Executable program** seçip kaydedin. Görsel, alanlar doldurulmadan önceki pencereyi gösterir.
-
-3. Kendi müşteri paketinizi kullanın; örneğin önceden oluşturduğunuz `ZCHE_IMAP`. `$TMP` yalnız geçici yerel deneme içindir.
-4. [Installer dosyasının](../../ZCHE_IMAP_INSTALL.abap) **tam kaynak kodunu** başlangıç kodunun yerine koyun. GitHub sayfasını HTML olarak kaydedip yüklemeyin.
+2. Açıklama girin; **Type / Tür** alanında **Executable program / Çalıştırılabilir program** seçip kaydedin.
+3. Kendi müşteri paketinizi kullanın; örneğin önceden oluşturduğunuz `ZCHE_IMAP`; `$TMP` geçici yerel deneme içindir.
+4. [Installer dosyasının](../../ZCHE_IMAP_INSTALL.abap) **tam kaynak kodunu** başlangıç kodunun yerine koyun; GitHub sayfasını HTML olarak kaydedip yüklemeyin.
 5. Kaydedin, sözdizimini kontrol edin ve **Ctrl+F3** ile etkinleştirin.
 
 **Devam koşulu:** program etkin ve sözdizimi hatası yok.
 
 ### 3.2. Kurulumu çalıştırın
 
-`ZCHE_IMAP_INSTALL` içinde **F8**:
-
-![A4H denemesinde kullanılan kurulum seçenekleri](../screenshots/sap-install-options.png)
-
-Görselde bu deneme için hazırlanan `/usr/sap/sapimap/` klasörü kullanılıyor. Siz SAP sunucunuzda hazırlanan gerçek klasörü yazın.
+`ZCHE_IMAP_INSTALL` içinde **F8** ile seçim ekranını açıp aşağıdaki alanları doldurun:
 
 | Seçim | İlk kurulumda |
 |---|---|
-| DDIC, Programs, SM69 commands, Server check | İşaretli. Tablolar, programlar, sunucu komutları ve son kontrol hazırlanır. |
-| Server folder | 2. bölümde hazırlanan **gerçek tam klasör yolu**. |
-| Code page | Otomatik; farklı seçim için [teknik açıklamayı](TECHNICAL-REFERENCE.md#sap-kurulum-seçenekleri-ve-kontrolleri) izleyin. |
-| Overwrite existing programs | İlk kurulumda işaretsiz; güncelleme için [ayrı yol](#guncelleme). |
+| DDIC, Programs, SM69 commands, Server check | İşaretli; SAP nesnelerini oluşturur ve sunucu hazırlığını kontrol eder. |
+| Server folder | 2. bölümde hazırlanan **gerçek tam klasör yolu**; örneğin bu denemede `/usr/sap/sapimap/`. |
+| Code page | Otomatik; eski non-Unicode sistemler için [teknik ayarlara](TECHNICAL-REFERENCE.md#sap-kurulum-seçenekleri-ve-kontrolleri) bakın. |
+| Overwrite existing programs | İlk kurulumda işaretsiz; güncelleme için [ayrı yolu](#guncelleme) izleyin. |
 | Uninstall | **İşaretsiz.** |
 
-F8 ile çalıştırıp sonuç listesinin tamamını okuyun. **Devam koşulu:** kurulum ve son sunucu kontrolü başarılı. Hatalı adımdan sonra devam etmeyin.
+Tekrar F8'e basıp son sunucu kontrolü dahil sonuç listesini okuyun; `OK` ve `Installation complete.` sonuçlarından sonra devam edin.
 
-![Program sözdizimi ve sunucu kontrollerinden sonra Installation complete sonucu](../screenshots/sap-install-complete.png)
+![v0.9.3 kurulumunda sözdizimi, sunucu kontrolü ve Installation complete sonucu](../screenshots/install-complete.png)
 
-**Sonucu okuyun:** dört ana programın sözdizimi ve sunucu kontrolü başarılı; en sonda `Installation complete.` yazıyor. A4H/001'deki bu çalıştırma, sürüm etiketi 0.9.3'e yükseltilmeden önceki `9447cbd` düzeltmesine ait; ekranda hâlâ 0.9.2 yazıyor. [Görselin kapsamı](../screenshots/README.md).
+Program sözdizimi ve sunucu kontrollerinin ardından v0.9.3 kurulumu başarıyla tamamlandı.
 
 Installer, oluşturduğu nesneleri `$TMP`'ye koyar; installer'ı kendi paketinize kaydetmek bunu değiştirmez. Kalıcı kullanımda nesneleri müşteri paketinize atayıp transport edin. [Paket ve transport](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport).
 
 <a id="yetkiler"></a>
 <a id="33-yetki-nesnesini-ve-rolü-oluşturun"></a>
-### 3.3. Yetkileri kontrol edin
-
-Programlar standart SAP yetkilerini kullanır: `ZCHI` tablo grubu için `S_TABU_DIS`, `ZCHE_IMAP_*` SM69 komutları için `S_LOG_COM` ve çalışma klasörü için `S_DATASET`. Geliştirici kullanıcısında genellikle bulunurlar; diğer kullanıcılar ve job kullanıcısı için [yetki tablosuna](../../SECURITY.md) bakın.
-
-**İsteğe bağlı — profil bazında ayrım:** Farklı ekiplerin yalnızca kendi posta kutusunu görmesi gerekiyorsa SU21'de `ZCHE_IMAP` yetki nesnesini tanımlayın. Programlar bunu kendiliğinden denetler. [Kurulum adımları](../../SECURITY.md#optional-per-profile-authorization).
-
-**Devam koşulu:** kendi kullanıcınızın ve job kullanıcısının standart yetkileri var.
+<a id="33-yetkileri-kontrol-edin"></a>
+Programlar standart yetkileri (`S_TABU_DIS`, `S_LOG_COM`, `S_DATASET`) kullanır; geliştirici kullanıcısında genellikle bulunurlar. Job kullanıcıları ve isteğe bağlı profil bazlı erişim (`ZCHE_IMAP`) için [SECURITY](../../SECURITY.md) belgesine bakın.
 
 <a id="34-posta-kutusu-profilini-tanımlayın"></a>
-### 3.4. Posta profilini kaydedin
+<a id="34-posta-profilini-kaydedin"></a>
+### 3.3. Posta profilini kaydedin
 
-**Profil**, bağlantı ve işleme ayarlarının birlikte saklanan adıdır. **SE38 → `ZCHE_IMAP_CONFIG` → F8** ile ayar ekranını açın. Ekranın içindeki F8, **ayarları kaydeder ve bağlantıyı kontrol eder**.
+**Profil**, posta bağlantısı ve işleme ayarlarınızı bir ad altında saklar. **SE38 → `ZCHE_IMAP_CONFIG` → F8** ile açın.
 
-![İlk bağlantı denemesinden önce doldurulan DEMO posta profili](../screenshots/sap-profile-demo.png)
+1. Bir profil adı seçin; örneğin `DEMO`; **Active** işaretli olsun.
+2. **Gerçek** IMAP sunucusunu, portu, bağlantı türünü ve kullanıcıyı girin.
+3. Parola kaynağını seçin: varsayılan **`O`**, parolanın SAP sunucusunda yönetilmesidir. SAP ekranından girmek için **`S` yazıp Enter'a basın**; parola alanı görünür hale gelir. Parolayı girin; ekran görüntülerinde paylaşmayın.
+4. Kaynak ve hedef klasörleri seçin; ilk denemede hazır demo handler kalsın.
 
-`greenmail`, `3993` portu ve `sap@demo.local` yerel deneme bilgileridir. Kendi posta hesabınızın gerçek bilgilerini kullanın. Görselde parola SAP'den girildiği için kaynak `S`; parola sunucuda yönetiliyorsa `O` seçilir.
+![Sunucu, kimlik, klasör ve işleme ayarları doldurulmuş DEMO profili](../screenshots/config-profile.png)
 
-| Alan | İlk kullanımda |
+DEMO profilinde GreenMail deneme bilgileri ve `S` kaynağıyla girilen maskelenmiş parola görülür.
+
+| Alan | Ne yazmalısınız? |
 |---|---|
-| Profile / Active | Seçtiğiniz ad; örneğin `DEMO`. Active işaretli. Bu adı sonraki adımlarda da kullanın. |
-| Server, Port, Security | Posta yöneticisinin verdiği gerçek bilgiler. Sertifika doğrulaması açık. |
-| User / Password source | Gerçek giriş adı; varsayılan `O`, parolayı sunucuda yöneticinin hazırlamasıdır. |
-| Folder to read | `INBOX` veya seçtiğiniz gerçek kaynak klasör. |
-| Processed folder | Aynı hesapta farklı, mevcut hedef klasör. `SAP-Processed` adı zorunlu değil. |
-| Move method | `MOVE`. Posta sunucusu bu işlemi desteklemeli. |
-| Handler program / FORM | `ZCHE_IMAP_HANDLER_DEMO` / `HANDLE_MAIL`. Hazır örnek iş programı. |
+| Server / Port / Security | Posta hesabınızın gerçek IMAP bilgileri; yerel GreenMail örneği `greenmail` / `3993` / `IMAPS`. |
+| Verify certificate | Gerçek hesapta işaretli tutun; izole GreenMail denemesinde kendinden imzalı sertifika nedeniyle **yalnız test için kaldırıldı**. |
+| User | Gerçek IMAP giriş adı; `sap@demo.local` yalnız bu yerel denemeye aittir. |
+| Password source | Varsayılan `O`: gerçek `SID_CLIENT_PROFILE` anahtarıyla [sunucuda parola hazırlığı](TECHNICAL-REFERENCE.md#profil-alanları-ve-sunucuda-parola-yönetimi); `S` + Enter: parolayı SAP ekranından girme. |
+| Folder to read | `INBOX` veya seçtiğiniz mevcut kaynak klasör. |
+| Processed folder | Aynı hesapta farklı, mevcut hedef klasör; `SAP-Processed` örnek addır, zorunlu değildir. |
+| Move method | `MOVE`; posta sunucusu UID MOVE desteklemeli. |
+| Handler program / FORM | İlk denemede `ZCHE_IMAP_HANDLER_DEMO` / `HANDLE_MAIL`. |
 
-`O` kaynağı için sunucu yöneticisi, gerçek `SID_CLIENT_PROFILE` anahtarıyla parolayı [sunucuda hazırlar](TECHNICAL-REFERENCE.md#profil-alanları-ve-sunucuda-parola-yönetimi). `S` kaynağı SAP ekranından parola girişidir; izin ve koruma koşulları farklıdır. Kaydedilen parola ekranda geri gösterilmez.
+Profil görselinde ilk denemeden önce sertifika doğrulaması işaretlidir; aşağıdaki başarılı GreenMail bağlantısında yukarıda açıklanan test istisnası kullanılmıştır. Gerçek posta hesabında doğrulamayı açık tutun ve SAP sunucusunda güvenilir sertifika zincirini hazırlayın.
 
-[Diğer alanların açıklaması](SCREEN-GUIDE.md#profil). **Devam koşulu:** ayarlar kaydedilmiş ve doğru hesap için bağlantı kontrolü başarılı.
+5. Ayar ekranının **içinde F8** ile kaydedip bağlantıyı test edin; kaydedilen parola yeniden gösterilmez.
+6. `LOGIN`, `INBOX` ve `PROCESSED` adımlarına bakın; `INBOX: 0 mails` bağlantı hatası değil, kutunun boş olmasıdır.
 
-![DEMO bağlantısı başarılı; oturum açma ve iki posta klasörü kontrol edilmiş](../screenshots/sap-connection-success.png)
+[Bütün profil alanlarının açıklaması](SCREEN-GUIDE.md#profil).
 
-**Sonucu okuyun:** `LOGIN`, `INBOX` ve `PROCESSED` adımları başarılı. `INBOX: 0 mails`, kontrol anında gelen kutusunun boş olduğunu gösterir; bağlantı hatası değildir.
+![Oturum açma ve iki posta klasörü kontrolü başarılı DEMO bağlantısı](../screenshots/config-test.png)
 
-**Yerel deneme ayarı:** GreenMail'in kendinden imzalı test sertifikası için **Verify certificate** işareti kaldırıldı. Gerçek posta hesabında doğrulamayı açık tutun ve SAP sunucusunda güvenilir sertifika zincirini hazırlayın. Bu görüntü deneme bağlantısını gösterir; sertifika güveninin doğrulandığını göstermez.
-
-<details>
-<summary>Bağlantı sertifika hatasında durursa</summary>
-
-![İlk bağlantıda GreenMail'in kendinden imzalı sertifikası reddedilmiş](../screenshots/sap-connection-tls-error.png)
-
-İlk deneme sunucuya ve porta ulaşmış, sertifika doğrulamasında durmuş. Posta sunucusunun sertifika zincirine güveni SAP sunucusunda yöneticinizle hazırlayın. Bu izole GreenMail denemesinde kullanıcı daha sonra **Verify certificate** işaretini kaldırdı; yukarıdaki başarılı bağlantı bu test istisnasıyla alındı.
-
-</details>
+Bağlantı testi GreenMail'e ulaştı, oturum açtı ve iki klasörü başarıyla kontrol etti.
 
 <a id="listeleme"></a>
 <a id="4-üç-bölümü-birlikte-deneyin"></a>
@@ -166,8 +146,12 @@ Programlar standart SAP yetkilerini kullanır: `ZCHI` tablo grubu için `S_TABU_
 
 1. **SE38 → `ZCHE_IMAP_INBOUND` → F8** ile seçim ekranını açın.
 2. Profil alanına **yalnız kendi deneme profilinizi** girin. Boş bırakmak bütün aktif profilleri kapsar.
-3. **List only (no downloads/changes)** kutusunu **kendiniz işaretleyin**; başlangıçta işaretli olduğunu varsaymayın.
+3. **List only (no downloads/changes)** kutusunu **işaretleyin**.
 4. F8 ile çalıştırın. `UID`, posta sunucusunun ileti numarasıdır; belge numarası değildir.
+
+![DEMO profili ve List only seçili, Retry failed mails işaretsiz](../screenshots/inbound-list-only.png)
+
+Bu yol için **List only** işaretli olmalı; görsel çalıştırmadan önceki seçim ekranını gösterir.
 
 **Başarı ölçütü:** uygun ileti numaraları veya boş kutu sonucu görülür. Bu yol **mail gövdesini/ekleri indirmez, handler'ı çalıştırmaz ve maili taşımaz**. [Seçim alanları](SCREEN-GUIDE.md#isleme).
 
@@ -184,36 +168,28 @@ Programlar standart SAP yetkilerini kullanır: `ZCHI` tablo grubu için `S_TABU_
 
 **Bu kez gerçek mail işlemesi başlar.** Mail ve ekler sunucuya alınır; hazır örnek ekleri okumayı dener. Başarılı mail hedef klasöre taşınır, okundu işaretlenebilir. Fatura veya sipariş oluşturulmaz.
 
-![Normal işlemeye hazır DEMO profili; List only ve Retry failed mails işaretsiz](../screenshots/sap-inbound-selection.png)
+![PDF ve JPG eki olan bir test maili başarıyla işlenmiş](../screenshots/inbound-processed.png)
 
-**Bu ekranda:** Yol B için `List only` işaretsiz. Yol A'da yalnız listelemek için çalıştırmadan önce işaretleyin. İlk gerçek denemeyi, profilin **Mails per run** alanında tek deneme mailiyle sınırlayın.
-
-![PDF ve JPG eki olan bir test maili tamamlanmış; Processed 1, Failed 0](../screenshots/sap-process-one-mail.png)
-
-**Sonucu okuyun:** UID `2` tamamlanmış; PDF ve JPG listelenmiş; `Processed: 1`, `Failed: 0` yazıyor. Şimdi monitörde gövdeyi ve dosyaları açın; ardından mailin posta hesabındaki hedef klasörünü kontrol edin.
+UID `2` iki ekiyle tamamlanmış; sonuçta `Processed: 1`, `Failed: 0` yazıyor.
 
 ### B2. Monitörde kontrol edin
 
-1. **SE38 → `ZCHE_IMAP_MONITOR` → F8** ile seçim ekranını açın.
-2. Kendi profilinizi ve çalıştırmayı kapsayan tarih aralığını seçip F8'e basın.
+1. **SE38 → `ZCHE_IMAP_MONITOR` → F8** ile açın.
+2. Kendi profilinizi ve SAP'deki işleme zamanını kapsayan tarih aralığını girip F8'e basın.
+3. **Done** (`S`) durumunu arayın; örnekte iki işlenmiş mail ve sıfır hata var.
 
-   ![DEMO profili girilmeden önceki monitör filtreleri](../screenshots/sap-monitor-selection.png)
+![Mail monitöründe iki Done kaydı ve sıfır hata](../screenshots/monitor-list.png)
 
-   **Bu ekranda:** bu örnek için `DEMO` yazın ve SAP işleme kaydındaki tarihi kapsayın. Görsel başlangıç filtrelerini gösteriyor; Profile henüz boş.
+İki deneme maili DEMO monitör listesinde Done olarak görünüyor.
 
-3. Sonuç listesini okuyun. Örnekte geçmişten gelen iki mail de **Done**; hata sayısı sıfır. Önceki tek mail çalıştırmasının kaydı UID `2`.
+4. Maile çift tıklayıp başlık, gövde ve ek bağlantılarını inceleyin.
 
-   ![Monitörde iki Done kaydı ve sıfır hata](../screenshots/sap-monitor-list.png)
+![Türkçe mail gövdesi ve PDF ile JPG ek bağlantılarının bulunduğu ayrıntı ekranı](../screenshots/monitor-detail.png)
 
-4. UID `2` satırına çift tıklayın; mail başlığını, gövdesini ve ek bağlantılarını inceleyin.
+Ayrıntı ekranında mail gövdesi ile `01_dosya.pdf` ve `02_email-inside-sap.jpg` ek bağlantıları bulunuyor.
 
-   ![UID 2 ayrıntıları; mail gövdesi ve PDF ile JPG eklerinin bağlantıları](../screenshots/sap-monitor-details.png)
-
-5. Ekin **Open** satırına çift tıklayın. Örnekte JPG, bilgisayarın görsel görüntüleyicisinde açılmış. PDF, metin ve desteklenen görseller uygun görüntüleyicide açılabilir; diğer türler yalnız indirilir. **Original mail**, EML dosyasını otomatik açmadan indirir.
-
-   ![JPG eki bilgisayarda açık; yanında SAP mail ayrıntıları](../screenshots/sap-monitor-image-open.png)
-
-6. Posta hesabında mailin seçtiğiniz hedef klasöre geçtiğini kontrol edin. Paylaşılan görüntüler hedef klasör kontrolünü ve PDF'nin açılmasını henüz göstermiyor.
+5. Ekin **Open** satırına çift tıklayın; PDF, metin ve desteklenen görseller uygun görüntüleyicide açılır, diğer türler yalnız indirilir. **Original mail**, EML dosyasını otomatik açmadan indirir.
+6. Posta hesabında başarılı mailin seçtiğiniz hedef klasöre geçtiğini kontrol edin.
 
 | Durum | Anlamı ve sonraki adım |
 |---|---|
@@ -240,11 +216,7 @@ INBOUND seçim ekranında kendi profilinizi girin, **List only işaretli** ve re
 
 ### C2. SM36'da işi tanımlayın
 
-1. **SM36** açın; kullanılmayan bir job adı girin. Görseldeki `ZCHE_IMAP_LIST_DEMO` yalnız örnektir.
-
-   ![SM36 başlangıç ekranında örnek iş adı; hedef, adım ve başlangıç henüz tanımlanmamış](../screenshots/sap-sm36-job-definition.png)
-
-   **Bu ekranda:** **Job Name** işin adı, **Target** çalışacağı sunucu, **Step** program/varyant, **Start condition** başlangıç zamanıdır. Görsel kaydedilmemiş bir tanımı gösterir; kalan alanları aşağıdaki adımlarla tamamlayın.
+1. **SM36** açıp kullanılmayan bir job adı girin; örneğin `ZCHE_IMAP_LIST_DEMO`.
 
 2. Normal iş için **Job Class C** kullanın; kurumunuzun kuralı varsa onu izleyin.
 3. **Target / Hedef** alanında kurulum yapılan uygulama sunucusunu seçin. Çok sunuculu sistemde boş hedefi rastgele sunucu seçimine bırakmayın.
