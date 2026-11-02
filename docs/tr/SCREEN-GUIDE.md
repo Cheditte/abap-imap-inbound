@@ -90,4 +90,4 @@ Varyantta profil, List only ve retry seçimleri saklanır. İlk job için **List
 
 SM36'da **Job Name** işin adı, **Target** kurulum yapılan SAP sunucusu, **Step** program/varyant/kullanıcı, **Start condition** zamanlama seçimidir. SM37'de kendi işinizi bulup **Job log** ve **Spool** okuyun. Finished tek başına başarılı mail işleme kanıtı değildir.
 
-[Adım adım job yolu](WALKTHROUGH.md#otomatik) · [Görsellerin kapsamı](../screenshots/README.md).
+[Adım adım job yolu](WALKTHROUGH.md#otomatik).

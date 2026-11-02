@@ -8,7 +8,7 @@ You are assumed to have the skills and permissions to create, activate and run p
 
 Being able to sign in to SAP GUI does not give you Windows/Linux administrator rights. Opening a mailbox in webmail does not give you mail-server administration rights either. If access is missing, involve the machine or email service owner.
 
-**Start with a test system and test mailbox.** Installation and runtime tests for the current 0.9.2 version on an actual SAP system are still pending. [Verification status](../VALIDATION.md).
+**Start with a test system and test mailbox.** [Verification status](../VALIDATION.md).
 
 ## 1. Which machine should you connect to?
 

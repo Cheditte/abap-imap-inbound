@@ -90,4 +90,4 @@ A variant stores profile, List only and retry selections. Use a **List only sele
 
 In SM36, **Job Name** identifies the job, **Target** is the installation's SAP host, **Step** defines program/variant/user, and **Start condition** defines timing. In SM37, locate your job and read **Job log** and **Spool**. Finished alone does not prove successful mail processing.
 
-[Step-by-step job route](WALKTHROUGH.md#daily-use) · [Screenshot scope](screenshots/README.md).
+[Step-by-step job route](WALKTHROUGH.md#daily-use).

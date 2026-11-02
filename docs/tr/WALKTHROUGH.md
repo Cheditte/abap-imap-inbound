@@ -16,7 +16,7 @@
 | Kendi iş adımımı eklemek | [Geliştirici rehberi](TECHNICAL-GUIDE.md) | Hazır örnek yerine kendi doğrulanmış ABAP işleminiz kullanılır. |
 | Otomatik çalıştırmak | [Yol C — Varyant ve job](#otomatik) | Doğru sunucuda çalışan işin log ve spool'u incelenir. |
 
-Rehber `v0.9.2` sürüm adayını anlatır. Güncel sürümün SAP çalışma kabulü henüz tamamlanmadı. Görseller gerçek A4H standart SAP ekranlarıdır; tamamlanmış IMAP kurulumu veya başarılı mail işleme kanıtı değildir. [Doğrulama kaydı](../../VALIDATION.md) · [Görsellerin kapsamı](../screenshots/README.md).
+Rehber `v0.9.2` sürüm adayını anlatır. [Doğrulama kaydı](../../VALIDATION.md).
 
 <a id="hazirlik"></a>
 ## Başlamadan önce üç hazırlık
@@ -68,11 +68,7 @@ Yönetim yetkiniz varsa [RDP/SSH ve dosya aktarımı rehberini](SELF-MANAGED-SET
 4. [Installer dosyasının](../../ZCHE_IMAP_INSTALL.abap) **tam kaynak kodunu** başlangıç kodunun yerine koyun. GitHub sayfasını HTML olarak kaydedip yüklemeyin.
 5. Kaydedin, sözdizimini kontrol edin ve **Ctrl+F3** ile etkinleştirin.
 
-![SE38'de ZCHE_IMAP_INSTALL adını girip Create seçilecek başlangıç ekranı](../screenshots/sap-se38-installer-entry.png)
-
-![Yeni programın başlangıç özellikleri; Type alanında Executable program seçilir](../screenshots/sap-program-attributes.png)
-
-Özellik görseli henüz doldurulmamış başlangıç penceresidir. Type seçimini siz yapın. **Devam koşulu:** program etkin ve sözdizimi hatası yok.
+**Devam koşulu:** program etkin ve sözdizimi hatası yok.
 
 ### 3.2. Kurulumu çalıştırın
 
@@ -181,10 +177,6 @@ INBOUND seçim ekranında kendi profilinizi girin, **List only işaretli** ve re
 2. Normal iş için **Job Class C** kullanın; kurumunuzun kuralı varsa onu izleyin.
 3. **Target / Hedef** alanında kurulum yapılan uygulama sunucusunu seçin. Çok sunuculu sistemde boş hedefi rastgele sunucu seçimine bırakmayın.
 4. **Step / Adım → ABAP program:** `ZCHE_IMAP_INBOUND` ve kaydettiğiniz listeleme varyantını girin. Doğru çalışma kullanıcısını kontrol edip adımı kaydedin.
-
-![SM36'da job adı, Target, Step ve Start condition alanları](../screenshots/sap-sm36-job-definition.png)
-
-Görsel kaydedilmemiş hazırlık ekranıdır. Hedef sunucu, adım ve başlangıç henüz seçilmemiştir; bu görsel çalışmış bir job göstermez.
 
 ### C3. Başlangıcı belirleyin ve sonucu okuyun
 
