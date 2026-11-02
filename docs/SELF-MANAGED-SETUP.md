@@ -8,7 +8,7 @@ You are assumed to have the skills and permissions to create, activate and run p
 
 Being able to sign in to SAP GUI does not give you Windows/Linux administrator rights. Opening a mailbox in webmail does not give you mail-server administration rights either. If access is missing, involve the machine or email service owner.
 
-**Start with a test system and test mailbox.** Installation and runtime tests for the current 0.9.0 version on an actual SAP system are still pending. [Verification status](../VALIDATION.md).
+**Start with a test system and test mailbox.** Installation and runtime tests for the current 0.9.1 version on an actual SAP system are still pending. [Verification status](../VALIDATION.md).
 
 ## 1. Which machine should you connect to?
 
@@ -52,7 +52,7 @@ $PSVersionTable.PSVersion
 curl.exe --version
 ```
 
-Windows PowerShell must be **5.1**. This project's Windows SAP command uses `powershell.exe`; installing PowerShell 7 alongside it does not replace this check. The curl output's **Protocols** line must include `imaps`. Use `curl.exe` in Windows PowerShell; `curl` can refer to a different command.
+Windows PowerShell must be **5.1**. This project's Windows SAP command uses `powershell.exe`; installing PowerShell 7 alongside it does not replace this check. curl must be **8.0.0 or newer** (first line of the output), and its **Protocols** line must include `imaps`. If the built-in `curl.exe` is older, install a current build and pass its path to setup with `-CurlPath`. Use `curl.exe` in Windows PowerShell; `curl` can refer to a different command.
 
 If a tool is missing or unsuitable, follow the approved installation method for your operating system: [Windows PowerShell preparation](https://learn.microsoft.com/en-us/powershell/scripting/windows-powershell/install/installing-windows-powershell), [curl Windows downloads](https://curl.se/windows/). Do not overwrite Windows system files with another curl build. For a separate installation, supply its actual executable path through setup's `-CurlPath` option.
 
@@ -83,7 +83,7 @@ command -v pwsh
 curl --version
 ```
 
-You need **PowerShell 7** and curl with `imaps` support. The command started by SAP uses `/usr/bin/pwsh`; confirm that this path exists and works in your installation.
+You need **PowerShell 7** and **curl 8.0.0 or newer** with `imaps` support. Many SAP Linux releases ship curl 7.x; install a newer curl and pass its path to setup with `--curl-path`. The command started by SAP uses `/usr/bin/pwsh`; confirm that this path exists and works in your installation.
 
 If PowerShell is missing, identify the Linux distribution and version, then follow [Microsoft's instructions for that distribution](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux). Install curl through the distribution's approved package manager; [curl's distribution packages](https://curl.se/download.html) provide a reference. Do not copy another distribution's commands or upgrade the operating system in place for this project.
 
@@ -123,7 +123,7 @@ Follow the instructions for your operating system:
 - [Windows server setup block and self-test](TECHNICAL-REFERENCE.md#windows)
 - [Linux server setup block and self-test](TECHNICAL-REFERENCE.md#linux)
 
-The blocks ask for the actual IMAP server, SAP service account and chosen working folder. They prepare protected folders and permissions and deploy both `imap.ps1` and `mime.ps1`. Confirm that the self-test ends in `OK` and reports protocol `2` and version `0.9.0`. Record the full working-folder path; use the same path in the SAP installer.
+The blocks ask for the actual IMAP server, SAP service account and chosen working folder. They prepare protected folders and permissions and deploy both `imap.ps1` and `mime.ps1`. Confirm that the self-test ends in `OK` and reports protocol `2` and version `0.9.1`. Record the full working-folder path; use the same path in the SAP installer.
 
 The mail server must be reachable **from the SAP machine**. For certificate errors, correct the actual hostname and trusted certificates; keep certificate verification enabled.
 

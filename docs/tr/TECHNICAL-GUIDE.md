@@ -10,7 +10,7 @@ Mevcut bağlantı noktası dışarıya açılmış bir sınıf değil, **`FORM` 
 
 1. Deneme kutusunda `ZCHE_IMAP_HANDLER_DEMO` ile başarılı bir çalıştırma yapın.
 2. **SE38** içinde kurulu programı `ZCHE_IMAP_HANDLER_CUSTOM` gibi müşteri adına kopyalayın. Türü **subroutine pool** olarak koruyun ve transport edilebilir müşteri paketinizi atayın.
-3. `INCLUDE zche_imap_common`, `INCLUDE zche_imap_io` ve `HANDLE_MAIL` arayüzünü koruyun. Kurulum, SAP sistemine uygun `ZCHE_IMAP_IO` uygulamasını seçer.
+3. `INCLUDE zche_imap_common` satırını ve `HANDLE_MAIL` arayüzünü koruyun. `ZCHE_IMAP_COMMON` dosya yardımcılarını (`ZCHE_IMAP_IO`) zaten içerir; ikinci kez eklemeyin.
 4. `ZCHE_IMAP_CONFIG` içindeki **Handler program** alanına programınızı, **Handler FORM** alanına `HANDLE_MAIL` girin. Kaydedip bağlantı sonucunu kontrol edin.
 5. İşlemeyi zamanlamadan önce yetkilendirilmiş job kullanıcısıyla test edip monitörü inceleyin.
 
@@ -18,7 +18,7 @@ Installer kendi demo handler'ını içerir; özel kopyanızı içermez. İş kod
 
 ## 2. Girdileri ve sonucu tanıyın
 
-`ZCHE_IMAP_HANDLER_CUSTOM` oluşturacağınız program için örnek addır. Başka ad seçerseniz SE38'de, örneğin `PROGRAM` satırında ve profilin handler alanında aynı adı kullanın. Kurulu include adlarını ve `HANDLE_MAIL` arayüzünü gösterildiği gibi koruyun.
+`ZCHE_IMAP_HANDLER_CUSTOM` oluşturacağınız program için örnek addır. Başka ad seçerseniz ad `ZCHE_IMAP_HANDLER_` ile başlamalıdır: işlemci yalnızca kurulumun belirlediği bu önekle başlayan programları çalıştırır, diğerlerini reddeder. SE38'de, örneğin `PROGRAM` satırında ve profilin handler alanında aynı adı kullanın. Kurulu include adlarını ve `HANDLE_MAIL` arayüzünü gösterildiği gibi koruyun.
 
 İş mantığı gereken her uygun ileti için işlemci şu arayüzü dinamik olarak çağırır:
 
@@ -48,7 +48,6 @@ Bu tam subroutine pool en az bir boş olmayan, inline dışı PDF'nin okunabildi
 PROGRAM zche_imap_handler_custom.
 
 INCLUDE zche_imap_common.
-INCLUDE zche_imap_io.
 
 FORM handle_mail USING    is_mail TYPE zche_imap_s_mail
                           it_body TYPE STANDARD TABLE
@@ -112,8 +111,8 @@ Bu koşulsuz bir “tam olarak bir kere çalışır” garantisi değildir. Koru
 | Durum / olay | İşlemcinin davranışı |
 |---|---|
 | Yeni uygun ileti | İndirir/ayrıştırır ve seçilen handler'ı çağırır. |
-| Handler hata döndürür | İş LUW'sunu geri alıp `E` kaydeder. Tekrar deneme istenmedikçe normal çalışma atlar. |
-| Monitörden yeniden deneme | `E`, `R` olur; normal çalıştırma handler'ı tekrar çağırabilir. İşlemcinin açık retry seçeneği de `E` içerebilir. |
+| Handler hata döndürür | İş LUW'sunu geri alıp `E` kaydeder. Tekrar deneme istenmedikçe normal çalışma atlar. `MAX_ATTEMPTS` (varsayılan 3) başarısız denemeden sonra retry seçeneği de atlar. |
+| Monitörden yeniden deneme | `E`, `R` olur; normal çalıştırma handler'ı deneme sınırı aşılmış olsa bile tekrar çağırabilir. İşlemcinin retry seçeneği `E` kayıtlarını yalnızca `MAX_ATTEMPTS` sınırının altındayken içerir. |
 | Handler başarısı kaydedildi | Uzak taşıma öncesi `H` kaydeder. |
 | `H` sonrası taşıma hatası / kesinti | Taşımayı bekletir; özgün UID gelen kutusunda bulunmasa da normal işlemci kurtarmayı sürdürür. Tamamlanmış handler'ı bilerek tekrar çağırmaz. |
 | Taşıma/arşiv tamamlandı | `S` kaydeder. |

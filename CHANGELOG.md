@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.1 — release candidate
+
+- Fix: 0.9.0 could not save a profile or process mail. The installer now writes the handler prefix (`ZCHE_IMAP_HANDLER_`) and retry limit (`3`) on first run and keeps existing values on a rerun.
+- Server setup checks for curl 8.0.0 or newer at the start; Linux setup accepts `--curl-path`.
+- Guides: authorization step with `S_LOG_COM` and `S_DATASET`, curl 8 requirement, handler template without the duplicate include, retry limit, setup commands for elevated sessions.
+
+Upgrade from 0.9.0: copy the new `script` files to the server (the script version must match), then rerun `ZCHE_IMAP_INSTALL` with Programs and Server check selected.
+
 ## 0.9.0 — release candidate
 
 - Rename SAP objects and commands to ZCHE_IMAP_; target classic ABAP 7.00.

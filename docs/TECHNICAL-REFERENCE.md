@@ -2,7 +2,7 @@
 
 > **English** | [Türkçe](tr/TECHNICAL-REFERENCE.md) · [Project overview](../README.md) · [Installation](WALKTHROUGH.md) · [Code examples](TECHNICAL-GUIDE.md)
 
-This file is for Basis and email teams preparing installation, and developers who want the details. It describes **0.9.0 sources and script protocol 2**. Use the [walkthrough](WALKTHROUGH.md) for installation in order, and the [developer guide](TECHNICAL-GUIDE.md) to add your business logic.
+This file is for Basis and email teams preparing installation, and developers who want the details. It describes **0.9.1 sources and script protocol 2**. Use the [walkthrough](WALKTHROUGH.md) for installation in order, and the [developer guide](TECHNICAL-GUIDE.md) to add your business logic.
 
 For the SAP steps, you are assumed to be able to create, activate and run programs in SE38. Here, **Basis / server administrator** means the person or team responsible for the server; this can be you if you hold the necessary permissions. The same distinction applies to email administration. [Preparation when you hold those permissions](SELF-MANAGED-SETUP.md).
 
@@ -107,13 +107,13 @@ The source targets **7.00 and later** compatibility on classical ABAP systems. T
 
 ## Access and operating boundaries
 
-Basis assigns permissions to the intended users and table authorization groups. The application checks table access with `VIEW_AUTHORITY_CHECK`; file and command permissions are additional checks.
+Basis assigns permissions to the intended users and table authorization groups. The application checks table access with `VIEW_AUTHORITY_CHECK`; file and command permissions are additional checks. The three tables belong to table authorization group `ZCHI`: grant `S_TABU_DIS` for `ZCHI` with activity `03` (display) or `02` (change) as listed below. Create authorization object `ZCHE_IMAP` first ([walkthrough step 3.3](WALKTHROUGH.md#33-create-the-authorization-object-and-role)).
 
 | Role | Required access |
 |---|---|
-| Job user | Display `ZCHE_IMAP_PROFILE`; change `ZCHE_IMAP_LOG`; execute `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE` through `S_LOG_COM`; read the input mail files through `S_DATASET`; handler-specific permissions. |
-| Profile administrator | Display/change `ZCHE_IMAP_PROFILE`; execute `ZCHE_IMAP_TEST`; write profile and credential files through `S_DATASET` for `ZCHE_IMAP_CONFIG`. |
-| Monitor user | Display `ZCHE_IMAP_LOG`; read input/archive files for `ZCHE_IMAP_MONITOR`. Retry additionally requires change access to `ZCHE_IMAP_LOG`. |
+| Job user | `ZCHE_IMAP` activity `16` for the profile name; display `ZCHE_IMAP_PROFILE`; change `ZCHE_IMAP_LOG`; execute `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE` through `S_LOG_COM`; read the input mail files through `S_DATASET`; handler-specific permissions. |
+| Profile administrator | `ZCHE_IMAP` activities `03` and `02` for the profile name; display/change `ZCHE_IMAP_PROFILE`; execute `ZCHE_IMAP_TEST`; write profile and credential files through `S_DATASET` for `ZCHE_IMAP_CONFIG`. |
+| Monitor user | `ZCHE_IMAP` activity `03` for the profile name; display `ZCHE_IMAP_LOG`; read input/archive files for `ZCHE_IMAP_MONITOR`. Retry additionally requires activity `02` and change access to `ZCHE_IMAP_LOG`. |
 | Installer | Development permissions for the project objects and the permissions needed to maintain and test SM69 commands. Uninstall has additional cross-client checks. |
 
 - The project does **not** put passwords in its SAP tables. Credentials are plain-text files protected by OS permissions, accessible to the SAP service account and privileged administrators. The application does not display saved passwords.
@@ -189,7 +189,7 @@ Check connectivity from that server. On Windows, for example:
 
 ### Windows
 
-Use PowerShell 5.1 or later and a curl build whose `curl.exe --version` output includes `imaps`. In Windows PowerShell, use `curl.exe`: `curl` can mean a different command.
+Use Windows PowerShell 5.1 and **curl 8.0.0 or newer** whose `curl.exe --version` output includes `imaps`. Older Windows releases ship an older `curl.exe`; install a current build and pass its path with `-CurlPath`. Setup stops with a clear message if curl is older than 8. In Windows PowerShell, use `curl.exe`: `curl` can mean a different command.
 
 Run this block from the repository folder in an administrator PowerShell session. At the prompts, enter the mail team's IMAP hostname and the Windows SAP account and full working folder confirmed by Basis. Blank answers stop setup.
 
@@ -218,15 +218,15 @@ Run the self-test. When prompted, enter the same full folder path you used durin
   if (@($ImapRoot) -contains '') {
     throw 'Values are required. Obtain them from the responsible team and run again.'
   }
-  powershell.exe -NoProfile -File (Join-Path $ImapRoot 'bin\imap.ps1') test
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $ImapRoot 'bin\imap.ps1') test
 }
 ```
 
-Success identifies `PROTOCOL 2`, `VERSION 0.9.0` and the chosen root, then ends in `OK`. An administrator's self-test is useful, but the later SAP installer check must pass under SAP's actual execution account too.
+Success identifies `PROTOCOL 2`, `VERSION 0.9.1` and the chosen root, then ends in `OK`. An administrator's self-test is useful, but the later SAP installer check must pass under SAP's actual execution account too.
 
 ### Linux
 
-Install PowerShell (`pwsh`) and curl with IMAPS support. The generated SM69 command expects `/usr/bin/pwsh`. Confirm the actual SAP execution user; `a4hadm` is an example.
+Install PowerShell (`pwsh`) and **curl 8.0.0 or newer** with IMAPS support. Many SAP Linux releases ship curl 7.x in `/usr/bin`; install a newer curl and pass `--curl-path /full/path/to/curl` to setup, which writes it to `bin/policy.psd1`. Setup stops with a clear message if curl is older than 8. The generated SM69 command expects `/usr/bin/pwsh`. Confirm the actual SAP execution user; `a4hadm` is an example.
 
 Run this block in Bash from the repository folder. Obtain the hostname from the mail team and the Linux SAP execution user and full working folder from Basis; enter your own values at each prompt.
 
@@ -242,7 +242,7 @@ Run this block in Bash from the repository folder. Obtain the hostname from the 
 }
 ```
 
-The default root is `/usr/sap/sapimap`. If its parents are writable by a non-root user/group, setup rejects the path. Basis should select an approved root with protected parents, such as `--root /opt/sapimap` where appropriate, and use it throughout. Do not change ownership of existing SAP directories just to pass this check.
+The default root is `/usr/sap/sapimap`. Setup rejects the path if an existing parent folder is not owned by root or is writable by a non-root user/group. Basis should select an approved root with protected parents, such as `--root /opt/sapimap` where appropriate, and use it throughout. Do not change ownership of existing SAP directories just to pass this check.
 
 Test with the SAP execution user and chosen root. Answer both prompts with the Linux user and full folder path used during setup:
 
@@ -255,7 +255,7 @@ Test with the SAP execution user and chosen root. Answer both prompts with the L
 }
 ```
 
-The result must identify protocol `2`, version `0.9.0` and the chosen root, then end in `OK`. It checks local prerequisites; SAP installation and mailbox access are checked later.
+The result must identify protocol `2`, version `0.9.1` and the chosen root, then end in `OK`. It checks local prerequisites; SAP installation and mailbox access are checked later.
 
 ### Certificates and handover
 
@@ -278,7 +278,7 @@ For a first installation in development:
 | Server check | Selected and required. Confirms SAP can run the expected script version and root. |
 | Overwrite programs | Use for an agreed update after backup/review; it can replace local changes. |
 | Server folder | The exact root from Basis, such as `C:\sapimap\` or `/usr/sap/sapimap/`. |
-| I/O mode / code page | Keep automatic mode unless the developer confirms another choice. These control older systems' file reading. |
+| Code page | Keep automatic mode unless the developer confirms another choice. These control older systems' file reading. |
 | Uninstall | Leave unselected. It removes shared objects across clients; it is not a profile reset. |
 
 Execute and read the entire result list. Continue only when selected steps and the final server check succeed. Otherwise, keep the output for Basis/development.
@@ -311,13 +311,13 @@ SAP references: [Object Directory and package reassignment](https://help.sap.com
 | Server / port | Your actual IMAP hostname / port | Obtain both from the mail team; do not copy the example address. |
 | Security / verify certificate | Mode supplied by the mail team / selected | Select `IMAPS` or `STARTTLS` to match the port. Keep verification enabled. |
 | User | Your actual mailbox login | Enter the login supplied by the mail team, not the example email address. |
-| Credential source | `S` or `O` | `S`: enter the password in SAP. `O`: Basis saves it on the server. |
+| Password source | `S` or `O` | `S`: enter the password in SAP. `O`: Basis saves it on the server. |
 | Folder to read | Default `INBOX` | Reads the inbox. To read another folder in the same mailbox, enter its actual IMAP name/path; only the selected folder is read. |
 | Processed folder | Name of the mail folder you select | You can use an existing folder. Replace the initial `SAP-Processed` value with its actual IMAP name/path. |
-| Move mode | `MOVE` | Requires UID MOVE support. |
+| Move method | `MOVE` | Requires UID MOVE support. |
 | Handler program | `ZCHE_IMAP_HANDLER_DEMO` | Supplied demonstration; no business document creation. |
-| Maximum mails | `50` | Example upper limit per run. |
-| Maximum size | `20` | Example MiB per message; server policy can impose a lower limit. |
+| Mails per run | `50` | Example upper limit per run. |
+| Max mail size (MB) | `20` | Example MiB per message; server policy can impose a lower limit. |
 | Timeout | `120` | Example network timeout in seconds. |
 | Retention | `30` | Days to retain eligible completed local archives, not SAP logs or remote mail. |
 
@@ -327,7 +327,7 @@ For **source `S`**, enter the password in SAP. It is written to an OS-protected 
 
 For **source `O`**, Basis needs the full **`SID_CLIENT_PROFILE`** key. For system `A4H`, client `001` and profile `INVOICE`, it is **`A4H_001_INVOICE`**. Find SID and client under **System → Status**.
 
-Basis runs the block for the server's operating system from the repository folder. It first asks for the actual full profile key, SAP OS account and full folder used during installation. Do not copy `A4H_001_INVOICE`; form the key from your own SID, client and profile. The setup tool prompts for the password separately afterwards; do not put it in the command.
+Basis runs the block for the server's operating system from the repository folder, in an administrator PowerShell session on Windows or as root on Linux. It first asks for the actual full profile key, SAP OS account and full folder used during installation. Do not copy `A4H_001_INVOICE`; form the key from your own SID, client and profile. The setup tool prompts for the password separately afterwards; do not put it in the command.
 
 ```powershell
 & {
@@ -337,7 +337,7 @@ Basis runs the block for the server's operating system from the repository folde
   if (@($ProfileKey, $SapOsAccount, $ImapRoot) -contains '') {
     throw 'Values are required. Obtain them from the responsible team and run again.'
   }
-  powershell.exe -NoProfile -File server\setup-server.ps1 `
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File server\setup-server.ps1 `
     -SetPassword $ProfileKey -SapAccount $SapOsAccount -Root $ImapRoot
 }
 ```
@@ -367,7 +367,7 @@ Log records can outlive their local files. Retention expires eligible completed 
 3. Correct the cause in the relevant program or select an approved test handler accepting that message. Marking retry does not change the demo's rule.
 4. An authorized monitor user selects the retry action. The record becomes `R`; run processing normally again.
 
-Retry requires change access to the log. The processor also offers **retry errors** for an intentional retry of selected `E` messages. `H` uses move recovery. Do not delete log rows or server files to force another attempt.
+Retry requires change access to the log. The processor also offers **retry errors** for an intentional retry of `E` messages, but only below `MAX_ATTEMPTS` failed attempts (default 3); after that, use the monitor retry. `H` uses move recovery. Do not delete log rows or server files to force another attempt.
 
 ## 7. Technical reference: what SAP runs
 

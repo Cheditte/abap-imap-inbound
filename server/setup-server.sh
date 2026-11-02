@@ -12,12 +12,13 @@
 #   --allow-plain         allow unencrypted IMAP
 #   --force               overwrite an existing policy.psd1
 #   --set-password KEY    SID_CLIENT_PROFILE (password source O)
+#   --curl-path FILE      curl 8.0.0+ outside /usr/bin (default /usr/bin/curl)
 #
-# Requirements: PowerShell 7 (pwsh) and curl with IMAPS support.
+# Requirements: PowerShell 7 (pwsh) and curl 8.0.0 or newer with IMAPS support.
 set -euo pipefail
 
 ROOT=/usr/sap/sapimap; SAPUSER=""; HOSTS=""; INSECURE='$false'; PLAIN='$false'
-FORCE=0; SETPW=""
+FORCE=0; SETPW=""; CURL=/usr/bin/curl
 PKG="$(cd "$(dirname "$0")/.." && pwd)"
 
 while [[ $# -gt 0 ]]; do
@@ -29,6 +30,7 @@ while [[ $# -gt 0 ]]; do
     --allow-plain) PLAIN='$true'; shift;;
     --force) FORCE=1; shift;;
     --set-password) SETPW="$2"; shift 2;;
+    --curl-path) CURL="$2"; shift 2;;
     *) echo "Unknown option: $1"; exit 2;;
   esac
 done
@@ -102,9 +104,11 @@ fi
 
 step "pwsh and curl check"
 command -v pwsh >/dev/null || fail "PowerShell 7 (pwsh) is not installed"
-command -v curl >/dev/null || fail "curl is not installed"
-curl --version | grep -qw imaps || fail "curl does not support IMAPS"
-echo "$(pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()') / $(curl --version | head -1 | cut -d' ' -f1-2)"
+[[ -x "$CURL" ]] || fail "curl not found: $CURL (install curl 8.0.0+ and pass --curl-path)"
+"$CURL" --version | grep -qw imaps || fail "curl does not support IMAPS"
+CURLMAJOR="$("$CURL" --version | head -1 | sed -n 's/^curl \([0-9][0-9]*\)\..*/\1/p')"
+[[ -n "$CURLMAJOR" && "$CURLMAJOR" -ge 8 ]] || fail "curl 8.0.0 or newer is required: $("$CURL" --version | head -1 | cut -d' ' -f1-2) (pass --curl-path)"
+echo "$(pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()') / $("$CURL" --version | head -1 | cut -d' ' -f1-2)"
 
 step "Folders: $ROOT"
 for module in imap.ps1 mime.ps1; do
@@ -132,6 +136,7 @@ else
     AllowInsecure    = $INSECURE
     AllowPlainImap   = $PLAIN
     CaCert           = ''
+    CurlPath         = '$CURL'
     MaxMailBytes     = 52428800
     RetentionDaysMax = 365
     TimeoutSecMax    = 600

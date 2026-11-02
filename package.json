@@ -1,6 +1,6 @@
 {
   "name": "abap-imap-inbound-checks",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "private": true,
   "description": "Development checks for the ABAP IMAP inbound sources",
   "license": "MIT",

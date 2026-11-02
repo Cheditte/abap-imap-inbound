@@ -22,7 +22,7 @@ RDP/SSH ile kendiniz bağlanacaksanız [kendi sistemini yönetenler için rehber
 
 **Deneme SAP sistemi ve deneme posta kutusu kullanın.** Normal işlem iletileri okundu işaretleyebilir ve başka klasöre taşıyabilir. Hazır örnek fatura oluşturmaz.
 
-Bu rehber 0.9.0 kaynakları içindir; güncel sürümün gerçek SAP kabul testleri henüz tamamlanmadı. [Test durumu](../../VALIDATION.md).
+Bu rehber 0.9.1 kaynakları içindir; güncel sürümün gerçek SAP kabul testleri henüz tamamlanmadı. [Test durumu](../../VALIDATION.md).
 
 ### Dosyaları indirin
 
@@ -53,7 +53,7 @@ Varsayılan olarak **Gelen Kutusu (`INBOX`)** okunur. Yalnız belirli bir klasö
 | Hazırlanacak parça | Ne işe yarar? |
 |---|---|
 | **PowerShell** | Projenin e-posta alma komutlarını çalıştırır. Windows'ta 5.1 veya üzeri, Linux'ta 7 gerekir. |
-| **curl** | Posta sunucusuyla bağlantıyı kurar. Şifreli IMAP bağlantısını desteklemelidir. |
+| **curl** | Posta sunucusuyla bağlantıyı kurar. **8.0.0 veya üzeri** olmalı ve şifreli IMAP (`imaps`) desteklemelidir. |
 | **Projenin sunucu dosyaları** | İletileri ve ekleri SAP'nin okuyabileceği dosyalara hazırlar. İndirdiğiniz paketin içindedir. |
 | **Korumalı çalışma klasörü** | E-postaların, eklerin ve bağlantı ayarlarının sunucuda tutulacağı yerdir. Basis yolunu ve erişim izinlerini belirler. |
 
@@ -83,7 +83,6 @@ SE38 üzerinden aşağıdaki programı oluşturun.
 4. İndirdiğiniz [ZCHE_IMAP_INSTALL.abap](../../ZCHE_IMAP_INSTALL.abap) dosyasının **tamamını** açıp SAP editörüne yapıştırın.
 5. Kaydedin, sözdizimi kontrolünü yapın ve **Activate / Etkinleştir** seçin.
 
-
 **Ne zaman devam edebilirsiniz?** Program hata vermeden etkinleştiğinde. Sözdizimi veya etkinleştirme hatası varsa çözmeden sonraki adıma geçmeyin. Program adını aynen kullanın.
 
 ### 3.2. Kurulum programını çalıştırın
@@ -91,7 +90,6 @@ SE38 üzerinden aşağıdaki programı oluşturun.
 **Ne yapıyoruz?** Kurulum programı gerekli SAP ekranlarını, tablolarını ve sunucuyla bağlantı için gereken tanımları oluşturacak.
 
 SE38'de **`ZCHE_IMAP_INSTALL`** açıp **Execute / Çalıştır (F8)** seçin.
-
 
 - İlk kurulumda **DDIC objects**, **Programs**, **SM69 commands** ve **Server check** seçili kalsın. Bunlar tabloları, programları, sunucu komutlarını ve son kontrolü kapsar.
 - **Server folder** alanına Basis'in verdiği **tam klasör yolunu** girin. Ekrandaki örnek yolun size uygun olduğunu varsaymayın.
@@ -106,9 +104,14 @@ SE38'de **`ZCHE_IMAP_INSTALL`** açıp **Execute / Çalıştır (F8)** seçin.
 
 **Ne yapıyoruz?** Kullanıcınızın programları çalıştırabilmesini sağlıyoruz. Her program, profil bazında `ZCHE_IMAP` yetki nesnesini kontrol eder; bu yetki yoksa deneme için bile yetki mesajıyla durur.
 
-1. **SU20:** `ZCHE_PROF` yetki alanını oluşturun (tip CHAR, uzunluk 20).
+1. **SU20:** `ZCHE_IMAP_PROFID` veri elemanıyla `ZCHE_PROF` yetki alanını oluşturun. Bu veri elemanını kurulum programı 3.2. adımda oluşturdu.
 2. **SU21:** `ZCHE_PROF` ve `ACTVT` alanlarıyla `ZCHE_IMAP` yetki nesnesini oluşturun. `02`, `03` ve `16` aktivitelerine izin verin.
-3. **PFCG:** Bir role `ZCHE_IMAP` nesnesini profil adınızla (örneğin `INVOICE`) ve gereken aktivitelerle ekleyin: görüntüleme için `03`, profil bakımı ve yeniden işleme için `02`, işlemeyi çalıştırmak için `16`. `ZCHI` tablo grubu için `S_TABU_DIS` ekleyin. Rolü kendi kullanıcınıza ve arka plan işini çalıştıran kullanıcıya atayın.
+3. **PFCG:** Bir role `ZCHE_IMAP` nesnesini profil adınızla (örneğin `INVOICE`) ve gereken aktivitelerle ekleyin: görüntüleme için `03`, profil bakımı ve yeniden işleme için `02`, işlemeyi çalıştırmak için `16`. Ayrıca şunları ekleyin:
+   - `ZCHI` tablo grubu için `S_TABU_DIS`: görüntüleme için `03`, değiştirme için `02`.
+   - SM69 komutları için `S_LOG_COM`: bağlantı testi için `ZCHE_IMAP_TEST`; işleme için `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH` ve `ZCHE_IMAP_DONE`.
+   - 2. adımdaki çalışma klasörü için `S_DATASET`; ayrıntısı [yetki rehberinde](../../SECURITY.md#file-access--dosya-erişimi).
+
+   Rolü kendi kullanıcınıza ve arka plan işini çalıştıran kullanıcıya atayın. Geniş geliştirici rolleri bunları zaten içerebilir; eksik olan yetki programı yetki mesajıyla durdurur.
 
 Bu nesneleri yetki ekibiniz de oluşturabilir. Aktivitelerin, dosya izinlerinin ve işlem kodlarının ayrıntısı [yetki rehberinde](../../SECURITY.md).
 
@@ -119,7 +122,6 @@ Bu nesneleri yetki ekibiniz de oluşturabilir. Aktivitelerin, dosya izinlerinin 
 **Ne yapıyoruz?** Hangi posta hesabına bağlanacağımızı ve hangi klasördeki iletileri okuyacağımızı SAP'ye söylüyoruz. Bu ayarların birlikte kaydedilmiş haline **profil** denir.
 
 SE38'de **`ZCHE_IMAP_CONFIG`** açıp **F8** ile çalıştırın. Basis'in hazırladığı sunucuya bağlı SAP oturumunu kullanın; emin değilseniz Basis kontrol etsin.
-
 
 | Alan | Ne yazacaksınız / seçeceksiniz? |
 |---|---|
@@ -153,7 +155,6 @@ Deneme posta kutusuna küçük bir PDF veya metin eki bulunan e-posta gönderin.
 3. **List only (no downloads/changes)**, yani **yalnız listele** seçeneğini işaretleyip **F8** basın. Uygun iletilerin numaraları listelenir; içerik ve ekler henüz alınmaz, iletiler taşınmaz.
 4. Listeleme başarılıysa geri dönün, **yalnız listele işaretini kaldırın** ve tekrar çalıştırın. Bu kez e-posta ve ekleri alınır, hazır örnek çalışır ve başarılı ileti seçtiğiniz işlenmiş klasörüne taşınır.
 
-
 **Ne zaman devam edebilirsiniz?** Çalıştırma tamamlandığında. Şimdi sonucu SAP'de ve posta kutusunda kontrol edeceğiz.
 
 ### 4.2. E-postaları ve ekleri izleyin
@@ -164,7 +165,6 @@ Deneme posta kutusuna küçük bir PDF veya metin eki bulunan e-posta gönderin.
 2. Profilinizi ve deneme gününü kapsayan tarih aralığını seçip **F8** basın.
 3. Deneme iletinizin kaydını açın; metnini ve eklerini inceleyin.
 4. Posta hesabınızı da açın. Başarılı ileti seçtiğiniz işlenmiş klasöründe bulunmalı.
-
 
 | Durum | Kısaca anlamı |
 |---|---|
