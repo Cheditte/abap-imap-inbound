@@ -18,7 +18,7 @@ Prepare the mailbox, SAP host and SAP programs first. Then open a test email in 
 | Add my business action | [Developer guide](TECHNICAL-GUIDE.md) | Your validated ABAP action replaces the demonstration. |
 | Run automatically | [Path C — Variant and job](#daily-use) | Job runs on the selected host; log and spool reviewed. |
 
-This guide describes the `v0.9.2` release candidate. [Validation record](../VALIDATION.md).
+This guide describes the `v0.9.2` release candidate. **Do not begin a new installation with its release asset:** SAP installation stops at a profile table name longer than the ABAP Dictionary limit. A corrected installer is awaiting SAP verification. [Validation record](../VALIDATION.md).
 
 The SAP examples use English menu labels. They show the SE38 and SM36 preparation screens. [Screenshot scope](screenshots/README.md).
 

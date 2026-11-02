@@ -111,8 +111,8 @@ Basis assigns permissions to the intended users and table authorization groups. 
 
 | Role | Required access |
 |---|---|
-| Job user | `ZCHE_IMAP` activity `16` for the profile name; display `ZCHE_IMAP_PROFILE`; change `ZCHE_IMAP_LOG`; execute `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE` through `S_LOG_COM`; read the input mail files through `S_DATASET`; handler-specific permissions. |
-| Profile administrator | `ZCHE_IMAP` activities `03` and `02` for the profile name; display/change `ZCHE_IMAP_PROFILE`; execute `ZCHE_IMAP_TEST`; write profile and credential files through `S_DATASET` for `ZCHE_IMAP_CONFIG`. |
+| Job user | `ZCHE_IMAP` activity `16` for the profile name; display `ZCHE_IMAP_PROF`; change `ZCHE_IMAP_LOG`; execute `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE` through `S_LOG_COM`; read the input mail files through `S_DATASET`; handler-specific permissions. |
+| Profile administrator | `ZCHE_IMAP` activities `03` and `02` for the profile name; display/change `ZCHE_IMAP_PROF`; execute `ZCHE_IMAP_TEST`; write profile and credential files through `S_DATASET` for `ZCHE_IMAP_CONFIG`. |
 | Monitor user | `ZCHE_IMAP` activity `03` for the profile name; display `ZCHE_IMAP_LOG`; read input/archive files for `ZCHE_IMAP_MONITOR`. Retry additionally requires activity `02` and change access to `ZCHE_IMAP_LOG`. |
 | Installer | Development permissions for the project objects and the permissions needed to maintain and test SM69 commands. Uninstall has additional cross-client checks. |
 
@@ -410,7 +410,7 @@ Before handling real business mail, implement and validate your business rules. 
 Profile and credential revisions are not automatically removed because an in-flight operation may still need them. Profile deletion attempts to remove current configuration/credential files and warns that older revisions require administrator cleanup.
 
 1. Stop the profile's scheduled jobs and wait for foreground processing to finish. Coordinate with systems/clients sharing the host.
-2. Confirm `REVISION`, `CREDSRC` and `CREDREV` in `ZCHE_IMAP_PROFILE` for the intended system/client. Do not display or log the password.
+2. Confirm `REVISION`, `CREDSRC` and `CREDREV` in `ZCHE_IMAP_PROF` for the intended system/client. Do not display or log the password.
 3. Preserve the active `conf/KEY_REVISION.conf` and its referenced credential: `secret/KEY_CREDREV.cred` for `S`, or `secret/KEY.cred` for `O`. Do not assume a file left by a failed save is active.
 4. Remove only exact old revision filenames confirmed unused and unnecessary for rollback, following your retention policy. Do not delete the entire `conf` or `secret` directory. Do not reuse a profile name with SAP processing history.
 5. Repeat connection and list-only tests before restarting jobs. Old `tmp` files left by terminated processes also need separate ownership/use checks; do not delete pending `in`/`done` data.

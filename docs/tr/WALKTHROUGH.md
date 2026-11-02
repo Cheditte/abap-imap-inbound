@@ -18,7 +18,7 @@ Bu rehberde önce posta hesabını, SAP sunucusunu ve SAP programlarını hazır
 | Kendi iş adımımı eklemek | [Geliştirici rehberi](TECHNICAL-GUIDE.md) | Hazır örnek yerine kendi doğrulanmış ABAP işleminiz kullanılır. |
 | Otomatik çalıştırmak | [Yol C — Varyant ve job](#otomatik) | Doğru sunucuda çalışan işin log ve spool'u incelenir. |
 
-Rehber `v0.9.2` sürüm adayını anlatır. [Doğrulama kaydı](../../VALIDATION.md).
+Rehber `v0.9.2` sürüm adayını anlatır. **Bu sürümün release dosyasıyla yeni kuruluma başlamayın:** profil tablosunun adı ABAP Dictionary sınırını aştığı için kurulum SAP'de duruyor. Düzeltilmiş kurucu SAP doğrulamasını bekliyor. [Doğrulama kaydı](../../VALIDATION.md).
 
 SAP ekran örneklerinde menüler İngilizcedir; adımlarda Türkçe karşılıkları da verilir. Görseller SE38 ve SM36 hazırlık ekranlarını gösterir. [Görsellerin kapsamı](../screenshots/README.md).
 

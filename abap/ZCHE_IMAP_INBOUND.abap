@@ -1,7 +1,7 @@
 * Project: abap-imap-inbound
 *---------------------------------------------------------------
 * ZCHE_IMAP_INBOUND - processes the mails in IMAP mailboxes
-* Reads the active profiles (ZCHE_IMAP_PROFILE) one by one and passes
+* Reads the active profiles (ZCHE_IMAP_PROF) one by one and passes
 * each mail to the handler of the profile. Run as a periodic job.
 *
 * Statuses (ZCHE_IMAP_LOG-STATUS):
@@ -16,11 +16,11 @@
 *---------------------------------------------------------------
 REPORT zche_imap_inbound LINE-SIZE 200.
 
-TABLES zche_imap_profile.
+TABLES zche_imap_prof.
 
 INCLUDE zche_imap_common.
 
-SELECT-OPTIONS s_prof FOR zche_imap_profile-profile.
+SELECT-OPTIONS s_prof FOR zche_imap_prof-profile.
 PARAMETERS: p_test  AS CHECKBOX,
             p_retry AS CHECKBOX.
 
@@ -34,11 +34,11 @@ START-OF-SELECTION.
 
 *---------------------------------------------------------------
 FORM main.
-  DATA: lt_prof TYPE STANDARD TABLE OF zche_imap_profile,
-        ls_prof TYPE zche_imap_profile,
+  DATA: lt_prof TYPE STANDARD TABLE OF zche_imap_prof,
+        ls_prof TYPE zche_imap_prof,
         lv_ok(1) TYPE c.
 
-  PERFORM table_auth USING 'ZCHE_IMAP_PROFILE' 'S'
+  PERFORM table_auth USING 'ZCHE_IMAP_PROF' 'S'
                      CHANGING lv_ok.
   IF lv_ok IS INITIAL.
     WRITE: / 'No profile display authorization (S_TABU_DIS).'.
@@ -56,7 +56,7 @@ FORM main.
     EXIT.
   ENDIF.
 
-  SELECT * FROM zche_imap_profile INTO TABLE lt_prof
+  SELECT * FROM zche_imap_prof INTO TABLE lt_prof
     WHERE profile IN s_prof AND active = 'X'.
   IF sy-subrc <> 0.
     WRITE: / 'No active profile. Define a profile with ZCHE_IMAP_CONFIG.'.
@@ -82,7 +82,7 @@ FORM main.
 ENDFORM.
 
 *---------------------------------------------------------------
-FORM run_profile USING is_prof TYPE zche_imap_profile.
+FORM run_profile USING is_prof TYPE zche_imap_prof.
   DATA: lt_out      TYPE ty_t_line,
         ls_out      TYPE zche_imap_s_line,
         lt_uid      TYPE ty_t_uid,
@@ -95,7 +95,7 @@ FORM run_profile USING is_prof TYPE zche_imap_profile.
         lv_max      TYPE i,
         lv_count    TYPE i,
         lv_key(28)  TYPE c,
-        ls_prof     TYPE zche_imap_profile,
+        ls_prof     TYPE zche_imap_prof,
         lt_pending  TYPE STANDARD TABLE OF zche_imap_log,
         ls_pending  TYPE zche_imap_log.
 
@@ -118,7 +118,7 @@ FORM run_profile USING is_prof TYPE zche_imap_profile.
     EXIT.
   ENDIF.
 * Reload under the lock; the initial selection may be stale.
-  SELECT SINGLE * FROM zche_imap_profile INTO ls_prof
+  SELECT SINGLE * FROM zche_imap_prof INTO ls_prof
     WHERE profile = is_prof-profile AND active = 'X'.
   IF sy-subrc <> 0.
     PERFORM profile_unlock USING is_prof-profile.
@@ -196,7 +196,7 @@ ENDFORM.
 * One mail: fetch, read, run the business logic, move.
 * cv_work = 'X': real work was done (counts towards MAXMAIL).
 *---------------------------------------------------------------
-FORM process_one USING    is_prof TYPE zche_imap_profile
+FORM process_one USING    is_prof TYPE zche_imap_prof
                           iv_uidv TYPE c
                           iv_uid  TYPE n
                  CHANGING cv_work TYPE c.
@@ -358,7 +358,7 @@ FORM process_one USING    is_prof TYPE zche_imap_profile
 ENDFORM.
 
 *---------------------------------------------------------------
-FORM finish_mail USING is_prof TYPE zche_imap_profile
+FORM finish_mail USING is_prof TYPE zche_imap_prof
                        iv_uidv TYPE c
                        iv_uid  TYPE n.
   DATA: lt_out      TYPE ty_t_line,

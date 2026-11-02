@@ -111,8 +111,8 @@ Basis, yetkileri ilgili kullanıcılara ve tablo yetki gruplarına göre tanıml
 
 | Rol | Gerekli erişim |
 |---|---|
-| Job kullanıcısı | Profil adı için `ZCHE_IMAP` aktivite `16`; `ZCHE_IMAP_PROFILE` görüntüleme; `ZCHE_IMAP_LOG` değiştirme; `S_LOG_COM` üzerinden `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE`; `S_DATASET` üzerinden gelen mail dosyalarını okuma; handler'ın ihtiyaç duyduğu yetkiler. |
-| Profil yöneticisi | Profil adı için `ZCHE_IMAP` aktivite `03` ve `02`; `ZCHE_IMAP_PROFILE` görüntüleme/değiştirme; `ZCHE_IMAP_TEST` çalıştırma; `ZCHE_IMAP_CONFIG` için profil ve kimlik bilgisi dosyalarına `S_DATASET` yazma erişimi. |
+| Job kullanıcısı | Profil adı için `ZCHE_IMAP` aktivite `16`; `ZCHE_IMAP_PROF` görüntüleme; `ZCHE_IMAP_LOG` değiştirme; `S_LOG_COM` üzerinden `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE`; `S_DATASET` üzerinden gelen mail dosyalarını okuma; handler'ın ihtiyaç duyduğu yetkiler. |
+| Profil yöneticisi | Profil adı için `ZCHE_IMAP` aktivite `03` ve `02`; `ZCHE_IMAP_PROF` görüntüleme/değiştirme; `ZCHE_IMAP_TEST` çalıştırma; `ZCHE_IMAP_CONFIG` için profil ve kimlik bilgisi dosyalarına `S_DATASET` yazma erişimi. |
 | İzleme kullanıcısı | Profil adı için `ZCHE_IMAP` aktivite `03` (yeniden deneme için ayrıca `02`); `ZCHE_IMAP_LOG` görüntüleme; `ZCHE_IMAP_MONITOR` için gelen/arşiv dosyalarını okuma. Yeniden işleme ayrıca `ZCHE_IMAP_LOG` değiştirme yetkisi gerektirir. |
 | Kurulumu yapan | Proje nesneleri için geliştirme yetkileri ve SM69 komutlarını yönetip test etme yetkileri. Kaldırmada ek client kontrolleri vardır. |
 
@@ -410,7 +410,7 @@ Gerçek iş postalarından önce iş kurallarınızı uygulayıp doğrulayın. A
 Profil ve parola revizyonları çalışan bir işlemin kullandığı dosyayı erken silmemek için otomatik temizlenmez. Profil silme işlemi yalnız etkin ayar/parola dosyalarını kaldırmayı dener; eski revizyonlar için yöneticiye bakım uyarısı verir.
 
 1. İlgili profilin zamanlanmış işlerini durdurun ve bu profille çalışan ön plan işlemlerinin tamamlanmasını bekleyin. Ortak sunucuyu kullanan sistem/mandantlarla koordine edin.
-2. Doğru sistem/mandanttaki `ZCHE_IMAP_PROFILE` kaydından `REVISION`, `CREDSRC` ve `CREDREV` değerlerini doğrulayın. Parolayı görüntülemeyin veya günlüğe yazmayın.
+2. Doğru sistem/mandanttaki `ZCHE_IMAP_PROF` kaydından `REVISION`, `CREDSRC` ve `CREDREV` değerlerini doğrulayın. Parolayı görüntülemeyin veya günlüğe yazmayın.
 3. Etkin `conf/KEY_REVISION.conf` dosyasını ve onun referans verdiği parolayı koruyun: `S` için `secret/KEY_CREDREV.cred`, `O` için `secret/KEY.cred`. Başarısız kaydetmeden kalan bir dosyanın etkin olduğunu varsaymayın.
 4. Artık kullanılmadığı ve geri dönüş planında gerekmediği doğrulanan eski revizyon dosyalarını kurumunuzun saklama politikasına göre, yalnız tam dosya adlarını seçerek kaldırın. `conf` veya `secret` klasörünün tamamını silmeyin. SAP geçmişi olan profilin adını yeniden kullanmayın.
 5. İşleri yeniden açmadan bağlantı ve yalnız listeleme testini tekrarlayın. Sonlandırılmış işlemlerden kalan eski `tmp` dosyaları için de sahiplik ve kullanım kontrolüyle ayrı bakım yapın; bekleyen `in`/`done` verisini silmeyin.

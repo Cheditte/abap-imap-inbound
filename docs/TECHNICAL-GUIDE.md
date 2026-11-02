@@ -130,7 +130,7 @@ The example report below asks for a profile in `P_PROF`. Enter the name actually
 ```abap
 REPORT zche_imap_start_demo.
 
-PARAMETERS p_prof LIKE zche_imap_profile-profile OBLIGATORY.
+PARAMETERS p_prof LIKE zche_imap_prof-profile OBLIGATORY.
 
 START-OF-SELECTION.
 SUBMIT zche_imap_inbound

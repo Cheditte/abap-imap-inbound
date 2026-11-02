@@ -130,7 +130,7 @@ FORM profile_lock USING iv_prof TYPE c CHANGING cv_ok TYPE c.
   lv_varkey = lv_key.
   CALL FUNCTION 'ENQUEUE_E_TABLE'
     EXPORTING
-      tabname = 'ZCHE_IMAP_PROFILE'
+      tabname = 'ZCHE_IMAP_PROF'
       varkey  = lv_varkey
       _scope  = '1'
     EXCEPTIONS
@@ -148,7 +148,7 @@ FORM profile_unlock USING iv_prof TYPE c.
   lv_varkey = lv_key.
   CALL FUNCTION 'DEQUEUE_E_TABLE'
     EXPORTING
-      tabname = 'ZCHE_IMAP_PROFILE'
+      tabname = 'ZCHE_IMAP_PROF'
       varkey  = lv_varkey
       _scope  = '1'.
 ENDFORM.

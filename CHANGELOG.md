@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — SAP installation correction
+
+- Shorten the profile database table name from the invalid 17-character `ZCHE_IMAP_PROFILE` to `ZCHE_IMAP_PROF` throughout the installer, ABAP sources, authorization guidance and development fixture. The profile domain retains its original name.
+- Reject database table names longer than 16 characters before creating any DDIC objects.
+- Serialize installers separately and take the profile runtime lock after DDIC maintenance. Stop processing jobs before an upgrade.
+- SAP installation of this correction has not yet been verified. Published v0.9.2 stops while creating the profile table; do not use its installer for a new installation.
+
 ## 0.9.2 — 2026-11-02 (release candidate)
 
 - Fix: a failed profile save (for example "Mail identity in use") could be reported as successful. The success flag is now set only after the profile is saved.

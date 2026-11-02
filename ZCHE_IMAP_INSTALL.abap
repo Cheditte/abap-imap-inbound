@@ -8,7 +8,7 @@
 *
 * Creates ($TMP):
 *   ZCHE_IMAP_* domains and data elements (only our own DDIC)
-*   ZCHE_IMAP_PARAM, ZCHE_IMAP_PROFILE, ZCHE_IMAP_LOG          tables
+*   ZCHE_IMAP_PARAM, ZCHE_IMAP_PROF, ZCHE_IMAP_LOG          tables
 *   ZCHE_IMAP_S_MAIL, ZCHE_IMAP_S_ATT, ZCHE_IMAP_S_LINE        structures
 *   ZCHE_IMAP_COMMON, ZCHE_IMAP_IO                         includes
 *   ZCHE_IMAP_INBOUND, ZCHE_IMAP_CONFIG, ZCHE_IMAP_MONITOR     programs
@@ -103,6 +103,7 @@ DATA: gt_src    TYPE STANDARD TABLE OF abapsource,
       gv_initerr(1) TYPE c,
       gv_cmdwrite(1) TYPE c,
       gv_lock(1) TYPE c,
+      gv_setup_lock(1) TYPE c,
       gv_newinb(1) TYPE c,
       gv_same   TYPE i.
 
@@ -195,7 +196,8 @@ INITIALIZATION.
   PERFORM load_params.
 
 START-OF-SELECTION.
-  CLEAR: gv_err, gv_lock, gv_cmdwrite, gv_newinb, gv_same.
+  CLEAR: gv_err, gv_lock, gv_setup_lock, gv_cmdwrite,
+         gv_newinb, gv_same.
   REFRESH: gt_change, gt_backup, gt_textbak, gt_cmdbak.
   PERFORM parse_defs.
   PERFORM check_authority.
@@ -209,13 +211,20 @@ START-OF-SELECTION.
     STOP.
   ENDIF.
   IF NOT p_del IS INITIAL.
-    PERFORM uninstall.
+    PERFORM profile_lock.
+    IF gv_err IS INITIAL.
+      PERFORM uninstall.
+    ENDIF.
   ELSE.
     PERFORM install.
   ENDIF.
   IF NOT gv_lock IS INITIAL.
     CALL FUNCTION 'DEQUEUE_E_TABLE'
-      EXPORTING tabname = 'ZCHE_IMAP_PROFILE' _scope = '1'.
+      EXPORTING tabname = 'ZCHE_IMAP_PROF' _scope = '1'.
+  ENDIF.
+  IF NOT gv_setup_lock IS INITIAL.
+    CALL FUNCTION 'DEQUEUE_E_TABLE'
+      EXPORTING tabname = 'ZCHE_IMAP_SETUP' _scope = '1'.
   ENDIF.
 
 *---------------------------------------------------------------
@@ -235,6 +244,9 @@ FORM install.
   ENDIF.
   IF NOT p_ddic IS INITIAL.
     PERFORM create_ddic.
+  ENDIF.
+  IF gv_err IS INITIAL.
+    PERFORM profile_lock.
   ENDIF.
   IF NOT p_prg IS INITIAL AND gv_err IS INITIAL.
     PERFORM create_programs.
@@ -268,7 +280,7 @@ FORM install.
   ENDIF.
 ENDFORM.
 
-* A generic table lock conflicts with every scoped profile lock.
+* Serialize installers without locking a DDIC object being created.
 * Scope 1 survives commits made by repository/DDIC APIs.
 FORM install_lock.
   DATA lv_ok(1) TYPE c.
@@ -284,9 +296,24 @@ FORM install_lock.
     EXIT.
   ENDIF.
   CALL FUNCTION 'ENQUEUE_E_TABLE'
-    EXPORTING tabname = 'ZCHE_IMAP_PROFILE' _scope = '1'
+    EXPORTING tabname = 'ZCHE_IMAP_SETUP' _scope = '1'
     EXCEPTIONS OTHERS = 1.
   IF sy-subrc <> 0.
+    gv_err = 'X'.
+  ELSE.
+    gv_setup_lock = 'X'.
+  ENDIF.
+ENDFORM.
+
+* Profile jobs and configuration use scoped locks on this table.
+* Take the generic lock only after DDIC maintenance; DDIF_TABL_PUT
+* must be able to save the table definition first.
+FORM profile_lock.
+  CALL FUNCTION 'ENQUEUE_E_TABLE'
+    EXPORTING tabname = 'ZCHE_IMAP_PROF' _scope = '1'
+    EXCEPTIONS OTHERS = 1.
+  IF sy-subrc <> 0.
+    WRITE: / 'Stop active ZCHE_IMAP jobs/configuration and retry.'.
     gv_err = 'X'.
   ELSE.
     gv_lock = 'X'.
@@ -609,6 +636,12 @@ FORM parse_defs.
           MODIFY gt_dtel FROM ls_dtel INDEX sy-tabix.
         ENDIF.
       WHEN 'T'.
+        IF lv_2 = 'TRANSP' AND strlen( lv_1 ) > 16.
+          WRITE: / 'Database table name exceeds 16 characters:',
+                   lv_1.
+          gv_initerr = 'X'.
+          CONTINUE.
+        ENDIF.
         ls_tab-name  = lv_1.
         ls_tab-class = lv_2.
         ls_tab-text  = lv_3.
@@ -2009,7 +2042,7 @@ FORM guard_uninstall.
     gv_err = 'X'.
     EXIT.
   ENDIF.
-  lv_table = 'ZCHE_IMAP_PROFILE'.
+  lv_table = 'ZCHE_IMAP_PROF'.
   SELECT SINGLE mandt FROM (lv_table) CLIENT SPECIFIED
     INTO lv_client WHERE mandt <> sy-mandt AND active = 'X'.
   IF sy-subrc = 0.
@@ -2195,35 +2228,35 @@ FORM fill_defs.
   def 'F|ZCHE_IMAP_PARAM|PARAM|X|ZCHE_IMAP_PARNAME'.
   def 'F|ZCHE_IMAP_PARAM|PVALUE|-|ZCHE_IMAP_PARVAL'.
 
-  def 'T|ZCHE_IMAP_PROFILE|TRANSP|IMAP mailbox profiles'.
-  def 'F|ZCHE_IMAP_PROFILE|MANDT|X|MANDT'.
-  def 'F|ZCHE_IMAP_PROFILE|PROFILE|X|ZCHE_IMAP_PROFID'.
-  def 'F|ZCHE_IMAP_PROFILE|DESCR|-|ZCHE_IMAP_DESCR'.
-  def 'F|ZCHE_IMAP_PROFILE|ACTIVE|-|ZCHE_IMAP_ACTIVE'.
-  def 'F|ZCHE_IMAP_PROFILE|HOST|-|ZCHE_IMAP_HOST'.
-  def 'F|ZCHE_IMAP_PROFILE|PORT|-|ZCHE_IMAP_PORT'.
-  def 'F|ZCHE_IMAP_PROFILE|SECURITY|-|ZCHE_IMAP_SECURITY'.
-  def 'F|ZCHE_IMAP_PROFILE|VERIFY|-|ZCHE_IMAP_VERIFY'.
-  def 'F|ZCHE_IMAP_PROFILE|USERNAME|-|ZCHE_IMAP_USERNAME'.
-  def 'F|ZCHE_IMAP_PROFILE|CREDSRC|-|ZCHE_IMAP_CREDSRC'.
-  def 'F|ZCHE_IMAP_PROFILE|PWDAT|-|ZCHE_IMAP_PWDAT'.
-  def 'F|ZCHE_IMAP_PROFILE|PWUSR|-|ZCHE_IMAP_PWUSR'.
-  def 'F|ZCHE_IMAP_PROFILE|MAILBOX|-|ZCHE_IMAP_MAILBOX'.
-  def 'F|ZCHE_IMAP_PROFILE|DONEBOX|-|ZCHE_IMAP_DONEBOX'.
-  def 'F|ZCHE_IMAP_PROFILE|MOVEMODE|-|ZCHE_IMAP_MOVEMODE'.
-  def 'F|ZCHE_IMAP_PROFILE|HPROG|-|ZCHE_IMAP_HPROG'.
-  def 'F|ZCHE_IMAP_PROFILE|HFORM|-|ZCHE_IMAP_HFORM'.
-  def 'F|ZCHE_IMAP_PROFILE|MAXMAIL|-|ZCHE_IMAP_MAXMAIL'.
-  def 'F|ZCHE_IMAP_PROFILE|MAXMB|-|ZCHE_IMAP_MAXMB'.
-  def 'F|ZCHE_IMAP_PROFILE|TIMEOUT|-|ZCHE_IMAP_TIMEOUT'.
-  def 'F|ZCHE_IMAP_PROFILE|RETDAYS|-|ZCHE_IMAP_RETDAYS'.
-  def 'F|ZCHE_IMAP_PROFILE|CRDAT|-|ZCHE_IMAP_CRDAT'.
-  def 'F|ZCHE_IMAP_PROFILE|CRUSR|-|ZCHE_IMAP_CRUSR'.
-  def 'F|ZCHE_IMAP_PROFILE|CHDAT|-|ZCHE_IMAP_CHDAT'.
-  def 'F|ZCHE_IMAP_PROFILE|CHTIM|-|ZCHE_IMAP_CHTIM'.
-  def 'F|ZCHE_IMAP_PROFILE|CHUSR|-|ZCHE_IMAP_CHUSR'.
-  def 'F|ZCHE_IMAP_PROFILE|REVISION|-|ZCHE_IMAP_REVISION'.
-  def 'F|ZCHE_IMAP_PROFILE|CREDREV|-|ZCHE_IMAP_CREDREV'.
+  def 'T|ZCHE_IMAP_PROF|TRANSP|IMAP mailbox profiles'.
+  def 'F|ZCHE_IMAP_PROF|MANDT|X|MANDT'.
+  def 'F|ZCHE_IMAP_PROF|PROFILE|X|ZCHE_IMAP_PROFID'.
+  def 'F|ZCHE_IMAP_PROF|DESCR|-|ZCHE_IMAP_DESCR'.
+  def 'F|ZCHE_IMAP_PROF|ACTIVE|-|ZCHE_IMAP_ACTIVE'.
+  def 'F|ZCHE_IMAP_PROF|HOST|-|ZCHE_IMAP_HOST'.
+  def 'F|ZCHE_IMAP_PROF|PORT|-|ZCHE_IMAP_PORT'.
+  def 'F|ZCHE_IMAP_PROF|SECURITY|-|ZCHE_IMAP_SECURITY'.
+  def 'F|ZCHE_IMAP_PROF|VERIFY|-|ZCHE_IMAP_VERIFY'.
+  def 'F|ZCHE_IMAP_PROF|USERNAME|-|ZCHE_IMAP_USERNAME'.
+  def 'F|ZCHE_IMAP_PROF|CREDSRC|-|ZCHE_IMAP_CREDSRC'.
+  def 'F|ZCHE_IMAP_PROF|PWDAT|-|ZCHE_IMAP_PWDAT'.
+  def 'F|ZCHE_IMAP_PROF|PWUSR|-|ZCHE_IMAP_PWUSR'.
+  def 'F|ZCHE_IMAP_PROF|MAILBOX|-|ZCHE_IMAP_MAILBOX'.
+  def 'F|ZCHE_IMAP_PROF|DONEBOX|-|ZCHE_IMAP_DONEBOX'.
+  def 'F|ZCHE_IMAP_PROF|MOVEMODE|-|ZCHE_IMAP_MOVEMODE'.
+  def 'F|ZCHE_IMAP_PROF|HPROG|-|ZCHE_IMAP_HPROG'.
+  def 'F|ZCHE_IMAP_PROF|HFORM|-|ZCHE_IMAP_HFORM'.
+  def 'F|ZCHE_IMAP_PROF|MAXMAIL|-|ZCHE_IMAP_MAXMAIL'.
+  def 'F|ZCHE_IMAP_PROF|MAXMB|-|ZCHE_IMAP_MAXMB'.
+  def 'F|ZCHE_IMAP_PROF|TIMEOUT|-|ZCHE_IMAP_TIMEOUT'.
+  def 'F|ZCHE_IMAP_PROF|RETDAYS|-|ZCHE_IMAP_RETDAYS'.
+  def 'F|ZCHE_IMAP_PROF|CRDAT|-|ZCHE_IMAP_CRDAT'.
+  def 'F|ZCHE_IMAP_PROF|CRUSR|-|ZCHE_IMAP_CRUSR'.
+  def 'F|ZCHE_IMAP_PROF|CHDAT|-|ZCHE_IMAP_CHDAT'.
+  def 'F|ZCHE_IMAP_PROF|CHTIM|-|ZCHE_IMAP_CHTIM'.
+  def 'F|ZCHE_IMAP_PROF|CHUSR|-|ZCHE_IMAP_CHUSR'.
+  def 'F|ZCHE_IMAP_PROF|REVISION|-|ZCHE_IMAP_REVISION'.
+  def 'F|ZCHE_IMAP_PROF|CREDREV|-|ZCHE_IMAP_CREDREV'.
 
   def 'T|ZCHE_IMAP_LOG|TRANSP|IMAP inbound mail log'.
   def 'F|ZCHE_IMAP_LOG|MANDT|X|MANDT'.
@@ -2446,7 +2479,7 @@ FORM fill_common.
   src '  lv_varkey = lv_key.'.
   src '  CALL FUNCTION ''ENQUEUE_E_TABLE'''.
   src '    EXPORTING'.
-  src '      tabname = ''ZCHE_IMAP_PROFILE'''.
+  src '      tabname = ''ZCHE_IMAP_PROF'''.
   src '      varkey  = lv_varkey'.
   src '      _scope  = ''1'''.
   src '    EXCEPTIONS'.
@@ -2464,7 +2497,7 @@ FORM fill_common.
   src '  lv_varkey = lv_key.'.
   src '  CALL FUNCTION ''DEQUEUE_E_TABLE'''.
   src '    EXPORTING'.
-  src '      tabname = ''ZCHE_IMAP_PROFILE'''.
+  src '      tabname = ''ZCHE_IMAP_PROF'''.
   src '      varkey  = lv_varkey'.
   src '      _scope  = ''1''.'.
   src 'ENDFORM.'.
@@ -3148,8 +3181,8 @@ FORM fill_inbound.
   src '*--------------------------------------------------------------'.
   cnt '-'.
   src '* ZCHE_IMAP_INBOUND - processes the mails in IMAP mailboxes'.
-  src '* Reads the active profiles (ZCHE_IMAP_PROFILE) one by one and'.
-  cnt ' passes'.
+  src '* Reads the active profiles (ZCHE_IMAP_PROF) one by one and pas'.
+  cnt 'ses'.
   src '* each mail to the handler of the profile. Run as a periodic jo'.
   cnt 'b.'.
   src '*'.
@@ -3169,11 +3202,11 @@ FORM fill_inbound.
   cnt '-'.
   src 'REPORT zche_imap_inbound LINE-SIZE 200.'.
   src ''.
-  src 'TABLES zche_imap_profile.'.
+  src 'TABLES zche_imap_prof.'.
   src ''.
   src 'INCLUDE zche_imap_common.'.
   src ''.
-  src 'SELECT-OPTIONS s_prof FOR zche_imap_profile-profile.'.
+  src 'SELECT-OPTIONS s_prof FOR zche_imap_prof-profile.'.
   src 'PARAMETERS: p_test  AS CHECKBOX,'.
   src '            p_retry AS CHECKBOX.'.
   src ''.
@@ -3188,11 +3221,11 @@ FORM fill_inbound.
   src '*--------------------------------------------------------------'.
   cnt '-'.
   src 'FORM main.'.
-  src '  DATA: lt_prof TYPE STANDARD TABLE OF zche_imap_profile,'.
-  src '        ls_prof TYPE zche_imap_profile,'.
+  src '  DATA: lt_prof TYPE STANDARD TABLE OF zche_imap_prof,'.
+  src '        ls_prof TYPE zche_imap_prof,'.
   src '        lv_ok(1) TYPE c.'.
   src ''.
-  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROFILE'' ''S'''.
+  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROF'' ''S'''.
   src '                     CHANGING lv_ok.'.
   src '  IF lv_ok IS INITIAL.'.
   src '    WRITE: / ''No profile display authorization (S_TABU_DIS).'''.
@@ -3213,7 +3246,7 @@ FORM fill_inbound.
   src '    EXIT.'.
   src '  ENDIF.'.
   src ''.
-  src '  SELECT * FROM zche_imap_profile INTO TABLE lt_prof'.
+  src '  SELECT * FROM zche_imap_prof INTO TABLE lt_prof'.
   src '    WHERE profile IN s_prof AND active = ''X''.'.
   src '  IF sy-subrc <> 0.'.
   src '    WRITE: / ''No active profile. Define a profile with ZCHE_IM'.
@@ -3242,7 +3275,7 @@ FORM fill_inbound.
   src ''.
   src '*--------------------------------------------------------------'.
   cnt '-'.
-  src 'FORM run_profile USING is_prof TYPE zche_imap_profile.'.
+  src 'FORM run_profile USING is_prof TYPE zche_imap_prof.'.
   src '  DATA: lt_out      TYPE ty_t_line,'.
   src '        ls_out      TYPE zche_imap_s_line,'.
   src '        lt_uid      TYPE ty_t_uid,'.
@@ -3255,7 +3288,7 @@ FORM fill_inbound.
   src '        lv_max      TYPE i,'.
   src '        lv_count    TYPE i,'.
   src '        lv_key(28)  TYPE c,'.
-  src '        ls_prof     TYPE zche_imap_profile,'.
+  src '        ls_prof     TYPE zche_imap_prof,'.
   src '        lt_pending  TYPE STANDARD TABLE OF zche_imap_log,'.
   src '        ls_pending  TYPE zche_imap_log.'.
   src ''.
@@ -3279,7 +3312,7 @@ FORM fill_inbound.
   src '    EXIT.'.
   src '  ENDIF.'.
   src '* Reload under the lock; the initial selection may be stale.'.
-  src '  SELECT SINGLE * FROM zche_imap_profile INTO ls_prof'.
+  src '  SELECT SINGLE * FROM zche_imap_prof INTO ls_prof'.
   src '    WHERE profile = is_prof-profile AND active = ''X''.'.
   src '  IF sy-subrc <> 0.'.
   src '    PERFORM profile_unlock USING is_prof-profile.'.
@@ -3359,7 +3392,7 @@ FORM fill_inbound.
   src '* cv_work = ''X'': real work was done (counts towards MAXMAIL).'.
   src '*--------------------------------------------------------------'.
   cnt '-'.
-  src 'FORM process_one USING    is_prof TYPE zche_imap_profile'.
+  src 'FORM process_one USING    is_prof TYPE zche_imap_prof'.
   src '                          iv_uidv TYPE c'.
   src '                          iv_uid  TYPE n'.
   src '                 CHANGING cv_work TYPE c.'.
@@ -3530,7 +3563,7 @@ FORM fill_inbound.
   src ''.
   src '*--------------------------------------------------------------'.
   cnt '-'.
-  src 'FORM finish_mail USING is_prof TYPE zche_imap_profile'.
+  src 'FORM finish_mail USING is_prof TYPE zche_imap_prof'.
   src '                       iv_uidv TYPE c'.
   src '                       iv_uid  TYPE n.'.
   src '  DATA: lt_out      TYPE ty_t_line,'.
@@ -3673,14 +3706,14 @@ FORM fill_config.
   cnt '-'.
   src 'REPORT zche_imap_config LINE-SIZE 150 NO STANDARD PAGE HEADING.'.
   src ''.
-  src 'TABLES: zche_imap_profile, sscrfields.'.
+  src 'TABLES: zche_imap_prof, sscrfields.'.
   src ''.
   src 'INCLUDE zche_imap_common.'.
   src ''.
   src 'TYPES: BEGIN OF ty_f4,'.
-  src '         profile LIKE zche_imap_profile-profile,'.
-  src '         descr   LIKE zche_imap_profile-descr,'.
-  src '         host    LIKE zche_imap_profile-host,'.
+  src '         profile LIKE zche_imap_prof-profile,'.
+  src '         descr   LIKE zche_imap_prof-descr,'.
+  src '         host    LIKE zche_imap_prof-host,'.
   src '       END OF ty_f4.'.
   src ''.
   src 'DATA: gv_setup(1) TYPE c,'.
@@ -3692,52 +3725,48 @@ FORM fill_config.
   src 'SELECTION-SCREEN FUNCTION KEY 4.'.
   src ''.
   src 'SELECTION-SCREEN BEGIN OF BLOCK b0 WITH FRAME TITLE t_b0.'.
-  src 'PARAMETERS: p_prof  LIKE zche_imap_profile-profile,'.
-  src '            p_descr LIKE zche_imap_profile-descr LOWER CASE,'.
+  src 'PARAMETERS: p_prof  LIKE zche_imap_prof-profile,'.
+  src '            p_descr LIKE zche_imap_prof-descr LOWER CASE,'.
   src '            p_act   AS CHECKBOX DEFAULT ''X''.'.
   src 'SELECTION-SCREEN END OF BLOCK b0.'.
   src ''.
   src 'SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME TITLE t_b1.'.
-  src 'PARAMETERS: p_host LIKE zche_imap_profile-host LOWER CASE,'.
-  src '            p_port LIKE zche_imap_profile-port DEFAULT ''993'','.
-  src '            p_sec  LIKE zche_imap_profile-security DEFAULT ''IM'.
-  cnt 'APS'''.
+  src 'PARAMETERS: p_host LIKE zche_imap_prof-host LOWER CASE,'.
+  src '            p_port LIKE zche_imap_prof-port DEFAULT ''993'','.
+  src '            p_sec  LIKE zche_imap_prof-security DEFAULT ''IMAPS'.
+  cnt ''''.
   src '                   VALUE CHECK,'.
   src '            p_ver  AS CHECKBOX DEFAULT ''X''.'.
   src 'SELECTION-SCREEN END OF BLOCK b1.'.
   src ''.
   src 'SELECTION-SCREEN BEGIN OF BLOCK b2 WITH FRAME TITLE t_b2.'.
-  src 'PARAMETERS: p_user  LIKE zche_imap_profile-username LOWER CASE,'.
-  src '            p_crsrc LIKE zche_imap_profile-credsrc DEFAULT ''O'.
-  cnt ''''.
+  src 'PARAMETERS: p_user  LIKE zche_imap_prof-username LOWER CASE,'.
+  src '            p_crsrc LIKE zche_imap_prof-credsrc DEFAULT ''O'''.
   src '                    VALUE CHECK,'.
   src '            p_pwd(100) TYPE c LOWER CASE.'.
   src 'SELECTION-SCREEN COMMENT /1(79) c_pwst.'.
   src 'SELECTION-SCREEN END OF BLOCK b2.'.
   src ''.
   src 'SELECTION-SCREEN BEGIN OF BLOCK b3 WITH FRAME TITLE t_b3.'.
-  src 'PARAMETERS: p_mbox LIKE zche_imap_profile-mailbox LOWER CASE'.
+  src 'PARAMETERS: p_mbox LIKE zche_imap_prof-mailbox LOWER CASE'.
   src '                   DEFAULT ''INBOX'','.
-  src '            p_done LIKE zche_imap_profile-donebox LOWER CASE'.
+  src '            p_done LIKE zche_imap_prof-donebox LOWER CASE'.
   src '                   DEFAULT ''SAP-Processed'','.
-  src '            p_move LIKE zche_imap_profile-movemode DEFAULT ''MO'.
-  cnt 'VE'''.
+  src '            p_move LIKE zche_imap_prof-movemode DEFAULT ''MOVE'.
+  cnt ''''.
   src '                   VALUE CHECK.'.
   src 'SELECTION-SCREEN END OF BLOCK b3.'.
   src ''.
   src 'SELECTION-SCREEN BEGIN OF BLOCK b4 WITH FRAME TITLE t_b4.'.
-  src 'PARAMETERS: p_hprog LIKE zche_imap_profile-hprog'.
+  src 'PARAMETERS: p_hprog LIKE zche_imap_prof-hprog'.
   src '                    DEFAULT ''ZCHE_IMAP_HANDLER_DEMO'','.
-  src '            p_hform LIKE zche_imap_profile-hform DEFAULT ''HAND'.
-  cnt 'LE_MAIL'','.
-  src '            p_maxm  LIKE zche_imap_profile-maxmail DEFAULT ''50'.
-  cnt ''','.
-  src '            p_maxmb LIKE zche_imap_profile-maxmb DEFAULT ''20'''.
+  src '            p_hform LIKE zche_imap_prof-hform DEFAULT ''HANDLE_'.
+  cnt 'MAIL'','.
+  src '            p_maxm  LIKE zche_imap_prof-maxmail DEFAULT ''50'','.
+  src '            p_maxmb LIKE zche_imap_prof-maxmb DEFAULT ''20'','.
+  src '            p_tout  LIKE zche_imap_prof-timeout DEFAULT ''120'''.
   cnt ','.
-  src '            p_tout  LIKE zche_imap_profile-timeout DEFAULT ''12'.
-  cnt '0'','.
-  src '            p_ret   LIKE zche_imap_profile-retdays DEFAULT ''30'.
-  cnt '''.'.
+  src '            p_ret   LIKE zche_imap_prof-retdays DEFAULT ''30''.'.
   src 'SELECTION-SCREEN END OF BLOCK b4.'.
   src ''.
   src 'INITIALIZATION.'.
@@ -3822,7 +3851,7 @@ FORM fill_config.
   src '*--------------------------------------------------------------'.
   cnt '-'.
   src 'FORM pw_status.'.
-  src '  DATA: ls_prof    TYPE zche_imap_profile,'.
+  src '  DATA: ls_prof    TYPE zche_imap_prof,'.
   src '        lv_date(10) TYPE c,'.
   src '        lv_auth(1) TYPE c.'.
   src ''.
@@ -3831,7 +3860,7 @@ FORM fill_config.
   src '  IF lv_auth IS INITIAL.'.
   src '    EXIT.'.
   src '  ENDIF.'.
-  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROFILE'' ''S'''.
+  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROF'' ''S'''.
   src '                     CHANGING lv_auth.'.
   src '  IF lv_auth IS INITIAL.'.
   src '    c_pwst = ''No profile display authorization (S_TABU_DIS).'''.
@@ -3848,7 +3877,7 @@ FORM fill_config.
   cnt ' O.''.'.
   src '    EXIT.'.
   src '  ENDIF.'.
-  src '  SELECT SINGLE * FROM zche_imap_profile INTO ls_prof'.
+  src '  SELECT SINGLE * FROM zche_imap_prof INTO ls_prof'.
   src '    WHERE profile = p_prof.'.
   src '  IF sy-subrc = 0 AND NOT ls_prof-pwdat IS INITIAL.'.
   src '    WRITE ls_prof-pwdat TO lv_date DD/MM/YYYY.'.
@@ -3873,15 +3902,15 @@ FORM fill_config.
   src '        ls_ret TYPE ddshretval,'.
   src '        lv_auth(1) TYPE c.'.
   src ''.
-  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROFILE'' ''S'''.
+  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROF'' ''S'''.
   src '                     CHANGING lv_auth.'.
   src '  IF lv_auth IS INITIAL.'.
   src '    PERFORM show_msg USING ''E'' ''No profile display authoriza'.
   cnt 'tion''.'.
   src '    EXIT.'.
   src '  ENDIF.'.
-  src '  SELECT profile descr host FROM zche_imap_profile INTO TABLE l'.
-  cnt 't_f4.'.
+  src '  SELECT profile descr host FROM zche_imap_prof INTO TABLE lt_f'.
+  cnt '4.'.
   src '* Offer only profiles the user may display (ZCHE_IMAP 03).'.
   src '  LOOP AT lt_f4 INTO ls_f4.'.
   src '    PERFORM profile_auth USING ls_f4-profile ''03'''.
@@ -3926,14 +3955,14 @@ FORM fill_config.
   src '*--------------------------------------------------------------'.
   cnt '-'.
   src 'FORM load_profile.'.
-  src '  DATA: ls_prof TYPE zche_imap_profile,'.
+  src '  DATA: ls_prof TYPE zche_imap_prof,'.
   src '        lv_auth(1) TYPE c.'.
   src ''.
   src '  PERFORM profile_auth USING p_prof ''03'' CHANGING lv_auth.'.
   src '  IF lv_auth IS INITIAL.'.
   src '    EXIT.'.
   src '  ENDIF.'.
-  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROFILE'' ''S'''.
+  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROF'' ''S'''.
   src '                     CHANGING lv_auth.'.
   src '  IF lv_auth IS INITIAL.'.
   src '    PERFORM show_msg USING ''E'' ''No profile display authoriza'.
@@ -3943,7 +3972,7 @@ FORM fill_config.
   src '  IF p_prof IS INITIAL.'.
   src '    PERFORM show_msg USING ''E'' ''Enter the profile name.''.'.
   src '  ENDIF.'.
-  src '  SELECT SINGLE * FROM zche_imap_profile INTO ls_prof'.
+  src '  SELECT SINGLE * FROM zche_imap_prof INTO ls_prof'.
   src '    WHERE profile = p_prof.'.
   src '  IF sy-subrc <> 0.'.
   src '    PERFORM show_msg USING ''S'''.
@@ -3999,8 +4028,8 @@ FORM fill_config.
   src '    cv_msg = ''Not authorized to change this profile''.'.
   src '    EXIT.'.
   src '  ENDIF.'.
-  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROFILE'' ''U'' CHANGING'.
-  cnt ' cv_ok.'.
+  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROF'' ''U'' CHANGING cv'.
+  cnt '_ok.'.
   src '  IF cv_ok IS INITIAL.'.
   src '    cv_msg = ''No profile change authorization (S_TABU_DIS).''.'.
   src '    EXIT.'.
@@ -4021,8 +4050,8 @@ FORM fill_config.
   src 'ENDFORM.'.
   src ''.
   src 'FORM save_profile_locked CHANGING cv_ok TYPE c cv_msg TYPE c.'.
-  src '  DATA: ls_prof    TYPE zche_imap_profile,'.
-  src '        ls_old     TYPE zche_imap_profile,'.
+  src '  DATA: ls_prof    TYPE zche_imap_prof,'.
+  src '        ls_old     TYPE zche_imap_prof,'.
   src '        lv_new(1)  TYPE c,'.
   src '        lv_name(40) TYPE c,'.
   src '        lv_chars(80) TYPE c,'.
@@ -4126,7 +4155,7 @@ FORM fill_config.
   src '    EXIT.'.
   src '  ENDIF.'.
   src ''.
-  src '  SELECT SINGLE * FROM zche_imap_profile INTO ls_old'.
+  src '  SELECT SINGLE * FROM zche_imap_prof INTO ls_old'.
   src '    WHERE profile = p_prof.'.
   src '  IF sy-subrc <> 0.'.
   src '    lv_new = ''X''.'.
@@ -4205,7 +4234,7 @@ FORM fill_config.
   src '    EXIT.'.
   src '  ENDIF.'.
   src ''.
-  src '  MODIFY zche_imap_profile FROM ls_prof.'.
+  src '  MODIFY zche_imap_prof FROM ls_prof.'.
   src '  IF sy-subrc <> 0.'.
   src '    ROLLBACK WORK.'.
   src '    CLEAR cv_ok.'.
@@ -4237,7 +4266,7 @@ FORM fill_config.
   src ''.
   src '*--------------------------------------------------------------'.
   cnt '-'.
-  src 'FORM write_conf USING    is_prof TYPE zche_imap_profile'.
+  src 'FORM write_conf USING    is_prof TYPE zche_imap_prof'.
   src '                CHANGING cv_ok   TYPE c'.
   src '                         cv_msg  TYPE c.'.
   src '  DATA: lt_lines     TYPE ty_t_line,'.
@@ -4299,7 +4328,7 @@ FORM fill_config.
   src '* this file is not read back from SAP.'.
   src '*--------------------------------------------------------------'.
   cnt '-'.
-  src 'FORM write_cred USING is_prof TYPE zche_imap_profile'.
+  src 'FORM write_cred USING is_prof TYPE zche_imap_prof'.
   src '                CHANGING cv_ok  TYPE c'.
   src '                         cv_msg TYPE c.'.
   src '  DATA: lt_lines      TYPE ty_t_line,'.
@@ -4332,8 +4361,8 @@ FORM fill_config.
   src '  IF lv_ok IS INITIAL.'.
   src '    EXIT.'.
   src '  ENDIF.'.
-  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROFILE'' ''U'' CHANGING'.
-  cnt ' lv_ok.'.
+  src '  PERFORM table_auth USING ''ZCHE_IMAP_PROF'' ''U'' CHANGING lv'.
+  cnt '_ok.'.
   src '  IF lv_ok IS INITIAL.'.
   src '    PERFORM show_msg USING ''E'' ''No profile change authorizat'.
   cnt 'ion''.'.
@@ -4365,7 +4394,7 @@ FORM fill_config.
   src '        lv_path(255)  TYPE c,'.
   src '        lv_key(28) TYPE c,'.
   src '        lv_logged LIKE zche_imap_log-profile,'.
-  src '        ls_prof TYPE zche_imap_profile.'.
+  src '        ls_prof TYPE zche_imap_prof.'.
   src ''.
   src '  SELECT SINGLE profile FROM zche_imap_log INTO lv_logged'.
   src '    WHERE profile = p_prof.'.
@@ -4375,7 +4404,7 @@ FORM fill_config.
   cnt '.'.
   src '    EXIT.'.
   src '  ENDIF.'.
-  src '  SELECT SINGLE * FROM zche_imap_profile INTO ls_prof'.
+  src '  SELECT SINGLE * FROM zche_imap_prof INTO ls_prof'.
   src '    WHERE profile = p_prof.'.
   src '  IF sy-subrc <> 0.'.
   src '    PERFORM show_msg USING ''S'' ''Profile not found''.'.
@@ -4417,7 +4446,7 @@ FORM fill_config.
   src '    EXIT.'.
   src '  ENDIF.'.
   src ''.
-  src '  DELETE FROM zche_imap_profile WHERE profile = p_prof.'.
+  src '  DELETE FROM zche_imap_prof WHERE profile = p_prof.'.
   src '  IF sy-subrc <> 0.'.
   src '    ROLLBACK WORK.'.
   src '    PERFORM show_msg USING ''S'' ''Profile delete failed''.'.
@@ -4460,7 +4489,7 @@ FORM fill_config.
   src '        lv_rest(128) TYPE c,'.
   src '        lv_key(28) TYPE c,'.
   src '        lv_par(80) TYPE c,'.
-  src '        ls_prof TYPE zche_imap_profile.'.
+  src '        ls_prof TYPE zche_imap_prof.'.
   src ''.
   src '  WRITE: / ''Profile:'', p_prof, p_descr.'.
   src '  ULINE.'.
@@ -4475,7 +4504,7 @@ FORM fill_config.
   src '  SKIP.'.
   src '  WRITE: / ''Connection test''.'.
   src ''.
-  src '  SELECT SINGLE * FROM zche_imap_profile INTO ls_prof'.
+  src '  SELECT SINGLE * FROM zche_imap_prof INTO ls_prof'.
   src '    WHERE profile = p_prof.'.
   src '  PERFORM storage_key USING p_prof CHANGING lv_key.'.
   src '  CONCATENATE lv_key ls_prof-revision INTO lv_par'.
@@ -4517,7 +4546,7 @@ FORM fill_config.
   src '  ENDIF.'.
   src 'ENDFORM.'.
   src ''.
-  src 'FORM delete_old_credential USING is_prof TYPE zche_imap_profile'.
+  src 'FORM delete_old_credential USING is_prof TYPE zche_imap_prof'.
   src '                           CHANGING cv_warning TYPE c.'.
   src '  DATA: lv_path(255) TYPE c, lv_key(28) TYPE c.'.
   src '  PERFORM storage_key USING is_prof-profile CHANGING lv_key.'.
@@ -4580,8 +4609,8 @@ FORM fill_monitor.
   src '      gv_auth(1)   TYPE c.'.
   src 'DATA: gt_allowed TYPE RANGE OF zche_imap_log-profile,'.
   src '      gs_allowed LIKE LINE OF gt_allowed,'.
-  src '      gt_profiles TYPE STANDARD TABLE OF zche_imap_profile,'.
-  src '      gs_profile TYPE zche_imap_profile.'.
+  src '      gt_profiles TYPE STANDARD TABLE OF zche_imap_prof,'.
+  src '      gs_profile TYPE zche_imap_prof.'.
   src ''.
   src 'INITIALIZATION.'.
   src '  s_date-sign   = ''I''.'.
@@ -4606,7 +4635,7 @@ FORM fill_monitor.
   cnt 't.''.'.
   src '    EXIT.'.
   src '  ENDIF.'.
-  src '  SELECT * FROM zche_imap_profile INTO TABLE gt_profiles'.
+  src '  SELECT * FROM zche_imap_prof INTO TABLE gt_profiles'.
   src '    WHERE profile IN s_prof.'.
   src '  LOOP AT gt_profiles INTO gs_profile.'.
   src '    PERFORM profile_auth USING gs_profile-profile ''03'''.

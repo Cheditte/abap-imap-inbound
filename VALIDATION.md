@@ -1,12 +1,12 @@
 # Validation / Doğrulama
 
-This record applies to the 0.9.2 release candidate. On 3 November 2026, the project owner confirmed running v0.9.2 in SAP and seeing results. This is an owner-reported manual result; the exact SAP release and individual scenario outcomes were not supplied with that confirmation. The date records the confirmation, not necessarily the execution date.
+This record covers the published 0.9.2 release candidate and the subsequent local repair attempt. On 3 November 2026, installation in A4H/001 stopped at `ZCHE_IMAP_PROFILE`: the database table name is 17 characters, exceeding the ABAP Dictionary limit of 16. The earlier owner-reported mail and attachment result cannot be attributed to v0.9.2; those screenshots show the older `ZIMAP_` edition. The corrected installer has not yet been run in SAP.
 
 Earlier code reviews found two defects: in 0.9.0 the installer never wrote the handler prefix, so no profile could be saved (fixed in 0.9.1), and a failed profile save could be reported as successful (fixed in 0.9.2). Screenshots of earlier editions were removed because they do not show this version. The current [preparation screenshots](docs/screenshots/README.md) illustrate SE38 and SM36 steps, not the reported runtime results.
 
 | Check / Kontrol | System and version | Date | Result |
 |---|---|---|---|
-| SAP execution of v0.9.2 | Owner's SAP system; exact SAP release not recorded | 2026-11-03 (confirmation) | Owner confirmed running this version and seeing results. |
+| SAP installation of v0.9.2 | A4H/001; SAP release not reconfirmed in this session | 2026-11-03 | Stopped at `ZCHE_IMAP_PROFILE`, `DDIF_TABL_PUT` exception 5. `ZCHE_IMAP_PARAM` and preceding DDIC definitions were created. No successful v0.9.2 mail run was established. |
 | ABAP Unit | Classic test classes included in COMMON | — | Test result not recorded; not inferred from the manual confirmation. |
 | One mail end to end in SAP | Target SAP and test mailbox | — | Separate outcomes for listing, body/attachment access and movement not recorded. |
 | Restricted-user background job | Target SAP | — | Result not recorded. |
@@ -18,4 +18,4 @@ Earlier code reviews found two defects: in 0.9.0 the installer never wrote the h
 
 The DDIC fixtures are development-only and must never be installed into SAP. Real authorization enforcement, database LUWs, installer APIs and file permissions still require SAP acceptance before production use.
 
-Bu kayıt 0.9.2 sürüm adayı içindir. Proje sahibi, 3 Kasım 2026'da v0.9.2'yi SAP'de çalıştırıp sonuç aldığını doğruladı. Bu tarih bildirimin tarihidir; çalıştırmanın tarihi ayrıca kaydedilmedi. Bildirimde SAP sürümü ve listeleme, gövde/ek açma, taşıma gibi adımların ayrı ayrı sonuçları belirtilmedi. ABAP Unit ve kısıtlı yetkili job sonuçları da bu manuel doğrulamadan çıkarılmadı. Rehberdeki SE38/SM36 görselleri hazırlık adımlarını gösterir; bu çalıştırmanın sonuç görüntüleri değildir. Yerel ve CI kontrolleri (abaplint v700, PowerShell testleri, GreenMail ile IMAP testleri) 0.9.2 için daha önce geçti; bu belge güncellemesi için yeniden çalıştırılmadı.
+Bu kayıt yayımlanmış 0.9.2 sürüm adayını ve yerel düzeltme girişimini kapsar. 3 Kasım 2026'da A4H/001'de kurulum `ZCHE_IMAP_PROFILE` tablosunda durdu: ad 17 karakterdir ve ABAP Dictionary sınırı 16 karakterdir. Önceki mail/ek sonucu 0.9.2'ye bağlanamaz; görüntüler eski `ZIMAP_` sürümündendir. Düzeltilmiş kurucu SAP'de henüz çalıştırılmadı. ABAP Unit ve kısıtlı yetkili job sonucu çıkarılamaz. Rehberdeki SE38/SM36 görselleri hazırlık adımlarını gösterir. Önceki yerel ve CI kontrolleri bu hatayı yakalamadı; bu düzeltme için testler yeniden çalıştırılmadı.
