@@ -3295,7 +3295,7 @@ FORM fill_inbound.
   src ''.
   src '  ULINE.'.
   src '  IF NOT p_test IS INITIAL.'.
-  src '    WRITE: / ''Test mode. Eligible mails:'', gv_read.'.
+  src '    WRITE: / ''List only. Eligible mails:'', gv_read.'.
   src '  ELSE.'.
   src '    WRITE: / ''Processed:'', gv_done, ''  Failed:'', gv_fail.'.
   src '  ENDIF.'.

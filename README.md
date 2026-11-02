@@ -8,6 +8,12 @@
 
 Use this project to read messages from a mail server in SAP, retrieve attachments, and connect them to your own ABAP process. The supplied example lets you open the message and attachments in SAP. Add your own ABAP business action, such as linking an attachment to a document.
 
+![From the mailbox to SAP: read messages and open attachments](docs/assets/diagrams/usage-en.svg)
+
+![SAP monitor showing a message body and PDF and JPG attachment links](docs/screenshots/monitor-detail.png)
+
+A real A4H/001 result: the message body and its two attachment links are available in SAP.
+
 ## Three parts to prepare
 
 ![Preparation map: mailbox, SAP application host and SAP programs](docs/assets/diagrams/setup-en.svg)
@@ -25,6 +31,7 @@ We assume you can create and activate programs in SE38. Prepare the host and mai
 | Your goal | Start here |
 |---|---|
 | Install for the first time | [Three preparations and SAP setup](docs/WALKTHROUGH.md#prepare) |
+| Set up a mailbox profile | [Connection, folders and password](docs/WALKTHROUGH.md#33-set-up-a-mailbox-profile) |
 | Check connectivity and the message list | [Path A — List only](docs/WALKTHROUGH.md#list-only) |
 | Open the first email and attachment in SAP | [Path B — First email](docs/WALKTHROUGH.md#first-mail) |
 | Process attachments with my own ABAP code | [Developer guide](docs/TECHNICAL-GUIDE.md) |
@@ -45,9 +52,6 @@ The default source is **the inbox (`INBOX`)**; you can select another folder. Su
 
 [Follow the illustrated steps from SE38 installation to SM36 job definition](docs/WALKTHROUGH.md#install).
 
-![A4H mail monitor showing the message body and links to a PDF and a JPG attachment](docs/screenshots/sap-monitor-details.png)
-
-In the A4H demonstration, this message was processed, its body displayed and its JPG opened. [See the steps and screenshots](docs/WALKTHROUGH.md#first-mail). The captures show the corrected source before its version label was raised to 0.9.3; [source and test context](docs/screenshots/README.md).
 
 Normal processing may mark mail as read and move it. Start with **a test SAP system and a dedicated test mailbox**.
 

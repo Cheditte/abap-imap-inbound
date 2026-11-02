@@ -8,6 +8,12 @@
 
 Bir posta sunucusundaki e-postaları SAP'de okumak, eklerini almak ve kendi ABAP sürecinizde işlemek için bu projeyi kullanabilirsiniz. Hazır örnekle e-postayı ve eklerini SAP içinde açabilirsiniz. Ekleri bir belgeye bağlamak gibi kendi iş adımlarınızı ABAP koduyla eklersiniz.
 
+![Posta kutusundan SAP’ye: iletileri okuyun ve ekleri açın](docs/assets/diagrams/usage-tr.svg)
+
+![SAP monitöründe mail gövdesi ile PDF ve JPG ek bağlantıları](docs/screenshots/monitor-detail.png)
+
+A4H/001'den gerçek sonuç: mail gövdesi ve iki ekin bağlantısı SAP içinde görüntüleniyor.
+
 ## Kurulumun üç parçası
 
 ![Posta hesabı, SAP sunucusu ve SAP programları için hazırlık haritası](docs/assets/diagrams/setup-tr.svg)
@@ -25,6 +31,7 @@ SE38'de program oluşturup etkinleştirebildiğiniz varsayılır. Sunucu ve post
 | Hedefiniz | Başlayacağınız yer |
 |---|---|
 | İlk kez kurmak | [Üç hazırlık ve SAP kurulumu](docs/tr/WALKTHROUGH.md#hazirlik) |
+| Posta profilini hazırlamak | [Bağlantı, klasör ve parola](docs/tr/WALKTHROUGH.md#33-posta-profilini-kaydedin) |
 | Bağlantıyı ve gelen ileti listesini kontrol etmek | [Yol A — Yalnız listeleme](docs/tr/WALKTHROUGH.md#listeleme) |
 | İlk maili ve ekini SAP'de açmak | [Yol B — İlk mail](docs/tr/WALKTHROUGH.md#ilk-mail) |
 | Ekleri kendi ABAP kodumla işlemek | [Geliştirici rehberi](docs/tr/TECHNICAL-GUIDE.md) |
@@ -45,9 +52,6 @@ Varsayılan okuma klasörü **Gelen Kutusu (`INBOX`)**. İsterseniz başka bir k
 
 [SE38 kurulumundan SM36 job tanımına kadar görsellerle ilerleyin](docs/tr/WALKTHROUGH.md#kurulum).
 
-![A4H mail monitöründe ileti gövdesi ve PDF ile JPG eklerinin bağlantıları](docs/screenshots/sap-monitor-details.png)
-
-A4H denemesinde bu mail işlendi, gövdesi görüntülendi ve JPG eki açıldı. [Adımlar ve ekran görüntüleri](docs/tr/WALKTHROUGH.md#ilk-mail). Görseller, sürüm etiketi 0.9.3'e yükseltilmeden önceki düzeltilmiş kaynağa ait; [kaynak ve deneme bilgisi](docs/screenshots/README.md).
 
 Normal işleme maili okundu işaretleyebilir ve taşıyabilir. İlk kullanım için **deneme sistemi ve ayrı bir deneme posta kutusu** seçin.
 
