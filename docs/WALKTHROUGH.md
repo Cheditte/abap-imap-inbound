@@ -18,7 +18,7 @@ Prepare the mailbox, SAP host and SAP programs first. Then open a test email in 
 | Add my business action | [Developer guide](TECHNICAL-GUIDE.md) | Your validated ABAP action replaces the demonstration. |
 | Run automatically | [Path C — Variant and job](#daily-use) | Job runs on the selected host; log and spool reviewed. |
 
-This guide describes the `v0.9.2` release candidate. [Validation record](../VALIDATION.md).
+This guide describes `v0.9.3`. [Validation record](../VALIDATION.md).
 
 The SAP examples use English menu labels. They show the SE38 and SM36 preparation screens. [Screenshot scope](screenshots/README.md).
 
@@ -55,13 +55,13 @@ In the [repository](https://github.com/Cheditte/abap-imap-inbound), choose **Cod
 | Preparation | Purpose | Expected output |
 |---|---|---|
 | PowerShell | Runs the project's host commands. | Windows PowerShell 5.1; Linux PowerShell 7.4+. |
-| curl | Connects to the mail server using encrypted IMAP. | Version 8.0.0+ with `imaps` support. |
+| curl | Connects to the mail server using encrypted IMAP. | Version 7.66.0+ with `imaps` support. |
 | Project files and folder | Holds mail, attachments and connection files. | Matching script versions and protected directories. |
 | Network and certificates | Allows the SAP host to reach the mail service. | Actual mail endpoint/port reachable; certificate trust prepared. |
 
 If you hold administrator access, follow the [RDP/SSH and file transfer guide](SELF-MANAGED-SETUP.md). Otherwise share the table with the responsible team. Run the [Windows](TECHNICAL-REFERENCE.md#windows) or [Linux setup commands](TECHNICAL-REFERENCE.md#linux) on the SAP machine.
 
-**Continue when:** the host check reports `PROTOCOL 2`, `VERSION 0.9.2` and the correct folder, ending in `OK`. Record the **SAP application server and full working-folder path**. Use that same host in subsequent steps.
+**Continue when:** the host check reports `PROTOCOL 2`, `VERSION 0.9.3` and the correct folder, ending in `OK`. Record the **SAP application server and full working-folder path**. Use that same host in subsequent steps.
 
 <a id="install"></a>
 ## 3. Install the programs in SAP ERP
@@ -105,16 +105,13 @@ Execute with F8 and read the whole result list. **Continue when:** installation 
 Generated objects go into `$TMP`; putting the installer itself in a package does not change this. For maintained use, reassign the objects to your customer package and prepare transport. [Package and transport](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport).
 
 <a id="authorization"></a>
-### 3.3. Create the authorization object and role
+### 3.3. Check the authorizations
 
-This permits users to work with the intended profile:
+The programs use standard SAP authorizations: `S_TABU_DIS` for table group `ZCHI`, `S_LOG_COM` for the `ZCHE_IMAP_*` SM69 commands and `S_DATASET` for the working folder. A developer user usually has them; for other users and the job user, see the [authorization matrix](../SECURITY.md).
 
-1. **SU20:** create authorization field `ZCHE_PROF` with installer-created data element `ZCHE_IMAP_PROFID`.
-2. **SU21:** create object `ZCHE_IMAP` containing `ZCHE_PROF` and `ACTVT`.
-3. **PFCG:** grant required profile activities: `03` display, `02` configuration/reprocessing, `16` execution.
-4. Complete table, command and file grants using the [authorization matrix](../SECURITY.md). `S_TABU_DIS`, `S_LOG_COM` and `S_DATASET` are required. Assign the role and complete user comparison.
+**Optional — separate access per profile:** if different teams must see only their own mailbox, define authorization object `ZCHE_IMAP` in SU21. The programs then check it automatically. [How to set it up](../SECURITY.md#optional-per-profile-authorization).
 
-Work with the security administrator if those permissions belong to another team. **Continue when:** your user and the intended job user have the required grants.
+**Continue when:** your user and the intended job user have the standard grants.
 
 ### 3.4. Set up a mailbox profile
 
@@ -214,7 +211,7 @@ After checking the real job user and selected host, prepare **a separate variant
 
 Do not repeat first-install instructions without review. Stop scheduled work and follow the [upgrade procedure](TECHNICAL-REFERENCE.md#8-update-an-existing-installation).
 
-For `0.9.0 / 0.9.1 → 0.9.2`, replace and activate the SAP installer source with the current file and deploy both matching host modules. After backup/review, select **Programs + Overwrite existing programs (update) + Server check**; assess required SM69/DDIC steps for your installation. Overwrite can replace local source changes. Do not resume jobs before host and profile checks succeed.
+For `0.9.x → 0.9.3`, replace and activate the SAP installer source with the current file and deploy both matching host modules. After backup/review, select **Programs + Overwrite existing programs (update) + Server check**; assess required SM69/DDIC steps for your installation. Overwrite can replace local source changes. Do not resume jobs before host and profile checks succeed.
 
 Old `ZIMAP_` and new `ZCHE_IMAP_` jobs must not process the same mailbox together. Old history is not migrated automatically.
 

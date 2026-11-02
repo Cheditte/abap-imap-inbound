@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.9.3 — 2026-11-03
+
+- Shorten the profile database table name from the invalid 17-character `ZCHE_IMAP_PROFILE` to `ZCHE_IMAP_PROF` throughout the installer, ABAP sources, authorization guidance and development fixture. The profile domain retains its original name.
+- Reject database table names longer than 16 characters before creating any DDIC objects.
+- Serialize installers separately and take the profile runtime lock after DDIC maintenance. Stop processing jobs before an upgrade.
+- Keep embedded ABAP source lines within 72 columns; the installer writes programs in 72-character lines.
+- Pass the revision to the list command with a compatible parameter type (`LIST_ARGUMENTS`).
+- Do not quote the script path in SM69 commands on Unix; SAPXPG passed the quotes to pwsh.
+- Make authorization object `ZCHE_IMAP` optional: the per-profile check applies only after a customer defines it in SU21; otherwise standard table, command and file authorizations decide.
+- Lower the curl minimum from 8.0.0 to 7.66.0, the version tested with the GreenMail suite on SLES 15.
+- Installed and run end to end on SAP ABAP Platform 2025 (SAP_BASIS 816, Linux) with GreenMail; see VALIDATION.md. Versions 0.9.0–0.9.2 cannot be installed; use 0.9.3.
+
+Upgrade from 0.9.x: stop jobs, copy the new `imap.ps1` and `mime.ps1` to the server, replace the `ZCHE_IMAP_INSTALL` source in SE38 and run it with Programs, Overwrite existing programs (update) and Server check.
+
 ## 0.9.2 — 2026-11-02 (release candidate)
 
 - Fix: a failed profile save (for example "Mail identity in use") could be reported as successful. The success flag is now set only after the profile is saved.

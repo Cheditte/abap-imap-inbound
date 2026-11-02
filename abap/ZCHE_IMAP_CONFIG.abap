@@ -15,14 +15,14 @@
 *---------------------------------------------------------------
 REPORT zche_imap_config LINE-SIZE 150 NO STANDARD PAGE HEADING.
 
-TABLES: zche_imap_profile, sscrfields.
+TABLES: zche_imap_prof, sscrfields.
 
 INCLUDE zche_imap_common.
 
 TYPES: BEGIN OF ty_f4,
-         profile LIKE zche_imap_profile-profile,
-         descr   LIKE zche_imap_profile-descr,
-         host    LIKE zche_imap_profile-host,
+         profile LIKE zche_imap_prof-profile,
+         descr   LIKE zche_imap_prof-descr,
+         host    LIKE zche_imap_prof-host,
        END OF ty_f4.
 
 DATA: gv_setup(1) TYPE c,
@@ -34,44 +34,44 @@ SELECTION-SCREEN FUNCTION KEY 3.
 SELECTION-SCREEN FUNCTION KEY 4.
 
 SELECTION-SCREEN BEGIN OF BLOCK b0 WITH FRAME TITLE t_b0.
-PARAMETERS: p_prof  LIKE zche_imap_profile-profile,
-            p_descr LIKE zche_imap_profile-descr LOWER CASE,
+PARAMETERS: p_prof  LIKE zche_imap_prof-profile,
+            p_descr LIKE zche_imap_prof-descr LOWER CASE,
             p_act   AS CHECKBOX DEFAULT 'X'.
 SELECTION-SCREEN END OF BLOCK b0.
 
 SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME TITLE t_b1.
-PARAMETERS: p_host LIKE zche_imap_profile-host LOWER CASE,
-            p_port LIKE zche_imap_profile-port DEFAULT '993',
-            p_sec  LIKE zche_imap_profile-security DEFAULT 'IMAPS'
+PARAMETERS: p_host LIKE zche_imap_prof-host LOWER CASE,
+            p_port LIKE zche_imap_prof-port DEFAULT '993',
+            p_sec  LIKE zche_imap_prof-security DEFAULT 'IMAPS'
                    VALUE CHECK,
             p_ver  AS CHECKBOX DEFAULT 'X'.
 SELECTION-SCREEN END OF BLOCK b1.
 
 SELECTION-SCREEN BEGIN OF BLOCK b2 WITH FRAME TITLE t_b2.
-PARAMETERS: p_user  LIKE zche_imap_profile-username LOWER CASE,
-            p_crsrc LIKE zche_imap_profile-credsrc DEFAULT 'O'
+PARAMETERS: p_user  LIKE zche_imap_prof-username LOWER CASE,
+            p_crsrc LIKE zche_imap_prof-credsrc DEFAULT 'O'
                     VALUE CHECK,
             p_pwd(100) TYPE c LOWER CASE.
 SELECTION-SCREEN COMMENT /1(79) c_pwst.
 SELECTION-SCREEN END OF BLOCK b2.
 
 SELECTION-SCREEN BEGIN OF BLOCK b3 WITH FRAME TITLE t_b3.
-PARAMETERS: p_mbox LIKE zche_imap_profile-mailbox LOWER CASE
+PARAMETERS: p_mbox LIKE zche_imap_prof-mailbox LOWER CASE
                    DEFAULT 'INBOX',
-            p_done LIKE zche_imap_profile-donebox LOWER CASE
+            p_done LIKE zche_imap_prof-donebox LOWER CASE
                    DEFAULT 'SAP-Processed',
-            p_move LIKE zche_imap_profile-movemode DEFAULT 'MOVE'
+            p_move LIKE zche_imap_prof-movemode DEFAULT 'MOVE'
                    VALUE CHECK.
 SELECTION-SCREEN END OF BLOCK b3.
 
 SELECTION-SCREEN BEGIN OF BLOCK b4 WITH FRAME TITLE t_b4.
-PARAMETERS: p_hprog LIKE zche_imap_profile-hprog
+PARAMETERS: p_hprog LIKE zche_imap_prof-hprog
                     DEFAULT 'ZCHE_IMAP_HANDLER_DEMO',
-            p_hform LIKE zche_imap_profile-hform DEFAULT 'HANDLE_MAIL',
-            p_maxm  LIKE zche_imap_profile-maxmail DEFAULT '50',
-            p_maxmb LIKE zche_imap_profile-maxmb DEFAULT '20',
-            p_tout  LIKE zche_imap_profile-timeout DEFAULT '120',
-            p_ret   LIKE zche_imap_profile-retdays DEFAULT '30'.
+            p_hform LIKE zche_imap_prof-hform DEFAULT 'HANDLE_MAIL',
+            p_maxm  LIKE zche_imap_prof-maxmail DEFAULT '50',
+            p_maxmb LIKE zche_imap_prof-maxmb DEFAULT '20',
+            p_tout  LIKE zche_imap_prof-timeout DEFAULT '120',
+            p_ret   LIKE zche_imap_prof-retdays DEFAULT '30'.
 SELECTION-SCREEN END OF BLOCK b4.
 
 INITIALIZATION.
@@ -153,7 +153,7 @@ ENDFORM.
 
 *---------------------------------------------------------------
 FORM pw_status.
-  DATA: ls_prof    TYPE zche_imap_profile,
+  DATA: ls_prof    TYPE zche_imap_prof,
         lv_date(10) TYPE c,
         lv_auth(1) TYPE c.
 
@@ -162,7 +162,7 @@ FORM pw_status.
   IF lv_auth IS INITIAL.
     EXIT.
   ENDIF.
-  PERFORM table_auth USING 'ZCHE_IMAP_PROFILE' 'S'
+  PERFORM table_auth USING 'ZCHE_IMAP_PROF' 'S'
                      CHANGING lv_auth.
   IF lv_auth IS INITIAL.
     c_pwst = 'No profile display authorization (S_TABU_DIS).'.
@@ -176,7 +176,7 @@ FORM pw_status.
     c_pwst = 'New password entry unavailable; use Basis source O.'.
     EXIT.
   ENDIF.
-  SELECT SINGLE * FROM zche_imap_profile INTO ls_prof
+  SELECT SINGLE * FROM zche_imap_prof INTO ls_prof
     WHERE profile = p_prof.
   IF sy-subrc = 0 AND NOT ls_prof-pwdat IS INITIAL.
     WRITE ls_prof-pwdat TO lv_date DD/MM/YYYY.
@@ -198,13 +198,13 @@ FORM f4_profile USING iv_field TYPE c.
         ls_ret TYPE ddshretval,
         lv_auth(1) TYPE c.
 
-  PERFORM table_auth USING 'ZCHE_IMAP_PROFILE' 'S'
+  PERFORM table_auth USING 'ZCHE_IMAP_PROF' 'S'
                      CHANGING lv_auth.
   IF lv_auth IS INITIAL.
     PERFORM show_msg USING 'E' 'No profile display authorization'.
     EXIT.
   ENDIF.
-  SELECT profile descr host FROM zche_imap_profile INTO TABLE lt_f4.
+  SELECT profile descr host FROM zche_imap_prof INTO TABLE lt_f4.
 * Offer only profiles the user may display (ZCHE_IMAP 03).
   LOOP AT lt_f4 INTO ls_f4.
     PERFORM profile_auth USING ls_f4-profile '03'
@@ -248,14 +248,14 @@ ENDFORM.
 
 *---------------------------------------------------------------
 FORM load_profile.
-  DATA: ls_prof TYPE zche_imap_profile,
+  DATA: ls_prof TYPE zche_imap_prof,
         lv_auth(1) TYPE c.
 
   PERFORM profile_auth USING p_prof '03' CHANGING lv_auth.
   IF lv_auth IS INITIAL.
     EXIT.
   ENDIF.
-  PERFORM table_auth USING 'ZCHE_IMAP_PROFILE' 'S'
+  PERFORM table_auth USING 'ZCHE_IMAP_PROF' 'S'
                      CHANGING lv_auth.
   IF lv_auth IS INITIAL.
     PERFORM show_msg USING 'E' 'No profile display authorization'.
@@ -264,7 +264,7 @@ FORM load_profile.
   IF p_prof IS INITIAL.
     PERFORM show_msg USING 'E' 'Enter the profile name.'.
   ENDIF.
-  SELECT SINGLE * FROM zche_imap_profile INTO ls_prof
+  SELECT SINGLE * FROM zche_imap_prof INTO ls_prof
     WHERE profile = p_prof.
   IF sy-subrc <> 0.
     PERFORM show_msg USING 'S'
@@ -317,7 +317,7 @@ FORM save_profile CHANGING cv_ok  TYPE c
     cv_msg = 'Not authorized to change this profile'.
     EXIT.
   ENDIF.
-  PERFORM table_auth USING 'ZCHE_IMAP_PROFILE' 'U' CHANGING cv_ok.
+  PERFORM table_auth USING 'ZCHE_IMAP_PROF' 'U' CHANGING cv_ok.
   IF cv_ok IS INITIAL.
     cv_msg = 'No profile change authorization (S_TABU_DIS).'.
     EXIT.
@@ -337,8 +337,8 @@ FORM save_profile CHANGING cv_ok  TYPE c
 ENDFORM.
 
 FORM save_profile_locked CHANGING cv_ok TYPE c cv_msg TYPE c.
-  DATA: ls_prof    TYPE zche_imap_profile,
-        ls_old     TYPE zche_imap_profile,
+  DATA: ls_prof    TYPE zche_imap_prof,
+        ls_old     TYPE zche_imap_prof,
         lv_new(1)  TYPE c,
         lv_name(40) TYPE c,
         lv_chars(80) TYPE c,
@@ -432,7 +432,7 @@ FORM save_profile_locked CHANGING cv_ok TYPE c cv_msg TYPE c.
     EXIT.
   ENDIF.
 
-  SELECT SINGLE * FROM zche_imap_profile INTO ls_old
+  SELECT SINGLE * FROM zche_imap_prof INTO ls_old
     WHERE profile = p_prof.
   IF sy-subrc <> 0.
     lv_new = 'X'.
@@ -508,7 +508,7 @@ FORM save_profile_locked CHANGING cv_ok TYPE c cv_msg TYPE c.
     EXIT.
   ENDIF.
 
-  MODIFY zche_imap_profile FROM ls_prof.
+  MODIFY zche_imap_prof FROM ls_prof.
   IF sy-subrc <> 0.
     ROLLBACK WORK.
     CLEAR cv_ok.
@@ -538,7 +538,7 @@ FORM save_profile_locked CHANGING cv_ok TYPE c cv_msg TYPE c.
 ENDFORM.
 
 *---------------------------------------------------------------
-FORM write_conf USING    is_prof TYPE zche_imap_profile
+FORM write_conf USING    is_prof TYPE zche_imap_prof
                 CHANGING cv_ok   TYPE c
                          cv_msg  TYPE c.
   DATA: lt_lines     TYPE ty_t_line,
@@ -596,7 +596,7 @@ ENDFORM.
 * Password file. The password is never written to the table;
 * this file is not read back from SAP.
 *---------------------------------------------------------------
-FORM write_cred USING is_prof TYPE zche_imap_profile
+FORM write_cred USING is_prof TYPE zche_imap_prof
                 CHANGING cv_ok  TYPE c
                          cv_msg TYPE c.
   DATA: lt_lines      TYPE ty_t_line,
@@ -627,7 +627,7 @@ FORM delete_profile.
   IF lv_ok IS INITIAL.
     EXIT.
   ENDIF.
-  PERFORM table_auth USING 'ZCHE_IMAP_PROFILE' 'U' CHANGING lv_ok.
+  PERFORM table_auth USING 'ZCHE_IMAP_PROF' 'U' CHANGING lv_ok.
   IF lv_ok IS INITIAL.
     PERFORM show_msg USING 'E' 'No profile change authorization'.
     EXIT.
@@ -657,7 +657,7 @@ FORM delete_profile_locked.
         lv_path(255)  TYPE c,
         lv_key(28) TYPE c,
         lv_logged LIKE zche_imap_log-profile,
-        ls_prof TYPE zche_imap_profile.
+        ls_prof TYPE zche_imap_prof.
 
   SELECT SINGLE profile FROM zche_imap_log INTO lv_logged
     WHERE profile = p_prof.
@@ -666,7 +666,7 @@ FORM delete_profile_locked.
       'Profile has mail history: deactivate; use a new name.'.
     EXIT.
   ENDIF.
-  SELECT SINGLE * FROM zche_imap_profile INTO ls_prof
+  SELECT SINGLE * FROM zche_imap_prof INTO ls_prof
     WHERE profile = p_prof.
   IF sy-subrc <> 0.
     PERFORM show_msg USING 'S' 'Profile not found'.
@@ -708,7 +708,7 @@ FORM delete_profile_locked.
     EXIT.
   ENDIF.
 
-  DELETE FROM zche_imap_profile WHERE profile = p_prof.
+  DELETE FROM zche_imap_prof WHERE profile = p_prof.
   IF sy-subrc <> 0.
     ROLLBACK WORK.
     PERFORM show_msg USING 'S' 'Profile delete failed'.
@@ -748,7 +748,7 @@ FORM save_and_test.
         lv_rest(128) TYPE c,
         lv_key(28) TYPE c,
         lv_par(80) TYPE c,
-        ls_prof TYPE zche_imap_profile.
+        ls_prof TYPE zche_imap_prof.
 
   WRITE: / 'Profile:', p_prof, p_descr.
   ULINE.
@@ -763,7 +763,7 @@ FORM save_and_test.
   SKIP.
   WRITE: / 'Connection test'.
 
-  SELECT SINGLE * FROM zche_imap_profile INTO ls_prof
+  SELECT SINGLE * FROM zche_imap_prof INTO ls_prof
     WHERE profile = p_prof.
   PERFORM storage_key USING p_prof CHANGING lv_key.
   CONCATENATE lv_key ls_prof-revision INTO lv_par
@@ -802,7 +802,7 @@ FORM save_and_test.
   ENDIF.
 ENDFORM.
 
-FORM delete_old_credential USING is_prof TYPE zche_imap_profile
+FORM delete_old_credential USING is_prof TYPE zche_imap_prof
                            CHANGING cv_warning TYPE c.
   DATA: lv_path(255) TYPE c, lv_key(28) TYPE c.
   PERFORM storage_key USING is_prof-profile CHANGING lv_key.

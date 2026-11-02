@@ -23,7 +23,7 @@ TYPES: BEGIN OF ty_uid,
 TYPES: ty_t_uid TYPE STANDARD TABLE OF ty_uid
                 WITH DEFAULT KEY.
 
-CONSTANTS: gc_version(10) TYPE c VALUE '0.9.2'.
+CONSTANTS: gc_version(10) TYPE c VALUE '0.9.3'.
 
 DATA: gv_root(200)  TYPE c,
       gv_sep(1)     TYPE c,
@@ -130,7 +130,7 @@ FORM profile_lock USING iv_prof TYPE c CHANGING cv_ok TYPE c.
   lv_varkey = lv_key.
   CALL FUNCTION 'ENQUEUE_E_TABLE'
     EXPORTING
-      tabname = 'ZCHE_IMAP_PROFILE'
+      tabname = 'ZCHE_IMAP_PROF'
       varkey  = lv_varkey
       _scope  = '1'
     EXCEPTIONS
@@ -148,7 +148,7 @@ FORM profile_unlock USING iv_prof TYPE c.
   lv_varkey = lv_key.
   CALL FUNCTION 'DEQUEUE_E_TABLE'
     EXPORTING
-      tabname = 'ZCHE_IMAP_PROFILE'
+      tabname = 'ZCHE_IMAP_PROF'
       varkey  = lv_varkey
       _scope  = '1'.
 ENDFORM.
@@ -309,7 +309,7 @@ FORM call_cmd USING    iv_cmd   TYPE c
   ENDIF.
   IF NOT cv_ok IS INITIAL AND lv_protocol <> 1.
     CLEAR cv_ok.
-    cv_msg = 'ERR CFG Script protocol mismatch; install v0.9.2'.
+    cv_msg = 'ERR CFG Script protocol mismatch; install v0.9.3'.
   ENDIF.
 ENDFORM.
 
@@ -484,7 +484,7 @@ FORM show_msg USING iv_type TYPE c
                lv_text+150(50).
 ENDFORM.
 
-* Both the configuration UI and processor enforce this server-owned prefix.
+* Configuration and processing both enforce this server-owned prefix.
 FORM handler_allowed USING iv_prog TYPE c iv_form TYPE c
                      CHANGING cv_ok TYPE c.
   DATA: lv_prefix(255) TYPE c, lv_pattern(256) TYPE c,
@@ -513,9 +513,28 @@ FORM handler_allowed USING iv_prog TYPE c iv_form TYPE c
   cv_ok = 'X'.
 ENDFORM.
 
+* Optional per-profile check. It applies only when the customer has
+* defined authorization object ZCHE_IMAP (SU21); otherwise the
+* standard table, command and file authorizations decide.
 FORM profile_auth USING iv_prof TYPE c iv_activity TYPE c
                   CHANGING cv_ok TYPE c.
+  STATICS: sv_known(1) TYPE c,
+           sv_defined(1) TYPE c.
+  DATA lv_object(10) TYPE c.
+
   CLEAR cv_ok.
+  IF sv_known IS INITIAL.
+    SELECT SINGLE objct FROM tobj INTO lv_object
+      WHERE objct = 'ZCHE_IMAP'.
+    IF sy-subrc = 0.
+      sv_defined = 'X'.
+    ENDIF.
+    sv_known = 'X'.
+  ENDIF.
+  IF sv_defined IS INITIAL.
+    cv_ok = 'X'.
+    EXIT.
+  ENDIF.
   AUTHORITY-CHECK OBJECT 'ZCHE_IMAP'
     ID 'ZCHE_PROF' FIELD iv_prof
     ID 'ACTVT' FIELD iv_activity.
@@ -524,7 +543,7 @@ FORM profile_auth USING iv_prof TYPE c iv_activity TYPE c
   ENDIF.
 ENDFORM.
 
-FORM list_arguments USING iv_key TYPE c iv_revision TYPE c
+FORM list_arguments USING iv_key TYPE c iv_revision TYPE clike
                           iv_test TYPE c CHANGING cv_args TYPE c.
   CONCATENATE iv_key iv_revision INTO cv_args SEPARATED BY space.
   IF iv_test IS INITIAL.

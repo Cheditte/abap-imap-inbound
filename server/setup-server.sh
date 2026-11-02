@@ -12,9 +12,9 @@
 #   --allow-plain         allow unencrypted IMAP
 #   --force               overwrite an existing policy.psd1
 #   --set-password KEY    SID_CLIENT_PROFILE (password source O)
-#   --curl-path FILE      curl 8.0.0+ outside /usr/bin (default /usr/bin/curl)
+#   --curl-path FILE      curl 7.66.0+ outside /usr/bin (default /usr/bin/curl)
 #
-# Requirements: PowerShell 7 (pwsh) and curl 8.0.0 or newer with IMAPS support.
+# Requirements: PowerShell 7 (pwsh) and curl 7.66.0 or newer with IMAPS support.
 set -euo pipefail
 
 ROOT=/usr/sap/sapimap; SAPUSER=""; HOSTS=""; INSECURE='$false'; PLAIN='$false'
@@ -104,10 +104,11 @@ fi
 
 step "pwsh and curl check"
 command -v pwsh >/dev/null || fail "PowerShell 7 (pwsh) is not installed"
-[[ -x "$CURL" ]] || fail "curl not found: $CURL (install curl 8.0.0+ and pass --curl-path)"
+[[ -x "$CURL" ]] || fail "curl not found: $CURL (install curl 7.66.0+ and pass --curl-path)"
 "$CURL" --version | grep -qw imaps || fail "curl does not support IMAPS"
-CURLMAJOR="$("$CURL" --version | head -1 | sed -n 's/^curl \([0-9][0-9]*\)\..*/\1/p')"
-[[ -n "$CURLMAJOR" && "$CURLMAJOR" -ge 8 ]] || fail "curl 8.0.0 or newer is required: $("$CURL" --version | head -1 | cut -d' ' -f1-2) (pass --curl-path)"
+CURLVER="$("$CURL" --version | head -1 | sed -n 's/^curl \([0-9][0-9]*\)\.\([0-9][0-9]*\)\..*/\1 \2/p')"
+read -r CURLMAJOR CURLMINOR <<<"$CURLVER"
+[[ -n "$CURLMAJOR" ]] && (( CURLMAJOR > 7 || (CURLMAJOR == 7 && CURLMINOR >= 66) )) || fail "curl 7.66.0 or newer is required: $("$CURL" --version | head -1 | cut -d' ' -f1-2) (pass --curl-path)"
 echo "$(pwsh -NoProfile -Command '$PSVersionTable.PSVersion.ToString()') / $("$CURL" --version | head -1 | cut -d' ' -f1-2)"
 
 step "Folders: $ROOT"

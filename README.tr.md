@@ -49,7 +49,7 @@ Normal işleme maili okundu işaretleyebilir ve taşıyabilir. İlk kullanım i�
 
 ## Durum ve ayrıntılar
 
-**Güncel sürüm: [v0.9.2 — sürüm adayı](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.2).** Proje sahibi, 3 Kasım 2026'da v0.9.2'yi SAP'de çalıştırıp sonuç aldığını doğruladı. Bu manuel doğrulama, bütün kabul senaryolarının tamamlandığı anlamına gelmez. Klasik ABAP 7.00 uyumluluğu bir hedeftir; ECC çalışma sertifikasyonu değildir. [Doğrulama kaydı](VALIDATION.md).
+**Güncel sürüm: [v0.9.3](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.3).** SAP ABAP Platform 2025 (SAP_BASIS 816, Linux, Unicode) üzerinde GreenMail test kutusuyla baştan sona kuruldu ve çalıştırıldı: profil, bağlantı testi, List only, işleme, taşıma ve monitörde ekler. ECC 6.0, Windows sunucular ve gerçek posta sunucuları henüz denenmedi; geri bildirime açık. [Doğrulama kaydı](VALIDATION.md).
 
 - [Kurulum ve kullanım](docs/tr/WALKTHROUGH.md) · [Alan rehberi](docs/tr/SCREEN-GUIDE.md)
 - [Sunucuya kendiniz bağlanacaksanız](docs/tr/SELF-MANAGED-SETUP.md)

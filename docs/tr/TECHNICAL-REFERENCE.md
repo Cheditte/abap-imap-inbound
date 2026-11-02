@@ -2,7 +2,7 @@
 
 > [English](../TECHNICAL-REFERENCE.md) | **Türkçe** · [Projeyi tanıyın](../../README.tr.md) · [Kurulum](WALKTHROUGH.md) · [Kod örnekleri](TECHNICAL-GUIDE.md)
 
-Bu dosya, kurulumu hazırlayan Basis ve e-posta ekipleri ile ayrıntıları incelemek isteyen geliştiriciler içindir. **0.9.2 kaynaklarını ve betik protokolü 2'yi** anlatır. Sırayla kurulum yapmak için [adım adım rehberi](WALKTHROUGH.md), kendi iş mantığınızı eklemek için [geliştirici rehberini](TECHNICAL-GUIDE.md) kullanın.
+Bu dosya, kurulumu hazırlayan Basis ve e-posta ekipleri ile ayrıntıları incelemek isteyen geliştiriciler içindir. **0.9.3 kaynaklarını ve betik protokolü 2'yi** anlatır. Sırayla kurulum yapmak için [adım adım rehberi](WALKTHROUGH.md), kendi iş mantığınızı eklemek için [geliştirici rehberini](TECHNICAL-GUIDE.md) kullanın.
 
 SAP adımlarında okuyucunun SE38 ile program oluşturup etkinleştirebildiği ve çalıştırabildiği varsayılır. Bu rehberde **Basis / sunucu yöneticisi**, sunucunun yönetim sorumluluğunu üstlenen kişi veya ekibi ifade eder; gerekli yetkilere sahipseniz bu kişi siz olabilirsiniz. Posta yönetimi için de aynı ayrım geçerlidir. [Yetkiler sizdeyse hazırlık adımları](SELF-MANAGED-SETUP.md).
 
@@ -69,7 +69,7 @@ Aşağıdaki liste bir yol haritasıdır. Ekran adımları ve çalıştırılaca
 1. **Proje dosyalarını indirin.** Deponun ana sayfasındaki **Code → Download ZIP** ile indirip arşivin tamamını açın. Git kurmanız gerekmez. Sunucu ve SAP dosyalarını aynı indirmeden kullanın.
 2. **Deneme posta kutusunu hazırlayın veya yöneticisinden isteyin.** Yukarıdaki bağlantı bilgilerini alın ve işlenen iletiler için posta kutusundaki mevcut bir klasörü seçin.
 3. **Sunucuyu hazırlayın veya yöneticisine hazırlatın.** İşlem SAP uygulama sunucusunda çalışır. PowerShell ve `curl` adlı yardımcı araçlar burada e-postayı alır; ayrı bir entegrasyon sunucusu gerekmez. Basis ağ erişimini ve korumalı çalışma klasörünü hazırlar, klasörün tam yolunu size verir. [Sunucu hazırlığı](WALKTHROUGH.md#2-sapnin-kurulu-olduğu-makineyi-hazırlayın).
-4. **SAP programlarını kurun.** **SE38** içinde `ZCHE_IMAP_INSTALL` programını oluşturup projedeki aynı adlı kaynağı yükleyin, etkinleştirin ve çalıştırın. Bu program gerekli SAP programlarını ve tablolarını oluşturur. [SAP kurulum adımları](WALKTHROUGH.md#31-kurulum-programını-oluşturun). Ardından `ZCHE_IMAP` yetki nesnesini ve rolü oluşturun; bunlar olmadan programlar yetki mesajıyla durur. [Yetki adımı](WALKTHROUGH.md#33-yetki-nesnesini-ve-rolü-oluşturun).
+4. **SAP programlarını kurun.** **SE38** içinde `ZCHE_IMAP_INSTALL` programını oluşturup projedeki aynı adlı kaynağı yükleyin, etkinleştirin ve çalıştırın. Bu program gerekli SAP programlarını ve tablolarını oluşturur. [SAP kurulum adımları](WALKTHROUGH.md#31-kurulum-programını-oluşturun). Ardından standart yetkileri kontrol edin; profil bazlı `ZCHE_IMAP` nesnesi isteğe bağlıdır. [Yetki adımı](WALKTHROUGH.md#33-yetki-nesnesini-ve-rolü-oluşturun).
 5. **Bir posta profili kaydedin.** `ZCHE_IMAP_CONFIG` içinde bir ad seçip gerçek sunucu, kullanıcı ve klasör bilgilerinizi girin. İlk denemede handler olarak `ZCHE_IMAP_HANDLER_DEMO`, taşıma yöntemi olarak `MOVE` seçin. Parola kaynağı `S`, parolayı SAP ekranından girmeniz; `O`, Basis'in sunucuda kaydetmesi anlamına gelir. **F8** ayarları kaydeder ve bağlantıyı test eder; yalnız kaydın oluşması başarılı bağlantı demek değildir. [Profil tanımlama](WALKTHROUGH.md#34-posta-kutusu-profilini-tanımlayın).
 
 Kalıcı kullanım için `ZCHE_IMAP` gibi bir müşteri paketi oluşturun veya projeye ayrılmış paketi kullanın. Installer şu anda ürettiği nesneleri `$TMP` adlı yerel deneme alanına koyar; installer'ı pakete kaydetmek tek başına bunu değiştirmez. Test ve canlı sisteme taşıma için [paket ve transport adımlarını](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) Basis ve geliştiriciyle planlayın.
@@ -107,12 +107,12 @@ Kaynaklar klasik ABAP sistemleri için **7.00 and later** uyumluluğunu hedefler
 
 ## Yetkiler ve işletim sınırları
 
-Basis, yetkileri ilgili kullanıcılara ve tablo yetki gruplarına göre tanımlar. Uygulama tablo erişimini `VIEW_AUTHORITY_CHECK` ile denetler; dosya ve komut yetkileri ayrıca kontrol edilir. Üç tablo `ZCHI` tablo yetki grubundadır: aşağıdaki tabloya göre `ZCHI` için `S_TABU_DIS` yetkisini `03` (görüntüleme) veya `02` (değiştirme) aktivitesiyle verin. Önce `ZCHE_IMAP` yetki nesnesini oluşturun ([kurulum rehberi adım 3.3](WALKTHROUGH.md#33-yetki-nesnesini-ve-rolü-oluşturun)).
+Basis, yetkileri ilgili kullanıcılara ve tablo yetki gruplarına göre tanımlar. Uygulama tablo erişimini `VIEW_AUTHORITY_CHECK` ile denetler; dosya ve komut yetkileri ayrıca kontrol edilir. Üç tablo `ZCHI` tablo yetki grubundadır: aşağıdaki tabloya göre `ZCHI` için `S_TABU_DIS` yetkisini `03` (görüntüleme) veya `02` (değiştirme) aktivitesiyle verin. Aşağıdaki `ZCHE_IMAP` yetkileri yalnızca isteğe bağlı nesneyi tanımlarsanız geçerlidir ([profil bazlı yetki](../../SECURITY.md#optional-per-profile-authorization)).
 
 | Rol | Gerekli erişim |
 |---|---|
-| Job kullanıcısı | Profil adı için `ZCHE_IMAP` aktivite `16`; `ZCHE_IMAP_PROFILE` görüntüleme; `ZCHE_IMAP_LOG` değiştirme; `S_LOG_COM` üzerinden `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE`; `S_DATASET` üzerinden gelen mail dosyalarını okuma; handler'ın ihtiyaç duyduğu yetkiler. |
-| Profil yöneticisi | Profil adı için `ZCHE_IMAP` aktivite `03` ve `02`; `ZCHE_IMAP_PROFILE` görüntüleme/değiştirme; `ZCHE_IMAP_TEST` çalıştırma; `ZCHE_IMAP_CONFIG` için profil ve kimlik bilgisi dosyalarına `S_DATASET` yazma erişimi. |
+| Job kullanıcısı | Profil adı için `ZCHE_IMAP` aktivite `16`; `ZCHE_IMAP_PROF` görüntüleme; `ZCHE_IMAP_LOG` değiştirme; `S_LOG_COM` üzerinden `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE`; `S_DATASET` üzerinden gelen mail dosyalarını okuma; handler'ın ihtiyaç duyduğu yetkiler. |
+| Profil yöneticisi | Profil adı için `ZCHE_IMAP` aktivite `03` ve `02`; `ZCHE_IMAP_PROF` görüntüleme/değiştirme; `ZCHE_IMAP_TEST` çalıştırma; `ZCHE_IMAP_CONFIG` için profil ve kimlik bilgisi dosyalarına `S_DATASET` yazma erişimi. |
 | İzleme kullanıcısı | Profil adı için `ZCHE_IMAP` aktivite `03` (yeniden deneme için ayrıca `02`); `ZCHE_IMAP_LOG` görüntüleme; `ZCHE_IMAP_MONITOR` için gelen/arşiv dosyalarını okuma. Yeniden işleme ayrıca `ZCHE_IMAP_LOG` değiştirme yetkisi gerektirir. |
 | Kurulumu yapan | Proje nesneleri için geliştirme yetkileri ve SM69 komutlarını yönetip test etme yetkileri. Kaldırmada ek client kontrolleri vardır. |
 
@@ -189,7 +189,7 @@ Bağlantıyı o sunucudan kontrol edin. Windows örneği:
 
 ### Windows
 
-Windows PowerShell 5.1 ve `curl.exe --version` çıktısında `imaps` bulunan **curl 8.0.0 veya üzeri** gerekir. Eski Windows sürümlerindeki `curl.exe` daha eskidir; güncel bir curl kurup yolunu `-CurlPath` ile verin. curl 8'den eskiyse kurulum anlaşılır bir mesajla durur. Windows PowerShell'de `curl.exe` yazın; `curl` başka bir komutu ifade edebilir.
+Windows PowerShell 5.1 ve `curl.exe --version` çıktısında `imaps` bulunan **curl 7.66.0 veya üzeri** gerekir. Windows Server 2019'daki `curl.exe` daha eskidir (7.55); güncel bir curl kurup yolunu `-CurlPath` ile verin. curl 7.66'dan eskiyse kurulum anlaşılır bir mesajla durur. Windows PowerShell'de `curl.exe` yazın; `curl` başka bir komutu ifade edebilir.
 
 Depo klasöründen, yönetici PowerShell oturumunda aşağıdaki bloğu çalıştırın. Sorulduğunda posta ekibinin IMAP sunucusunu, Basis'in doğruladığı Windows SAP hesabını ve tam çalışma klasörünü girin. Boş yanıtla kurulum başlamaz.
 
@@ -222,11 +222,11 @@ Varsayılan kök klasör `C:\sapimap`. Yukarıdaki blok klasör yolunu ayrıca s
 }
 ```
 
-Başarılı çıktı `PROTOCOL 2`, `VERSION 0.9.2` ve seçilen kökü belirtir; `OK` ile biter. Yönetici hesabıyla bu test yararlıdır; ileride SAP kurulum programının testi gerçek SAP çalışma hesabıyla da geçmelidir.
+Başarılı çıktı `PROTOCOL 2`, `VERSION 0.9.3` ve seçilen kökü belirtir; `OK` ile biter. Yönetici hesabıyla bu test yararlıdır; ileride SAP kurulum programının testi gerçek SAP çalışma hesabıyla da geçmelidir.
 
 ### Linux
 
-PowerShell (`pwsh`) ve IMAPS destekli **curl 8.0.0 veya üzeri** kurun. Birçok SAP Linux sürümünde `/usr/bin` altındaki curl 7.x'tir; daha yeni bir curl kurup kuruluma `--curl-path /tam/yol/curl` verin, kurulum bunu `bin/policy.psd1` dosyasına yazar. curl 8'den eskiyse kurulum anlaşılır bir mesajla durur. Oluşturulan SM69 komutu `/usr/bin/pwsh` bekler. SAP'nin gerçek çalışma kullanıcısını doğrulayın; `a4hadm` örnektir.
+PowerShell (`pwsh`) ve IMAPS destekli **curl 7.66.0 veya üzeri** kurun; SLES 15'te `/usr/bin` altında bulunur. Başka bir curl için kuruluma `--curl-path /tam/yol/curl` verin, kurulum bunu `bin/policy.psd1` dosyasına yazar. curl 7.66'dan eskiyse kurulum anlaşılır bir mesajla durur. Oluşturulan SM69 komutu `/usr/bin/pwsh` bekler. SAP'nin gerçek çalışma kullanıcısını doğrulayın; `a4hadm` örnektir.
 
 Depo klasöründen Bash içinde aşağıdaki bloğu çalıştırın. Sunucu adı posta ekibinden, Linux SAP kullanıcısı ve tam çalışma klasörü Basis'ten alınır; her soruya kendi değerinizle yanıt verin.
 
@@ -255,7 +255,7 @@ Seçilen kökü SAP'nin çalışma kullanıcısıyla test edin. İki soruya önc
 }
 ```
 
-Çıktı protokol `2`, sürüm `0.9.2` ve seçilen kökü belirtip `OK` ile bitmelidir. Bu yerel ön koşulları kontrol eder; SAP kurulumu ve posta bağlantısı sonraki adımlardadır.
+Çıktı protokol `2`, sürüm `0.9.3` ve seçilen kökü belirtip `OK` ile bitmelidir. Bu yerel ön koşulları kontrol eder; SAP kurulumu ve posta bağlantısı sonraki adımlardadır.
 
 ### Sertifika ve danışmana teslim
 
@@ -392,7 +392,7 @@ Bu isteğe bağlı bölüm Basis/geliştirme ekibinin teşhisi içindir; canlı 
 4. Sunucuyu, rolleri ve profilleri kontrol edin. Profilleri tekrar kaydedip `S` parolalarını yeniden girin. `O` parolalarını tam `SID_MANDANT_PROFIL` anahtarıyla oluşturun.
 5. Sunucu, bağlantı, salt okunur liste, normal demo, hata/tekrar deneme ve bekleyen taşıma kurtarma kontrollerini yapın. Job kullanıcısı ve iş handler'ını doğrulayıp job'ları yeniden açın.
 
-**0.9.x içinde** (örneğin 0.9.1'den 0.9.2'ye) protokol ve saklama biçimi değişmez. 1–3. adımlardan sonra SE38'de `ZCHE_IMAP_INSTALL` kaynağını yeni dosyayla değiştirip etkinleştirin; **Programs**, **Overwrite existing programs (update)** ve **Server check** seçili çalıştırın. **Overwrite** seçilmezse programlar farklı olduğu için kurulum durur. Yeniden çalıştırma mevcut handler önekini ve deneme sınırını korur.
+**0.9.x içinde** (örneğin 0.9.2'den 0.9.3'e) protokol ve saklama biçimi değişmez. 1–3. adımlardan sonra SE38'de `ZCHE_IMAP_INSTALL` kaynağını yeni dosyayla değiştirip etkinleştirin; **Programs**, **Overwrite existing programs (update)** ve **Server check** seçili çalıştırın. **Overwrite** seçilmezse programlar farklı olduğu için kurulum durur. Yeniden çalıştırma mevcut handler önekini ve deneme sınırını korur.
 
 Posta geçmişi olan profil başka kutuya yönlendirilemez veya silinemez. Posta kimliği değişecekse profili pasifleştirip yenisini oluşturun.
 
@@ -410,7 +410,7 @@ Gerçek iş postalarından önce iş kurallarınızı uygulayıp doğrulayın. A
 Profil ve parola revizyonları çalışan bir işlemin kullandığı dosyayı erken silmemek için otomatik temizlenmez. Profil silme işlemi yalnız etkin ayar/parola dosyalarını kaldırmayı dener; eski revizyonlar için yöneticiye bakım uyarısı verir.
 
 1. İlgili profilin zamanlanmış işlerini durdurun ve bu profille çalışan ön plan işlemlerinin tamamlanmasını bekleyin. Ortak sunucuyu kullanan sistem/mandantlarla koordine edin.
-2. Doğru sistem/mandanttaki `ZCHE_IMAP_PROFILE` kaydından `REVISION`, `CREDSRC` ve `CREDREV` değerlerini doğrulayın. Parolayı görüntülemeyin veya günlüğe yazmayın.
+2. Doğru sistem/mandanttaki `ZCHE_IMAP_PROF` kaydından `REVISION`, `CREDSRC` ve `CREDREV` değerlerini doğrulayın. Parolayı görüntülemeyin veya günlüğe yazmayın.
 3. Etkin `conf/KEY_REVISION.conf` dosyasını ve onun referans verdiği parolayı koruyun: `S` için `secret/KEY_CREDREV.cred`, `O` için `secret/KEY.cred`. Başarısız kaydetmeden kalan bir dosyanın etkin olduğunu varsaymayın.
 4. Artık kullanılmadığı ve geri dönüş planında gerekmediği doğrulanan eski revizyon dosyalarını kurumunuzun saklama politikasına göre, yalnız tam dosya adlarını seçerek kaldırın. `conf` veya `secret` klasörünün tamamını silmeyin. SAP geçmişi olan profilin adını yeniden kullanmayın.
 5. İşleri yeniden açmadan bağlantı ve yalnız listeleme testini tekrarlayın. Sonlandırılmış işlemlerden kalan eski `tmp` dosyaları için de sahiplik ve kullanım kontrolüyle ayrı bakım yapın; bekleyen `in`/`done` verisini silmeyin.

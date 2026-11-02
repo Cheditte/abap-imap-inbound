@@ -2,7 +2,7 @@
 
 > **English** | [Türkçe](tr/TECHNICAL-REFERENCE.md) · [Project overview](../README.md) · [Installation](WALKTHROUGH.md) · [Code examples](TECHNICAL-GUIDE.md)
 
-This file is for Basis and email teams preparing installation, and developers who want the details. It describes **0.9.2 sources and script protocol 2**. Use the [walkthrough](WALKTHROUGH.md) for installation in order, and the [developer guide](TECHNICAL-GUIDE.md) to add your business logic.
+This file is for Basis and email teams preparing installation, and developers who want the details. It describes **0.9.3 sources and script protocol 2**. Use the [walkthrough](WALKTHROUGH.md) for installation in order, and the [developer guide](TECHNICAL-GUIDE.md) to add your business logic.
 
 For the SAP steps, you are assumed to be able to create, activate and run programs in SE38. Here, **Basis / server administrator** means the person or team responsible for the server; this can be you if you hold the necessary permissions. The same distinction applies to email administration. [Preparation when you hold those permissions](SELF-MANAGED-SETUP.md).
 
@@ -69,7 +69,7 @@ This is a roadmap. The screens and commands are in the [step-by-step installatio
 1. **Download the project files.** Use **Code → Download ZIP** on the repository home page and unpack the entire archive. Git is not required. Use server and SAP files from the same download.
 2. **Prepare the test mailbox.** Obtain the settings above and select an existing mailbox folder for processed messages.
 3. **Prepare the server or ask its administrator.** Processing runs on the SAP application server. Two helper tools, PowerShell and `curl`, retrieve mail there; no separate integration server is needed. Basis prepares network access and a protected working folder, then gives you its full path. [Server preparation](WALKTHROUGH.md#2-prepare-the-machine-running-sap).
-4. **Install the SAP programs.** Create `ZCHE_IMAP_INSTALL` in **SE38**, load the matching source file from this project, activate it and run it. It creates the required SAP programs and tables. [SAP installation steps](WALKTHROUGH.md#31-create-the-installer-program). Then create authorization object `ZCHE_IMAP` and a role; without them the programs stop with an authorization message. [Authorization step](WALKTHROUGH.md#33-create-the-authorization-object-and-role).
+4. **Install the SAP programs.** Create `ZCHE_IMAP_INSTALL` in **SE38**, load the matching source file from this project, activate it and run it. It creates the required SAP programs and tables. [SAP installation steps](WALKTHROUGH.md#31-create-the-installer-program). Then check the standard authorizations; per-profile object `ZCHE_IMAP` is optional. [Authorization step](WALKTHROUGH.md#authorization).
 5. **Save a mailbox profile.** In `ZCHE_IMAP_CONFIG`, choose a profile name and enter your actual server, user and folder settings. For the first trial, select `ZCHE_IMAP_HANDLER_DEMO` as the handler and `MOVE` as the move method. Password source `S` means entering the password in SAP; `O` means Basis saves it on the server. **F8** saves the settings and tests the connection; saved settings alone do not prove the connection works. [Mailbox profile setup](WALKTHROUGH.md#34-set-up-a-mailbox-profile).
 
 For maintained use, create a customer package such as `ZCHE_IMAP` or use one assigned to the project. The installer currently creates its objects in the local trial area `$TMP`; saving the installer in a package does not change that. Plan [package and transport steps](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport) with Basis and development to move the objects to test and production systems.
@@ -107,12 +107,12 @@ The source targets **7.00 and later** compatibility on classical ABAP systems. T
 
 ## Access and operating boundaries
 
-Basis assigns permissions to the intended users and table authorization groups. The application checks table access with `VIEW_AUTHORITY_CHECK`; file and command permissions are additional checks. The three tables belong to table authorization group `ZCHI`: grant `S_TABU_DIS` for `ZCHI` with activity `03` (display) or `02` (change) as listed below. Create authorization object `ZCHE_IMAP` first ([walkthrough step 3.3](WALKTHROUGH.md#33-create-the-authorization-object-and-role)).
+Basis assigns permissions to the intended users and table authorization groups. The application checks table access with `VIEW_AUTHORITY_CHECK`; file and command permissions are additional checks. The three tables belong to table authorization group `ZCHI`: grant `S_TABU_DIS` for `ZCHI` with activity `03` (display) or `02` (change) as listed below. The `ZCHE_IMAP` grants below apply only if you define the optional object ([per-profile authorization](../SECURITY.md#optional-per-profile-authorization)).
 
 | Role | Required access |
 |---|---|
-| Job user | `ZCHE_IMAP` activity `16` for the profile name; display `ZCHE_IMAP_PROFILE`; change `ZCHE_IMAP_LOG`; execute `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE` through `S_LOG_COM`; read the input mail files through `S_DATASET`; handler-specific permissions. |
-| Profile administrator | `ZCHE_IMAP` activities `03` and `02` for the profile name; display/change `ZCHE_IMAP_PROFILE`; execute `ZCHE_IMAP_TEST`; write profile and credential files through `S_DATASET` for `ZCHE_IMAP_CONFIG`. |
+| Job user | `ZCHE_IMAP` activity `16` for the profile name; display `ZCHE_IMAP_PROF`; change `ZCHE_IMAP_LOG`; execute `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE` through `S_LOG_COM`; read the input mail files through `S_DATASET`; handler-specific permissions. |
+| Profile administrator | `ZCHE_IMAP` activities `03` and `02` for the profile name; display/change `ZCHE_IMAP_PROF`; execute `ZCHE_IMAP_TEST`; write profile and credential files through `S_DATASET` for `ZCHE_IMAP_CONFIG`. |
 | Monitor user | `ZCHE_IMAP` activity `03` for the profile name; display `ZCHE_IMAP_LOG`; read input/archive files for `ZCHE_IMAP_MONITOR`. Retry additionally requires activity `02` and change access to `ZCHE_IMAP_LOG`. |
 | Installer | Development permissions for the project objects and the permissions needed to maintain and test SM69 commands. Uninstall has additional cross-client checks. |
 
@@ -189,7 +189,7 @@ Check connectivity from that server. On Windows, for example:
 
 ### Windows
 
-Use Windows PowerShell 5.1 and **curl 8.0.0 or newer** whose `curl.exe --version` output includes `imaps`. Older Windows releases ship an older `curl.exe`; install a current build and pass its path with `-CurlPath`. Setup stops with a clear message if curl is older than 8. In Windows PowerShell, use `curl.exe`: `curl` can mean a different command.
+Use Windows PowerShell 5.1 and **curl 7.66.0 or newer** whose `curl.exe --version` output includes `imaps`. Windows Server 2019 ships an older `curl.exe` (7.55); install a current build and pass its path with `-CurlPath`. Setup stops with a clear message if curl is older than 7.66. In Windows PowerShell, use `curl.exe`: `curl` can mean a different command.
 
 Run this block from the repository folder in an administrator PowerShell session. At the prompts, enter the mail team's IMAP hostname and the Windows SAP account and full working folder confirmed by Basis. Blank answers stop setup.
 
@@ -222,11 +222,11 @@ Run the self-test. When prompted, enter the same full folder path you used durin
 }
 ```
 
-Success identifies `PROTOCOL 2`, `VERSION 0.9.2` and the chosen root, then ends in `OK`. An administrator's self-test is useful, but the later SAP installer check must pass under SAP's actual execution account too.
+Success identifies `PROTOCOL 2`, `VERSION 0.9.3` and the chosen root, then ends in `OK`. An administrator's self-test is useful, but the later SAP installer check must pass under SAP's actual execution account too.
 
 ### Linux
 
-Install PowerShell (`pwsh`) and **curl 8.0.0 or newer** with IMAPS support. Many SAP Linux releases ship curl 7.x in `/usr/bin`; install a newer curl and pass `--curl-path /full/path/to/curl` to setup, which writes it to `bin/policy.psd1`. Setup stops with a clear message if curl is older than 8. The generated SM69 command expects `/usr/bin/pwsh`. Confirm the actual SAP execution user; `a4hadm` is an example.
+Install PowerShell (`pwsh`) and **curl 7.66.0 or newer** with IMAPS support; SLES 15 provides it in `/usr/bin`. For another curl, pass `--curl-path /full/path/to/curl` to setup, which writes it to `bin/policy.psd1`. Setup stops with a clear message if curl is older than 7.66. The generated SM69 command expects `/usr/bin/pwsh`. Confirm the actual SAP execution user; `a4hadm` is an example.
 
 Run this block in Bash from the repository folder. Obtain the hostname from the mail team and the Linux SAP execution user and full working folder from Basis; enter your own values at each prompt.
 
@@ -255,7 +255,7 @@ Test with the SAP execution user and chosen root. Answer both prompts with the L
 }
 ```
 
-The result must identify protocol `2`, version `0.9.2` and the chosen root, then end in `OK`. It checks local prerequisites; SAP installation and mailbox access are checked later.
+The result must identify protocol `2`, version `0.9.3` and the chosen root, then end in `OK`. It checks local prerequisites; SAP installation and mailbox access are checked later.
 
 ### Certificates and handover
 
@@ -392,7 +392,7 @@ Version 0.9.0 changes the script protocol, profile file names and revision stora
 4. Check the selected host, roles and profiles. Re-save profiles and re-enter source `S` passwords. Recreate source `O` credentials using the full `SID_CLIENT_PROFILE` key.
 5. Repeat server, connection, read-only list, normal demo, error/retry and pending-move recovery checks. Validate the job user and business handler before restarting jobs.
 
-**Within 0.9.x** (for example 0.9.1 to 0.9.2) the protocol and storage do not change. After steps 1–3, replace the source of `ZCHE_IMAP_INSTALL` in SE38 with the new file, activate it and run it with **Programs**, **Overwrite existing programs (update)** and **Server check** selected. Without **Overwrite** the installer stops because the programs differ. A rerun keeps the existing handler prefix and retry limit.
+**Within 0.9.x** (for example 0.9.2 to 0.9.3) the protocol and storage do not change. After steps 1–3, replace the source of `ZCHE_IMAP_INSTALL` in SE38 with the new file, activate it and run it with **Programs**, **Overwrite existing programs (update)** and **Server check** selected. Without **Overwrite** the installer stops because the programs differ. A rerun keeps the existing handler prefix and retry limit.
 
 A profile with mail history cannot be redirected to another mailbox or deleted. Deactivate it and create a new profile when mailbox identity changes.
 
@@ -410,7 +410,7 @@ Before handling real business mail, implement and validate your business rules. 
 Profile and credential revisions are not automatically removed because an in-flight operation may still need them. Profile deletion attempts to remove current configuration/credential files and warns that older revisions require administrator cleanup.
 
 1. Stop the profile's scheduled jobs and wait for foreground processing to finish. Coordinate with systems/clients sharing the host.
-2. Confirm `REVISION`, `CREDSRC` and `CREDREV` in `ZCHE_IMAP_PROFILE` for the intended system/client. Do not display or log the password.
+2. Confirm `REVISION`, `CREDSRC` and `CREDREV` in `ZCHE_IMAP_PROF` for the intended system/client. Do not display or log the password.
 3. Preserve the active `conf/KEY_REVISION.conf` and its referenced credential: `secret/KEY_CREDREV.cred` for `S`, or `secret/KEY.cred` for `O`. Do not assume a file left by a failed save is active.
 4. Remove only exact old revision filenames confirmed unused and unnecessary for rollback, following your retention policy. Do not delete the entire `conf` or `secret` directory. Do not reuse a profile name with SAP processing history.
 5. Repeat connection and list-only tests before restarting jobs. Old `tmp` files left by terminated processes also need separate ownership/use checks; do not delete pending `in`/`done` data.

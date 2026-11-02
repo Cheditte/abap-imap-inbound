@@ -130,7 +130,7 @@ Aşağıdaki rapor `P_PROF` alanında profil sorar. `ZCHE_IMAP_CONFIG` içinde g
 ```abap
 REPORT zche_imap_start_demo.
 
-PARAMETERS p_prof LIKE zche_imap_profile-profile OBLIGATORY.
+PARAMETERS p_prof LIKE zche_imap_prof-profile OBLIGATORY.
 
 START-OF-SELECTION.
 SUBMIT zche_imap_inbound

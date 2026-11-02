@@ -1,8 +1,14 @@
 # Security and operations / Yetki ve işletim
 
-## Provision before activation / Aktivasyondan önce
+## Optional per-profile authorization
 
-In SU20 create authorization field `ZCHE_PROF` with data element `ZCHE_IMAP_PROFID` (created by the installer; CHAR20, the profile name such as `INVOICE`). In SU21 create customer object `ZCHE_IMAP` with `ZCHE_PROF` and standard `ACTVT`. Assign explicit profile values through PFCG; a missing object or grant fails closed.
+By default the programs rely on standard SAP authorizations (`S_TABU_DIS`, `S_LOG_COM`, `S_DATASET`). Anyone with display access to the log table can then see every profile's mail. If different teams must see only their own mailbox, define the optional object; the programs detect it and check it from then on:
+
+1. SU20: create authorization field `ZCHE_PROF` with data element `ZCHE_IMAP_PROFID` (created by the installer; the profile name such as `INVOICE`).
+2. SU21: create authorization object `ZCHE_IMAP` with fields `ZCHE_PROF` and `ACTVT`; permitted activities `02`, `03`, `16`.
+3. PFCG: grant profile names and activities per role. Once the object exists, a user without a matching grant is refused.
+
+Varsayılan olarak programlar standart SAP yetkilerini kullanır; log tablosunu görebilen herkes bütün profillerin maillerini görür. Profil bazında ayrım gerekiyorsa SU21'de `ZCHE_IMAP` nesnesini tanımlayın; programlar bundan sonra bu nesneyi denetler.
 
 | Activity | Permission / İzin |
 |---|---|

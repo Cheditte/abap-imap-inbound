@@ -1,6 +1,6 @@
 * Project: abap-imap-inbound
 *---------------------------------------------------------------
-* ZCHE_IMAP_INSTALL - abap-imap-inbound installer (v0.9.2)
+* ZCHE_IMAP_INSTALL - abap-imap-inbound installer (v0.9.3)
 *
 * Usage: in SE38 create an executable program named ZCHE_IMAP_INSTALL
 * (local object, $TMP), paste this whole file, activate it and
@@ -8,7 +8,7 @@
 *
 * Creates ($TMP):
 *   ZCHE_IMAP_* domains and data elements (only our own DDIC)
-*   ZCHE_IMAP_PARAM, ZCHE_IMAP_PROFILE, ZCHE_IMAP_LOG          tables
+*   ZCHE_IMAP_PARAM, ZCHE_IMAP_PROF, ZCHE_IMAP_LOG          tables
 *   ZCHE_IMAP_S_MAIL, ZCHE_IMAP_S_ATT, ZCHE_IMAP_S_LINE        structures
 *   ZCHE_IMAP_COMMON, ZCHE_IMAP_IO                         includes
 *   ZCHE_IMAP_INBOUND, ZCHE_IMAP_CONFIG, ZCHE_IMAP_MONITOR     programs
@@ -103,10 +103,11 @@ DATA: gt_src    TYPE STANDARD TABLE OF abapsource,
       gv_initerr(1) TYPE c,
       gv_cmdwrite(1) TYPE c,
       gv_lock(1) TYPE c,
+      gv_setup_lock(1) TYPE c,
       gv_newinb(1) TYPE c,
       gv_same   TYPE i.
 
-CONSTANTS gc_version(10) TYPE c VALUE '0.9.2'.
+CONSTANTS gc_version(10) TYPE c VALUE '0.9.3'.
 
 * Embedded source lines: src adds a new line, cnt continues the
 * last line (for lines longer than 72 characters). def adds a
@@ -195,7 +196,8 @@ INITIALIZATION.
   PERFORM load_params.
 
 START-OF-SELECTION.
-  CLEAR: gv_err, gv_lock, gv_cmdwrite, gv_newinb, gv_same.
+  CLEAR: gv_err, gv_lock, gv_setup_lock, gv_cmdwrite,
+         gv_newinb, gv_same.
   REFRESH: gt_change, gt_backup, gt_textbak, gt_cmdbak.
   PERFORM parse_defs.
   PERFORM check_authority.
@@ -209,13 +211,20 @@ START-OF-SELECTION.
     STOP.
   ENDIF.
   IF NOT p_del IS INITIAL.
-    PERFORM uninstall.
+    PERFORM profile_lock.
+    IF gv_err IS INITIAL.
+      PERFORM uninstall.
+    ENDIF.
   ELSE.
     PERFORM install.
   ENDIF.
   IF NOT gv_lock IS INITIAL.
     CALL FUNCTION 'DEQUEUE_E_TABLE'
-      EXPORTING tabname = 'ZCHE_IMAP_PROFILE' _scope = '1'.
+      EXPORTING tabname = 'ZCHE_IMAP_PROF' _scope = '1'.
+  ENDIF.
+  IF NOT gv_setup_lock IS INITIAL.
+    CALL FUNCTION 'DEQUEUE_E_TABLE'
+      EXPORTING tabname = 'ZCHE_IMAP_SETUP' _scope = '1'.
   ENDIF.
 
 *---------------------------------------------------------------
@@ -235,6 +244,9 @@ FORM install.
   ENDIF.
   IF NOT p_ddic IS INITIAL.
     PERFORM create_ddic.
+  ENDIF.
+  IF gv_err IS INITIAL.
+    PERFORM profile_lock.
   ENDIF.
   IF NOT p_prg IS INITIAL AND gv_err IS INITIAL.
     PERFORM create_programs.
@@ -268,7 +280,7 @@ FORM install.
   ENDIF.
 ENDFORM.
 
-* A generic table lock conflicts with every scoped profile lock.
+* Serialize installers without locking a DDIC object being created.
 * Scope 1 survives commits made by repository/DDIC APIs.
 FORM install_lock.
   DATA lv_ok(1) TYPE c.
@@ -284,9 +296,24 @@ FORM install_lock.
     EXIT.
   ENDIF.
   CALL FUNCTION 'ENQUEUE_E_TABLE'
-    EXPORTING tabname = 'ZCHE_IMAP_PROFILE' _scope = '1'
+    EXPORTING tabname = 'ZCHE_IMAP_SETUP' _scope = '1'
     EXCEPTIONS OTHERS = 1.
   IF sy-subrc <> 0.
+    gv_err = 'X'.
+  ELSE.
+    gv_setup_lock = 'X'.
+  ENDIF.
+ENDFORM.
+
+* Profile jobs and configuration use scoped locks on this table.
+* Take the generic lock only after DDIC maintenance; DDIF_TABL_PUT
+* must be able to save the table definition first.
+FORM profile_lock.
+  CALL FUNCTION 'ENQUEUE_E_TABLE'
+    EXPORTING tabname = 'ZCHE_IMAP_PROF' _scope = '1'
+    EXCEPTIONS OTHERS = 1.
+  IF sy-subrc <> 0.
+    WRITE: / 'Stop active ZCHE_IMAP jobs/configuration and retry.'.
     gv_err = 'X'.
   ELSE.
     gv_lock = 'X'.
@@ -437,7 +464,7 @@ FORM next_steps.
   SKIP.
   WRITE: / 'Next steps:',
          / '  1. ZCHE_IMAP_CONFIG: mailbox profile, password, F8 test',
-         / '  2. ZCHE_IMAP_INBOUND: first with "Test mode", then SM36 job',
+         / '  2. ZCHE_IMAP_INBOUND: first with "List only", then SM36',
          / '  3. ZCHE_IMAP_MONITOR: processed mails, attachments, errors'.
   SKIP.
   WRITE: / 'Required authorizations (PFCG):',
@@ -445,7 +472,10 @@ FORM next_steps.
            'S_DATASET ZCHE_IMAP_INBOUND read',
          / '  Administrator   : S_LOG_COM ZCHE_IMAP_TEST; S_DATASET',
            'ZCHE_IMAP_CONFIG write (conf, secret)',
-         / '  Monitoring      : S_DATASET ZCHE_IMAP_MONITOR read'.
+         / '  Monitoring      : S_DATASET ZCHE_IMAP_MONITOR read',
+         / '  Tables          : S_TABU_DIS group ZCHI',
+         / '  Optional        : define object ZCHE_IMAP in SU21 for',
+           'per-profile access (see SECURITY.md)'.
 ENDFORM.
 
 *---------------------------------------------------------------
@@ -609,6 +639,12 @@ FORM parse_defs.
           MODIFY gt_dtel FROM ls_dtel INDEX sy-tabix.
         ENDIF.
       WHEN 'T'.
+        IF lv_2 = 'TRANSP' AND strlen( lv_1 ) > 16.
+          WRITE: / 'Database table name exceeds 16 characters:',
+                   lv_1.
+          gv_initerr = 'X'.
+          CONTINUE.
+        ENDIF.
         ls_tab-name  = lv_1.
         ls_tab-class = lv_2.
         ls_tab-text  = lv_3.
@@ -1749,7 +1785,19 @@ FORM create_command USING iv_name   TYPE c
     ENDIF.
   ENDIF.
   CONCATENATE lv_script 'bin' lv_sep 'imap.ps1' INTO lv_script.
-  CONCATENATE '"' lv_script '"' INTO lv_quoted.
+* SAPXPG passes Unix parameters without a shell, so quotes would
+* reach pwsh literally. Quote only on Windows; no spaces on Unix.
+  IF lv_sep = '/'.
+    lv_len = STRLEN( lv_script ).
+    IF lv_script(lv_len) CA ' '.
+      WRITE: / 'Server folder must not contain spaces on Unix.'.
+      gv_err = 'X'.
+      EXIT.
+    ENDIF.
+    lv_quoted = lv_script.
+  ELSE.
+    CONCATENATE '"' lv_script '"' INTO lv_quoted.
+  ENDIF.
 * Reserve the largest valid additional argument block (61 chars)
 * in the old SXPG 128-character combined parameter limit.
   lv_len = STRLEN( iv_pre ) + STRLEN( lv_quoted ) +
@@ -2009,7 +2057,7 @@ FORM guard_uninstall.
     gv_err = 'X'.
     EXIT.
   ENDIF.
-  lv_table = 'ZCHE_IMAP_PROFILE'.
+  lv_table = 'ZCHE_IMAP_PROF'.
   SELECT SINGLE mandt FROM (lv_table) CLIENT SPECIFIED
     INTO lv_client WHERE mandt <> sy-mandt AND active = 'X'.
   IF sy-subrc = 0.
@@ -2195,35 +2243,35 @@ FORM fill_defs.
   def 'F|ZCHE_IMAP_PARAM|PARAM|X|ZCHE_IMAP_PARNAME'.
   def 'F|ZCHE_IMAP_PARAM|PVALUE|-|ZCHE_IMAP_PARVAL'.
 
-  def 'T|ZCHE_IMAP_PROFILE|TRANSP|IMAP mailbox profiles'.
-  def 'F|ZCHE_IMAP_PROFILE|MANDT|X|MANDT'.
-  def 'F|ZCHE_IMAP_PROFILE|PROFILE|X|ZCHE_IMAP_PROFID'.
-  def 'F|ZCHE_IMAP_PROFILE|DESCR|-|ZCHE_IMAP_DESCR'.
-  def 'F|ZCHE_IMAP_PROFILE|ACTIVE|-|ZCHE_IMAP_ACTIVE'.
-  def 'F|ZCHE_IMAP_PROFILE|HOST|-|ZCHE_IMAP_HOST'.
-  def 'F|ZCHE_IMAP_PROFILE|PORT|-|ZCHE_IMAP_PORT'.
-  def 'F|ZCHE_IMAP_PROFILE|SECURITY|-|ZCHE_IMAP_SECURITY'.
-  def 'F|ZCHE_IMAP_PROFILE|VERIFY|-|ZCHE_IMAP_VERIFY'.
-  def 'F|ZCHE_IMAP_PROFILE|USERNAME|-|ZCHE_IMAP_USERNAME'.
-  def 'F|ZCHE_IMAP_PROFILE|CREDSRC|-|ZCHE_IMAP_CREDSRC'.
-  def 'F|ZCHE_IMAP_PROFILE|PWDAT|-|ZCHE_IMAP_PWDAT'.
-  def 'F|ZCHE_IMAP_PROFILE|PWUSR|-|ZCHE_IMAP_PWUSR'.
-  def 'F|ZCHE_IMAP_PROFILE|MAILBOX|-|ZCHE_IMAP_MAILBOX'.
-  def 'F|ZCHE_IMAP_PROFILE|DONEBOX|-|ZCHE_IMAP_DONEBOX'.
-  def 'F|ZCHE_IMAP_PROFILE|MOVEMODE|-|ZCHE_IMAP_MOVEMODE'.
-  def 'F|ZCHE_IMAP_PROFILE|HPROG|-|ZCHE_IMAP_HPROG'.
-  def 'F|ZCHE_IMAP_PROFILE|HFORM|-|ZCHE_IMAP_HFORM'.
-  def 'F|ZCHE_IMAP_PROFILE|MAXMAIL|-|ZCHE_IMAP_MAXMAIL'.
-  def 'F|ZCHE_IMAP_PROFILE|MAXMB|-|ZCHE_IMAP_MAXMB'.
-  def 'F|ZCHE_IMAP_PROFILE|TIMEOUT|-|ZCHE_IMAP_TIMEOUT'.
-  def 'F|ZCHE_IMAP_PROFILE|RETDAYS|-|ZCHE_IMAP_RETDAYS'.
-  def 'F|ZCHE_IMAP_PROFILE|CRDAT|-|ZCHE_IMAP_CRDAT'.
-  def 'F|ZCHE_IMAP_PROFILE|CRUSR|-|ZCHE_IMAP_CRUSR'.
-  def 'F|ZCHE_IMAP_PROFILE|CHDAT|-|ZCHE_IMAP_CHDAT'.
-  def 'F|ZCHE_IMAP_PROFILE|CHTIM|-|ZCHE_IMAP_CHTIM'.
-  def 'F|ZCHE_IMAP_PROFILE|CHUSR|-|ZCHE_IMAP_CHUSR'.
-  def 'F|ZCHE_IMAP_PROFILE|REVISION|-|ZCHE_IMAP_REVISION'.
-  def 'F|ZCHE_IMAP_PROFILE|CREDREV|-|ZCHE_IMAP_CREDREV'.
+  def 'T|ZCHE_IMAP_PROF|TRANSP|IMAP mailbox profiles'.
+  def 'F|ZCHE_IMAP_PROF|MANDT|X|MANDT'.
+  def 'F|ZCHE_IMAP_PROF|PROFILE|X|ZCHE_IMAP_PROFID'.
+  def 'F|ZCHE_IMAP_PROF|DESCR|-|ZCHE_IMAP_DESCR'.
+  def 'F|ZCHE_IMAP_PROF|ACTIVE|-|ZCHE_IMAP_ACTIVE'.
+  def 'F|ZCHE_IMAP_PROF|HOST|-|ZCHE_IMAP_HOST'.
+  def 'F|ZCHE_IMAP_PROF|PORT|-|ZCHE_IMAP_PORT'.
+  def 'F|ZCHE_IMAP_PROF|SECURITY|-|ZCHE_IMAP_SECURITY'.
+  def 'F|ZCHE_IMAP_PROF|VERIFY|-|ZCHE_IMAP_VERIFY'.
+  def 'F|ZCHE_IMAP_PROF|USERNAME|-|ZCHE_IMAP_USERNAME'.
+  def 'F|ZCHE_IMAP_PROF|CREDSRC|-|ZCHE_IMAP_CREDSRC'.
+  def 'F|ZCHE_IMAP_PROF|PWDAT|-|ZCHE_IMAP_PWDAT'.
+  def 'F|ZCHE_IMAP_PROF|PWUSR|-|ZCHE_IMAP_PWUSR'.
+  def 'F|ZCHE_IMAP_PROF|MAILBOX|-|ZCHE_IMAP_MAILBOX'.
+  def 'F|ZCHE_IMAP_PROF|DONEBOX|-|ZCHE_IMAP_DONEBOX'.
+  def 'F|ZCHE_IMAP_PROF|MOVEMODE|-|ZCHE_IMAP_MOVEMODE'.
+  def 'F|ZCHE_IMAP_PROF|HPROG|-|ZCHE_IMAP_HPROG'.
+  def 'F|ZCHE_IMAP_PROF|HFORM|-|ZCHE_IMAP_HFORM'.
+  def 'F|ZCHE_IMAP_PROF|MAXMAIL|-|ZCHE_IMAP_MAXMAIL'.
+  def 'F|ZCHE_IMAP_PROF|MAXMB|-|ZCHE_IMAP_MAXMB'.
+  def 'F|ZCHE_IMAP_PROF|TIMEOUT|-|ZCHE_IMAP_TIMEOUT'.
+  def 'F|ZCHE_IMAP_PROF|RETDAYS|-|ZCHE_IMAP_RETDAYS'.
+  def 'F|ZCHE_IMAP_PROF|CRDAT|-|ZCHE_IMAP_CRDAT'.
+  def 'F|ZCHE_IMAP_PROF|CRUSR|-|ZCHE_IMAP_CRUSR'.
+  def 'F|ZCHE_IMAP_PROF|CHDAT|-|ZCHE_IMAP_CHDAT'.
+  def 'F|ZCHE_IMAP_PROF|CHTIM|-|ZCHE_IMAP_CHTIM'.
+  def 'F|ZCHE_IMAP_PROF|CHUSR|-|ZCHE_IMAP_CHUSR'.
+  def 'F|ZCHE_IMAP_PROF|REVISION|-|ZCHE_IMAP_REVISION'.
+  def 'F|ZCHE_IMAP_PROF|CREDREV|-|ZCHE_IMAP_CREDREV'.
 
   def 'T|ZCHE_IMAP_LOG|TRANSP|IMAP inbound mail log'.
   def 'F|ZCHE_IMAP_LOG|MANDT|X|MANDT'.

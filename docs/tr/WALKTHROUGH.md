@@ -18,7 +18,7 @@ Bu rehberde önce posta hesabını, SAP sunucusunu ve SAP programlarını hazır
 | Kendi iş adımımı eklemek | [Geliştirici rehberi](TECHNICAL-GUIDE.md) | Hazır örnek yerine kendi doğrulanmış ABAP işleminiz kullanılır. |
 | Otomatik çalıştırmak | [Yol C — Varyant ve job](#otomatik) | Doğru sunucuda çalışan işin log ve spool'u incelenir. |
 
-Rehber `v0.9.2` sürüm adayını anlatır. [Doğrulama kaydı](../../VALIDATION.md).
+Rehber `v0.9.3` sürümünü anlatır. [Doğrulama kaydı](../../VALIDATION.md).
 
 SAP ekran örneklerinde menüler İngilizcedir; adımlarda Türkçe karşılıkları da verilir. Görseller SE38 ve SM36 hazırlık ekranlarını gösterir. [Görsellerin kapsamı](../screenshots/README.md).
 
@@ -55,13 +55,13 @@ SE38'de program oluşturup etkinleştirebilen bir SAP geliştiricisi olduğunuz 
 | Hazırlık | Ne işe yarar? | Beklenen çıktı |
 |---|---|---|
 | PowerShell | Projenin sunucu komutlarını çalıştırır. | Windows'ta 5.1; Linux'ta 7.4+ hazır. |
-| curl | Posta sunucusuna şifreli IMAP bağlantısı kurar. | Sürüm 8.0.0+ ve `imaps` desteği. |
+| curl | Posta sunucusuna şifreli IMAP bağlantısı kurar. | Sürüm 7.66.0+ ve `imaps` desteği. |
 | Proje dosyaları ve klasör | Mail, ek ve bağlantı dosyalarını tutar. | İki betik aynı sürümde; klasör ve dosya izinleri hazırlanmış. |
 | Ağ ve sertifika | SAP sunucusunun posta hizmetine erişmesini sağlar. | Gerçek posta adresine/portuna erişim; sertifika güveni hazır. |
 
 Yönetim yetkiniz varsa [RDP/SSH ve dosya aktarımı rehberini](SELF-MANAGED-SETUP.md) izleyin. Başka ekip hazırlayacaksa tabloyu onlara iletin. [Windows](TECHNICAL-REFERENCE.md#windows) veya [Linux kurulum komutlarını](TECHNICAL-REFERENCE.md#linux) SAP makinesinde çalıştırın.
 
-**Devam koşulu:** Sunucu kontrolü `PROTOCOL 2`, `VERSION 0.9.2` ve doğru klasörü gösterip `OK` ile bitmeli. Kullanılacak **SAP uygulama sunucusunu ve tam çalışma klasörü yolunu** not edin. Sonraki adımlarda aynı sunucuyu kullanın.
+**Devam koşulu:** Sunucu kontrolü `PROTOCOL 2`, `VERSION 0.9.3` ve doğru klasörü gösterip `OK` ile bitmeli. Kullanılacak **SAP uygulama sunucusunu ve tam çalışma klasörü yolunu** not edin. Sonraki adımlarda aynı sunucuyu kullanın.
 
 <a id="kurulum"></a>
 ## 3. SAP ERP içindeki kurulumu yapın
@@ -106,16 +106,13 @@ Installer, oluşturduğu nesneleri `$TMP`'ye koyar; installer'ı kendi paketiniz
 
 <a id="yetkiler"></a>
 <a id="33-yetki-nesnesini-ve-rolü-oluşturun"></a>
-### 3.3. Yetki nesnesini ve rolü hazırlayın
+### 3.3. Yetkileri kontrol edin
 
-Programların profil bazında çalışmasına izin verirsiniz:
+Programlar standart SAP yetkilerini kullanır: `ZCHI` tablo grubu için `S_TABU_DIS`, `ZCHE_IMAP_*` SM69 komutları için `S_LOG_COM` ve çalışma klasörü için `S_DATASET`. Geliştirici kullanıcısında genellikle bulunurlar; diğer kullanıcılar ve job kullanıcısı için [yetki tablosuna](../../SECURITY.md) bakın.
 
-1. **SU20:** `ZCHE_PROF` yetki alanını, installer'ın oluşturduğu `ZCHE_IMAP_PROFID` veri elemanıyla oluşturun.
-2. **SU21:** `ZCHE_IMAP` yetki nesnesine `ZCHE_PROF` ve `ACTVT` alanlarını ekleyin.
-3. **PFCG:** seçtiğiniz profil adı için `03` görüntüleme, `02` profil bakımı/yeniden işleme, `16` çalıştırma aktivitelerini gereken kullanıcılara verin.
-4. Rolün tablo, komut ve dosya yetkilerini [yetki tablosuna](../../SECURITY.md) göre tamamlayın. Özellikle `S_TABU_DIS`, `S_LOG_COM` ve `S_DATASET` gerekir. Rolü kullanıcıya atayıp kullanıcı karşılaştırmasını tamamlayın.
+**İsteğe bağlı — profil bazında ayrım:** Farklı ekiplerin yalnızca kendi posta kutusunu görmesi gerekiyorsa SU21'de `ZCHE_IMAP` yetki nesnesini tanımlayın. Programlar bunu kendiliğinden denetler. [Kurulum adımları](../../SECURITY.md#optional-per-profile-authorization).
 
-Yetki yönetimi başka ekipteyse bu adımı onlarla yapın. **Devam koşulu:** kendi kullanıcınızın ve ileride job kullanıcısının gerekli yetkileri var.
+**Devam koşulu:** kendi kullanıcınızın ve job kullanıcısının standart yetkileri var.
 
 <a id="34-posta-kutusu-profilini-tanımlayın"></a>
 ### 3.4. Posta profilini kaydedin
@@ -216,7 +213,7 @@ Bu kontrolü gerçek job kullanıcısı ve seçilen sunucuda tamamladıktan sonr
 
 İlk kurulum adımlarını doğrudan tekrar etmeyin. İşleri durdurup [güncelleme prosedürünü](TECHNICAL-REFERENCE.md#8-mevcut-kurulumu-güncelleyin) izleyin.
 
-`0.9.0 / 0.9.1 → 0.9.2` için SAP'deki installer kaynağını güncel dosyayla değiştirip etkinleştirin; sunucudaki iki betiği aynı sürüme güncelleyin. Yedekleme ve inceleme sonrasında **Programs + Overwrite existing programs (update) + Server check** seçin; gereken SM69/DDIC adımlarını mevcut kurulumunuza göre değerlendirin. Overwrite yerel kaynak değişikliklerini değiştirebilir. Sunucu kontrolü ve profil kontrolü başarılı olmadan işleri yeniden açmayın.
+`0.9.x → 0.9.3` için SAP'deki installer kaynağını güncel dosyayla değiştirip etkinleştirin; sunucudaki iki betiği aynı sürüme güncelleyin. Yedekleme ve inceleme sonrasında **Programs + Overwrite existing programs (update) + Server check** seçin; gereken SM69/DDIC adımlarını mevcut kurulumunuza göre değerlendirin. Overwrite yerel kaynak değişikliklerini değiştirebilir. Sunucu kontrolü ve profil kontrolü başarılı olmadan işleri yeniden açmayın.
 
 Eski `ZIMAP_` ve yeni `ZCHE_IMAP_` işleri aynı kutuyu birlikte işlememeli; eski geçmişin otomatik taşındığını varsaymayın.
 

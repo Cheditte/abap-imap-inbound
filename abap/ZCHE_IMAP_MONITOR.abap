@@ -33,8 +33,8 @@ DATA: gt_log       TYPE STANDARD TABLE OF zche_imap_log,
       gv_auth(1)   TYPE c.
 DATA: gt_allowed TYPE RANGE OF zche_imap_log-profile,
       gs_allowed LIKE LINE OF gt_allowed,
-      gt_profiles TYPE STANDARD TABLE OF zche_imap_profile,
-      gs_profile TYPE zche_imap_profile.
+      gt_profiles TYPE STANDARD TABLE OF zche_imap_prof,
+      gs_profile TYPE zche_imap_prof.
 
 INITIALIZATION.
   s_date-sign   = 'I'.
@@ -57,7 +57,7 @@ START-OF-SELECTION.
     WRITE: / 'Setup missing or this is the wrong execution host.'.
     EXIT.
   ENDIF.
-  SELECT * FROM zche_imap_profile INTO TABLE gt_profiles
+  SELECT * FROM zche_imap_prof INTO TABLE gt_profiles
     WHERE profile IN s_prof.
   LOOP AT gt_profiles INTO gs_profile.
     PERFORM profile_auth USING gs_profile-profile '03'

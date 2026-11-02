@@ -52,7 +52,7 @@ $PSVersionTable.PSVersion
 curl.exe --version
 ```
 
-Windows PowerShell **5.1** olmalı. Bu projenin Windows SAP komutu `powershell.exe` kullanır; ayrıca PowerShell 7 kurmak bu kontrolün yerini tutmaz. curl **8.0.0 veya üzeri** olmalı (çıktının ilk satırı) ve **Protocols** satırında `imaps` bulunmalı. Hazır `curl.exe` daha eskiyse güncel bir sürüm kurup yolunu kuruluma `-CurlPath` ile verin. Windows PowerShell'de `curl.exe` yazın; `curl` başka bir komut olabilir.
+Windows PowerShell **5.1** olmalı. Bu projenin Windows SAP komutu `powershell.exe` kullanır; ayrıca PowerShell 7 kurmak bu kontrolün yerini tutmaz. curl **7.66.0 veya üzeri** olmalı (çıktının ilk satırı) ve **Protocols** satırında `imaps` bulunmalı. Hazır `curl.exe` daha eskiyse güncel bir sürüm kurup yolunu kuruluma `-CurlPath` ile verin. Windows PowerShell'de `curl.exe` yazın; `curl` başka bir komut olabilir.
 
 Eksik veya uygun olmayan araç varsa işletim sisteminize uygun, onaylı kurulum yolunu kullanın: [Windows PowerShell hazırlığı](https://learn.microsoft.com/en-us/powershell/scripting/windows-powershell/install/installing-windows-powershell), [curl Windows indirmeleri](https://curl.se/windows/). Windows'un sistem dosyalarının üzerine başka bir curl kopyalamayın. Ayrı konum kullanırsanız sunucu kurulumundaki `-CurlPath` ayarını gerçek dosya yoluna göre verin.
 
@@ -83,7 +83,7 @@ command -v pwsh
 curl --version
 ```
 
-**PowerShell 7** ve `imaps` destekli **curl 8.0.0 veya üzeri** gerekir. Birçok SAP Linux sürümünde curl 7.x gelir; daha yeni bir curl kurup yolunu kuruluma `--curl-path` ile verin. Bu projede SAP'nin başlattığı komut `/usr/bin/pwsh` yolunu kullanır; bu yolun kurulumunuzda mevcut ve çalışır olduğunu doğrulayın.
+**PowerShell 7** ve `imaps` destekli **curl 7.66.0 veya üzeri** gerekir. SLES 15 uygun bir sürümle gelir; sizinki daha eskiyse yeni bir curl kurup yolunu kuruluma `--curl-path` ile verin. Bu projede SAP'nin başlattığı komut `/usr/bin/pwsh` yolunu kullanır; bu yolun kurulumunuzda mevcut ve çalışır olduğunu doğrulayın.
 
 PowerShell eksikse Linux dağıtımınızı ve sürümünüzü belirleyip [Microsoft'un o dağıtım için kurulum adımlarını](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux) izleyin. curl için dağıtımın onaylı paket yöneticisini kullanın; [curl'ün dağıtım paketleri](https://curl.se/download.html) başvuru sağlar. Başka dağıtıma ait komutları kopyalamayın; uygun olmayan bir işletim sistemini bu proje için yerinde yükseltmeyin.
 
@@ -123,7 +123,7 @@ Ardından işletim sisteminize uygun adımları uygulayın:
 - [Windows sunucu kurulum bloğu ve öz test](TECHNICAL-REFERENCE.md#windows)
 - [Linux sunucu kurulum bloğu ve öz test](TECHNICAL-REFERENCE.md#linux)
 
-Bu bloklar gerçek IMAP sunucusunu, SAP servis hesabını ve seçtiğiniz çalışma klasörünü sorar. Korunan klasörleri ve dosya izinlerini hazırlar; `imap.ps1` ile `mime.ps1` dosyalarını birlikte yerleştirir. Öz testin `OK` ile bittiğini, protokol `2` ve sürüm `0.9.2` bildirdiğini kontrol edin. Kullanılan klasörün tam yolunu kaydedin; SAP kurulum ekranında da aynısını kullanacaksınız.
+Bu bloklar gerçek IMAP sunucusunu, SAP servis hesabını ve seçtiğiniz çalışma klasörünü sorar. Korunan klasörleri ve dosya izinlerini hazırlar; `imap.ps1` ile `mime.ps1` dosyalarını birlikte yerleştirir. Öz testin `OK` ile bittiğini, protokol `2` ve sürüm `0.9.3` bildirdiğini kontrol edin. Kullanılan klasörün tam yolunu kaydedin; SAP kurulum ekranında da aynısını kullanacaksınız.
 
 Posta sunucusuna bağlantı **SAP makinesinden** kurulabilmelidir. Sertifika hatası varsa gerçek sunucu adını ve güvenilen sertifikaları düzeltin; sertifika doğrulamasını kapatmayın.
 

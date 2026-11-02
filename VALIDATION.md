@@ -1,21 +1,19 @@
 # Validation / Doğrulama
 
-This record applies to the 0.9.2 release candidate. On 3 November 2026, the project owner confirmed running v0.9.2 in SAP and seeing results. This is an owner-reported manual result; the exact SAP release and individual scenario outcomes were not supplied with that confirmation. The date records the confirmation, not necessarily the execution date.
-
-Earlier code reviews found two defects: in 0.9.0 the installer never wrote the handler prefix, so no profile could be saved (fixed in 0.9.1), and a failed profile save could be reported as successful (fixed in 0.9.2). Screenshots of earlier editions were removed because they do not show this version. The current [preparation screenshots](docs/screenshots/README.md) illustrate SE38 and SM36 steps, not the reported runtime results.
+This record applies to v0.9.3. Version 0.9.3 is the first `ZCHE_IMAP_` release that was installed and run in SAP. Earlier 0.9.x releases could not be installed: the profile table name exceeded the ABAP Dictionary limit, an embedded line exceeded 72 columns, a parameter type did not match, and the Unix SM69 command quoted the script path. 0.9.3 fixes these, as found during the installation below.
 
 | Check / Kontrol | System and version | Date | Result |
 |---|---|---|---|
-| SAP execution of v0.9.2 | Owner's SAP system; exact SAP release not recorded | 2026-11-03 (confirmation) | Owner confirmed running this version and seeing results. |
-| ABAP Unit | Classic test classes included in COMMON | — | Test result not recorded; not inferred from the manual confirmation. |
-| One mail end to end in SAP | Target SAP and test mailbox | — | Separate outcomes for listing, body/attachment access and movement not recorded. |
-| Restricted-user background job | Target SAP | — | Result not recorded. |
-| ABAP syntax and installer build | abaplint 2.120.92 v700; limited DDIC stand-ins; GitHub Actions | 2026-11-02 | Passed for 0.9.2. Does not validate SAP API signatures or runtime. |
-| Windows PowerShell 5.1 and 7 | Parser, codepage and retention regressions; Windows CI | 2026-11-02 | Passed for 0.9.2. |
-| Linux helper | Linux CI + disposable GreenMail 2.1.14 | 2026-11-02 | Passed for 0.9.2. |
-| Earlier edition in SAP | A4H (SAP_BASIS 7.58), `ZIMAP_` objects before the rename | before 2026-11-02 | Owner processed mail, viewed it in the monitor and opened attachments. Does not cover the 0.9.x changes. |
-| Old curl 7.55.1 | Unsupported | 2026-11-02 | Rejected by the version check; setup requires curl 8.0.0 or newer. |
+| SAP installation | SAP ABAP Platform 2025 Trial (A4H/001), SAP_BASIS 816, Linux (SLES), Unicode | 2026-11-03 | `Installation complete.`: DDIC objects, programs, syntax checks, SM69 commands and server check. Handler prefix and retry limit written to `ZCHE_IMAP_PARAM`. |
+| Profile and connection test | Same system; GreenMail 2.1.14, IMAPS, password source `S` | 2026-11-03 | Profile saved; connection test passed. Optional `ZCHE_IMAP` object not defined, so standard authorizations applied. |
+| One mail end to end in SAP | Same system and mailbox | 2026-11-03 | List only showed the messages; two test mails processed with status `S` and moved to the processed folder. Body (Turkish characters) and attachments (PDF, JPEG) opened from the monitor. |
+| Host scripts | A4H host: PowerShell 7.4.6, curl 7.66.0 (SLES 15), GreenMail 2.1.14 | 2026-11-03 | IMAP test suite passed: list, nonconsecutive UIDs, size limit, bad MIME, cleanup, TLS policy. curl 7.66.0 is the minimum. |
+| ABAP syntax and installer build | abaplint 2.120.92 v700; GitHub Actions; A4H compiler check | 2026-11-03 | Passed. |
+| PowerShell 5.1 and 7 | Parser, codepage and retention regressions; Windows and Linux CI | 2026-11-03 | Passed. |
+| Background job, restricted user | Target SAP | — | Not yet tested. |
+| Windows host, ECC 6.0 / SAP_BASIS 7.0x, production mail servers | — | — | Not yet tested. |
+| Old curl 7.55.1 | — | 2026-11-02 | Rejected by the version check. |
 
-The DDIC fixtures are development-only and must never be installed into SAP. Real authorization enforcement, database LUWs, installer APIs and file permissions still require SAP acceptance before production use.
+The DDIC fixtures under `.abaplint-deps` are development-only and must never be installed into SAP.
 
-Bu kayıt 0.9.2 sürüm adayı içindir. Proje sahibi, 3 Kasım 2026'da v0.9.2'yi SAP'de çalıştırıp sonuç aldığını doğruladı. Bu tarih bildirimin tarihidir; çalıştırmanın tarihi ayrıca kaydedilmedi. Bildirimde SAP sürümü ve listeleme, gövde/ek açma, taşıma gibi adımların ayrı ayrı sonuçları belirtilmedi. ABAP Unit ve kısıtlı yetkili job sonuçları da bu manuel doğrulamadan çıkarılmadı. Rehberdeki SE38/SM36 görselleri hazırlık adımlarını gösterir; bu çalıştırmanın sonuç görüntüleri değildir. Yerel ve CI kontrolleri (abaplint v700, PowerShell testleri, GreenMail ile IMAP testleri) 0.9.2 için daha önce geçti; bu belge güncellemesi için yeniden çalıştırılmadı.
+Bu kayıt v0.9.3 içindir. 0.9.3, SAP'de kurulup çalıştırılan ilk `ZCHE_IMAP_` sürümüdür. SAP ABAP Platform 2025 Trial (SAP_BASIS 816, Linux, Unicode) üzerinde GreenMail test kutusuyla kurulum, profil, bağlantı testi, List only, iki test mailinin işlenmesi ve taşınması, monitörde gövde ve eklerin (PDF, JPEG) açılması başarılı oldu. Sunucu betikleri curl 7.66.0 ile test edildi. Arka plan işi, kısıtlı kullanıcı, Windows sunucu, ECC 6.0 ve gerçek posta sunucuları henüz denenmedi.

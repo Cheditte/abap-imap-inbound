@@ -49,7 +49,7 @@ Normal processing may mark mail as read and move it. Start with **a test SAP sys
 
 ## Status and details
 
-**Current version: [v0.9.2 — release candidate](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.2).** On 3 November 2026, the project owner confirmed running v0.9.2 in SAP and seeing results. This manual confirmation does not cover every acceptance scenario. Classic ABAP 7.00 compatibility is a target, not an ECC runtime certification. [Validation record](VALIDATION.md).
+**Current version: [v0.9.3](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.3).** Installed and run end to end on SAP ABAP Platform 2025 (SAP_BASIS 816, Linux, Unicode) with a GreenMail test mailbox: profile, connection test, list only, processing, move and attachments in the monitor. ECC 6.0, Windows hosts and production mail servers are not yet tested; feedback is welcome. [Validation record](VALIDATION.md).
 
 - [Setup and usage](docs/WALKTHROUGH.md) · [Field guide](docs/SCREEN-GUIDE.md)
 - [Preparing the host yourself](docs/SELF-MANAGED-SETUP.md)
