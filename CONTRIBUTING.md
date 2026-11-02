@@ -1,6 +1,6 @@
 # Contributing
 
-This repository uses manual checks rather than an automated CI workflow. Run the relevant checks before sharing a change. SAP compiler/runtime validation remains necessary for SAP-side changes.
+GitHub Actions (`.github/workflows/checks.yml`) runs the source checks and the Windows and Linux script tests on every push and pull request. Run the relevant checks locally before sharing a change. SAP compiler/runtime validation remains necessary for SAP-side changes.
 
 ## Source checks and parser tests
 

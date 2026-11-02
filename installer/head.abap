@@ -1,6 +1,6 @@
 * Project: abap-imap-inbound
 *---------------------------------------------------------------
-* ZCHE_IMAP_INSTALL - abap-imap-inbound installer (v0.9.0)
+* ZCHE_IMAP_INSTALL - abap-imap-inbound installer (v0.9.1)
 *
 * Usage: in SE38 create an executable program named ZCHE_IMAP_INSTALL
 * (local object, $TMP), paste this whole file, activate it and
@@ -106,7 +106,7 @@ DATA: gt_src    TYPE STANDARD TABLE OF abapsource,
       gv_newinb(1) TYPE c,
       gv_same   TYPE i.
 
-CONSTANTS gc_version(10) TYPE c VALUE '0.9.0'.
+CONSTANTS gc_version(10) TYPE c VALUE '0.9.1'.
 
 * Embedded source lines: src adds a new line, cnt continues the
 * last line (for lines longer than 72 characters). def adds a
@@ -1218,6 +1218,10 @@ FORM save_params.
   PERFORM save_param USING 'VERSION' gc_version.
   PERFORM save_param USING 'EXEC_HOST' sy-host.
   PERFORM save_param USING 'OWNER' 'ABAP_IMAP_INBOUND'.
+* Policy defaults: written once, an administrator's value is kept.
+  PERFORM save_param_default USING 'HANDLER_PREFIX'
+                                   'ZCHE_IMAP_HANDLER_'.
+  PERFORM save_param_default USING 'MAX_ATTEMPTS' '3'.
   IF gv_err IS INITIAL.
     COMMIT WORK.
   ELSE.
@@ -1249,6 +1253,21 @@ FORM save_param USING iv_name  TYPE c
     WRITE: / 'Installation parameter could not be saved:', iv_name.
     gv_err = 'X'.
   ENDIF.
+ENDFORM.
+
+*---------------------------------------------------------------
+* Saves a parameter only when it does not exist yet.
+FORM save_param_default USING iv_name  TYPE c
+                              iv_value TYPE c.
+  DATA: lv_tab(30)    TYPE c VALUE 'ZCHE_IMAP_PARAM',
+        lv_value(255) TYPE c.
+
+  SELECT SINGLE pvalue FROM (lv_tab) INTO lv_value
+    WHERE param = iv_name.
+  IF sy-subrc = 0 AND NOT lv_value IS INITIAL.
+    EXIT.
+  ENDIF.
+  PERFORM save_param USING iv_name iv_value.
 ENDFORM.
 
 *---------------------------------------------------------------

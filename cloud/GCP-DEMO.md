@@ -1,7 +1,7 @@
 # Demo environment on Google Cloud
 > **English** | [Türkçe](../docs/tr/GCP-DEMO.md)
 
-A disposable demo environment for learning and screenshots. Check your cloud account's costs and trial-credit conditions before creating resources. The current SAP 0.9.0 runtime still needs target-system validation.
+A disposable demo environment for learning and screenshots. Check your cloud account's costs and trial-credit conditions before creating resources. The current SAP 0.9.1 runtime still needs target-system validation.
 
 ```
 Windows (SAP GUI) ──SSH tunnel──► Google Cloud VM (Ubuntu 24.04)
@@ -77,7 +77,7 @@ SAP Logon → new connection: application server `127.0.0.1`, instance number `0
 
 Follow the [SAP installation steps](../docs/WALKTHROUGH.md#31-create-the-installer-program). On this demo the server root folder is `/usr/sap/sapimap`; `ZCHE_IMAP_INSTALL` detects Linux and Unicode by itself.
 
-In `ZCHE_IMAP_CONFIG`, the demo mailbox is: server `greenmail`, port `3993`, IMAPS, certificate check off, user `sap@demo.local`, password `sapdemo` (GreenMail test values only).
+In `ZCHE_IMAP_CONFIG`, the demo mailbox is: server `greenmail`, port `3993`, IMAPS, certificate check off, user `sap@demo.local`, password source `S` and password `sapdemo` (GreenMail test values only; the screen defaults to source `O`).
 
 ## 6. Screenshots
 
@@ -90,11 +90,11 @@ In `ZCHE_IMAP_CONFIG`, the demo mailbox is: server `greenmail`, port `3993`, IMA
 | 5 | `ZCHE_IMAP_MONITOR` | List, mail details, a PDF and an image opened on the PC |
 | 6 | Error scenario | A mail with `TEST-ERROR` in the subject: status `E`, then reprocessing |
 | 7 | SM37 | Periodic job and spool output |
-| 8 | Windows PowerShell | `test\run-tests.ps1` and `test\run-imap-tests.ps1` output |
+| 8 | PowerShell | `test/run-tests.ps1` output; run `test/run-imap-tests.ps1` on the VM, where GreenMail's ports are reachable |
 
 No real server, customer or person names in screenshots; the demo uses `demo.local`.
 
-Add a note under the screenshots: *"Run on ABAP Platform Trial 2025 (Linux, Unicode). Old non-Unicode releases use the LEGACY include and need to be verified separately."*
+Add a note under the screenshots: *"Run on ABAP Platform Trial 2025 (Linux, Unicode). Older and non-Unicode releases need to be verified separately."*
 
 ## 7. Shutting down
 
