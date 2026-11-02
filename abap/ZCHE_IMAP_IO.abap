@@ -1,17 +1,14 @@
-*---------------------------------------------------------------
-* ZIMAP_IO  (UNICODE: Unicode systems)
-* In SAP the content of this file is loaded as the include ZIMAP_IO
-* (ZIMAP_INSTALL picks it automatically). Text files are
-* read and written as UTF-8.
-*---------------------------------------------------------------
+* Project: abap-imap-inbound
+* ZCHE_IMAP_IO: ABAP 7.00, ENCODING DEFAULT follows system type.
 FORM read_text_file USING    iv_path  TYPE c
                     CHANGING ct_lines TYPE ty_t_line
                              cv_ok    TYPE c.
-  DATA: ls_line     TYPE zimap_s_line,
+  DATA: ls_line     TYPE zche_imap_s_line,
         lv_msg(100) TYPE c.
 
   CLEAR: ct_lines, cv_ok.
-  OPEN DATASET iv_path FOR INPUT IN TEXT MODE ENCODING UTF-8
+  TRY.
+  OPEN DATASET iv_path FOR INPUT IN TEXT MODE ENCODING DEFAULT
                MESSAGE lv_msg.
   IF sy-subrc <> 0.
     EXIT.
@@ -26,6 +23,9 @@ FORM read_text_file USING    iv_path  TYPE c
   ENDDO.
   CLOSE DATASET iv_path.
   cv_ok = 'X'.
+  CATCH cx_sy_file_authority.
+    CLEAR cv_ok.
+  ENDTRY.
 ENDFORM.
 
 *---------------------------------------------------------------
@@ -33,10 +33,11 @@ FORM write_text_file USING    iv_path  TYPE c
                               it_lines TYPE ty_t_line
                      CHANGING cv_ok    TYPE c
                               cv_msg   TYPE c.
-  DATA ls_line TYPE zimap_s_line.
+  DATA ls_line TYPE zche_imap_s_line.
 
   CLEAR: cv_ok, cv_msg.
-  OPEN DATASET iv_path FOR OUTPUT IN TEXT MODE ENCODING UTF-8
+  TRY.
+  OPEN DATASET iv_path FOR OUTPUT IN TEXT MODE ENCODING DEFAULT
                MESSAGE cv_msg.
   IF sy-subrc <> 0.
     EXIT.
@@ -46,11 +47,20 @@ FORM write_text_file USING    iv_path  TYPE c
   ENDLOOP.
   CLOSE DATASET iv_path.
   cv_ok = 'X'.
+  CATCH cx_sy_file_authority.
+    CLEAR cv_ok.
+    cv_msg = 'S_DATASET: file access denied'.
+  ENDTRY.
 ENDFORM.
 
 *---------------------------------------------------------------
 FORM delete_file USING iv_path TYPE c.
-  DELETE DATASET iv_path.
+  TRY.
+    DELETE DATASET iv_path.
+  CATCH cx_sy_file_authority.
+    MESSAGE 'S_DATASET: cannot delete file' TYPE 'S'
+      DISPLAY LIKE 'E'.
+  ENDTRY.
 ENDFORM.
 
 *---------------------------------------------------------------
@@ -67,6 +77,7 @@ FORM read_binary_file USING    iv_path TYPE c
         lv_msg(100) TYPE c.
 
   CLEAR: ct_bin, cv_len, cv_ok.
+  TRY.
   OPEN DATASET iv_path FOR INPUT IN BINARY MODE MESSAGE lv_msg.
   IF sy-subrc <> 0.
     EXIT.
@@ -85,4 +96,7 @@ FORM read_binary_file USING    iv_path TYPE c
   ENDDO.
   CLOSE DATASET iv_path.
   cv_ok = 'X'.
+  CATCH cx_sy_file_authority.
+    CLEAR cv_ok.
+  ENDTRY.
 ENDFORM.

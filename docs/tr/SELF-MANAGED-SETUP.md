@@ -8,7 +8,7 @@ SAP tarafında SE38 ile program oluşturma, etkinleştirme ve çalıştırma bil
 
 SAP GUI'ye giriş yapmak, Windows/Linux makinesinde yönetici yetkisi vermez. Posta kutusunu webden açabilmek de posta sunucusunun yönetim paneline erişim vermez. Gerekli erişiminiz yoksa makinenin veya posta hizmetinin sahibinden destek alın.
 
-**Önce deneme sistemi ve deneme posta kutusu kullanın.** Güncel 1.1.0 sürümünün gerçek SAP sistemindeki kurulum ve çalışma testleri henüz tamamlanmadı. [Doğrulama durumu](TECHNICAL-REFERENCE.md#neler-doğrulandı).
+**Önce deneme sistemi ve deneme posta kutusu kullanın.** Güncel 0.9.0 sürümünün gerçek SAP sistemindeki kurulum ve çalışma testleri henüz tamamlanmadı. [Doğrulama durumu](TECHNICAL-REFERENCE.md#neler-doğrulandı).
 
 ## 1. Hangi makineye bağlanacaksınız?
 
@@ -91,7 +91,7 @@ PowerShell eksikse Linux dağıtımınızı ve sürümünüzü belirleyip [Micro
 
 [Depodan](https://github.com/Cheditte/abap-imap-inbound) **Code → Download ZIP** ile indirdiğiniz paketin **tamamını** aktarın. Uzak makinedeki tarayıcıyla indirebilir veya izin verilen dosya aktarım yönteminizi kullanabilirsiniz. Linux'a aktarırken SSH ile çalışan dosya aktarımı (`scp`/SFTP) da kullanılabilir. Yalnız tek bir `.ps1` dosyasını taşımayın.
 
-ZIP'i SAP makinesinde açın. Açılan **proje ana klasöründe** `server`, `script` ve `ZIMAP_INSTALL.abap` birlikte görünmeli. Sunucu komutlarını bu ana klasörden çalıştıracaksınız; ZIP'in açıldığı klasör, iletilerin saklanacağı korumalı çalışma klasöründen farklıdır.
+ZIP'i SAP makinesinde açın. Açılan **proje ana klasöründe** `server`, `script` ve `ZCHE_IMAP_INSTALL.abap` birlikte görünmeli. Sunucu komutlarını bu ana klasörden çalıştıracaksınız; ZIP'in açıldığı klasör, iletilerin saklanacağı korumalı çalışma klasöründen farklıdır.
 
 Windows'taki yönetici PowerShell penceresinde proje klasörüne geçmek için:
 
@@ -100,7 +100,7 @@ Windows'taki yönetici PowerShell penceresinde proje klasörüne geçmek için:
   $ProjectFolder = (Read-Host 'SAP makinesinde acilan proje ana klasorunun tam yolu').Trim()
   if ($ProjectFolder -eq '') { throw 'Proje klasoru gereklidir.' }
   Set-Location -LiteralPath $ProjectFolder -ErrorAction Stop
-  Get-Item server, script, ZIMAP_INSTALL.abap -ErrorAction Stop
+  Get-Item server, script, ZCHE_IMAP_INSTALL.abap -ErrorAction Stop
 }
 ```
 
@@ -110,7 +110,7 @@ Linux SSH oturumunda:
 {
   read -r -p 'SAP makinesindeki proje ana klasorunun tam yolu: ' project_folder
   cd -- "${project_folder:?Project folder is required}" &&
-    ls server script ZIMAP_INSTALL.abap
+    ls server script ZCHE_IMAP_INSTALL.abap
 }
 ```
 
@@ -123,7 +123,7 @@ Ardından işletim sisteminize uygun adımları uygulayın:
 - [Windows sunucu kurulum bloğu ve öz test](TECHNICAL-REFERENCE.md#windows)
 - [Linux sunucu kurulum bloğu ve öz test](TECHNICAL-REFERENCE.md#linux)
 
-Bu bloklar gerçek IMAP sunucusunu, SAP servis hesabını ve seçtiğiniz çalışma klasörünü sorar. Korunan klasörleri ve dosya izinlerini hazırlar; `imap.ps1` ile `mime.ps1` dosyalarını birlikte yerleştirir. Öz testin `OK` ile bittiğini, protokol `2` ve sürüm `1.1.0` bildirdiğini kontrol edin. Kullanılan klasörün tam yolunu kaydedin; SAP kurulum ekranında da aynısını kullanacaksınız.
+Bu bloklar gerçek IMAP sunucusunu, SAP servis hesabını ve seçtiğiniz çalışma klasörünü sorar. Korunan klasörleri ve dosya izinlerini hazırlar; `imap.ps1` ile `mime.ps1` dosyalarını birlikte yerleştirir. Öz testin `OK` ile bittiğini, protokol `2` ve sürüm `0.9.0` bildirdiğini kontrol edin. Kullanılan klasörün tam yolunu kaydedin; SAP kurulum ekranında da aynısını kullanacaksınız.
 
 Posta sunucusuna bağlantı **SAP makinesinden** kurulabilmelidir. Sertifika hatası varsa gerçek sunucu adını ve güvenilen sertifikaları düzeltin; sertifika doğrulamasını kapatmayın.
 

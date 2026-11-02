@@ -1,26 +1,26 @@
+* Project: abap-imap-inbound
 *---------------------------------------------------------------
-* ZIMAP_INBOUND - processes the mails in IMAP mailboxes
-* Reads the active profiles (ZIMAP_PROFILE) one by one and passes
+* ZCHE_IMAP_INBOUND - processes the mails in IMAP mailboxes
+* Reads the active profiles (ZCHE_IMAP_PROFILE) one by one and passes
 * each mail to the handler of the profile. Run as a periodic job.
 *
-* Statuses (ZIMAP_LOG-STATUS):
+* Statuses (ZCHE_IMAP_LOG-STATUS):
 *   H  business logic ran, mail not moved yet
 *   S  completed
-*   E  error; retry with P_RETRY or ZIMAP_MONITOR > Reprocess
-*   R  to be reprocessed (ZIMAP_MONITOR)
+*   E  error; retry with P_RETRY or ZCHE_IMAP_MONITOR > Reprocess
+*   R  to be reprocessed (ZCHE_IMAP_MONITOR)
 * A committed H record resumes only the pending move. Handlers must
 * honor the LUW contract and deduplicate external business effects.
 *
-* 4.6C compatible; lines at most 72 characters; ASCII only.
+* Classic ABAP 7.00 syntax target.
 *---------------------------------------------------------------
-REPORT zimap_inbound LINE-SIZE 200.
+REPORT zche_imap_inbound LINE-SIZE 200.
 
-TABLES zimap_profile.
+TABLES zche_imap_profile.
 
-INCLUDE zimap_common.
-INCLUDE zimap_io.
+INCLUDE zche_imap_common.
 
-SELECT-OPTIONS s_prof FOR zimap_profile-profile.
+SELECT-OPTIONS s_prof FOR zche_imap_profile-profile.
 PARAMETERS: p_test  AS CHECKBOX,
             p_retry AS CHECKBOX.
 
@@ -34,17 +34,17 @@ START-OF-SELECTION.
 
 *---------------------------------------------------------------
 FORM main.
-  DATA: lt_prof TYPE STANDARD TABLE OF zimap_profile,
-        ls_prof TYPE zimap_profile,
+  DATA: lt_prof TYPE STANDARD TABLE OF zche_imap_profile,
+        ls_prof TYPE zche_imap_profile,
         lv_ok(1) TYPE c.
 
-  PERFORM table_auth USING 'ZIMAP_PROFILE' 'S'
+  PERFORM table_auth USING 'ZCHE_IMAP_PROFILE' 'S'
                      CHANGING lv_ok.
   IF lv_ok IS INITIAL.
     WRITE: / 'No profile display authorization (S_TABU_DIS).'.
     EXIT.
   ENDIF.
-  PERFORM table_auth USING 'ZIMAP_LOG' 'U' CHANGING lv_ok.
+  PERFORM table_auth USING 'ZCHE_IMAP_LOG' 'U' CHANGING lv_ok.
   IF lv_ok IS INITIAL.
     WRITE: / 'No log change authorization (S_TABU_DIS).'.
     EXIT.
@@ -52,14 +52,14 @@ FORM main.
   PERFORM get_setup CHANGING lv_ok.
   IF lv_ok IS INITIAL.
     WRITE: / 'Setup missing or this is the wrong execution host.',
-             'Run ZIMAP_INSTALL on the selected host.'.
+             'Run ZCHE_IMAP_INSTALL on the selected host.'.
     EXIT.
   ENDIF.
 
-  SELECT * FROM zimap_profile INTO TABLE lt_prof
+  SELECT * FROM zche_imap_profile INTO TABLE lt_prof
     WHERE profile IN s_prof AND active = 'X'.
   IF sy-subrc <> 0.
-    WRITE: / 'No active profile. Define a profile with ZIMAP_CONFIG.'.
+    WRITE: / 'No active profile. Define a profile with ZCHE_IMAP_CONFIG.'.
     EXIT.
   ENDIF.
 
@@ -77,27 +77,27 @@ FORM main.
   IF gv_skip > 0.
     WRITE: / 'Skipped:  ', gv_skip,
              '  failed earlier; tick "Retry failed mails"',
-           / '            or reprocess them in ZIMAP_MONITOR.'.
+           / '            or reprocess them in ZCHE_IMAP_MONITOR.'.
   ENDIF.
 ENDFORM.
 
 *---------------------------------------------------------------
-FORM run_profile USING is_prof TYPE zimap_profile.
+FORM run_profile USING is_prof TYPE zche_imap_profile.
   DATA: lt_out      TYPE ty_t_line,
-        ls_out      TYPE zimap_s_line,
+        ls_out      TYPE zche_imap_s_line,
         lt_uid      TYPE ty_t_uid,
         ls_uid      TYPE ty_uid,
         lv_ok(1)    TYPE c,
         lv_msg(255) TYPE c,
         lv_work(1)  TYPE c,
         lv_uidv(20) TYPE c,
-        lv_tmp(40)  TYPE c,
+        lv_tmp(128)  TYPE c,
         lv_max      TYPE i,
         lv_count    TYPE i,
         lv_key(28)  TYPE c,
-        ls_prof     TYPE zimap_profile,
-        lt_pending  TYPE STANDARD TABLE OF zimap_log,
-        ls_pending  TYPE zimap_log.
+        ls_prof     TYPE zche_imap_profile,
+        lt_pending  TYPE STANDARD TABLE OF zche_imap_log,
+        ls_pending  TYPE zche_imap_log.
 
   SKIP.
   FORMAT COLOR COL_HEADING.
@@ -105,13 +105,19 @@ FORM run_profile USING is_prof TYPE zimap_profile.
   FORMAT COLOR OFF.
 
 * Configuration and job share this lock across every commit.
+  PERFORM profile_auth USING is_prof-profile '16'
+                       CHANGING lv_ok.
+  IF lv_ok IS INITIAL.
+    WRITE: / 'Not authorized for profile:', is_prof-profile.
+    EXIT.
+  ENDIF.
   PERFORM profile_lock USING is_prof-profile CHANGING lv_ok.
   IF lv_ok IS INITIAL.
     WRITE: / '  Profile in use or lock unavailable, skipped.'.
     EXIT.
   ENDIF.
 * Reload under the lock; the initial selection may be stale.
-  SELECT SINGLE * FROM zimap_profile INTO ls_prof
+  SELECT SINGLE * FROM zche_imap_profile INTO ls_prof
     WHERE profile = is_prof-profile AND active = 'X'.
   IF sy-subrc <> 0.
     PERFORM profile_unlock USING is_prof-profile.
@@ -125,7 +131,7 @@ FORM run_profile USING is_prof TYPE zimap_profile.
 
 * Recover H even after a remote MOVE removed the inbox UID.
   IF p_test IS INITIAL.
-    SELECT * FROM zimap_log INTO TABLE lt_pending
+    SELECT * FROM zche_imap_log INTO TABLE lt_pending
       UP TO lv_max ROWS
       WHERE profile = ls_prof-profile AND status = 'H'
       ORDER BY PRIMARY KEY.
@@ -136,12 +142,9 @@ FORM run_profile USING is_prof TYPE zimap_profile.
     ENDLOOP.
   ENDIF.
 
-  CONCATENATE lv_key ls_prof-revision INTO lv_tmp
-              SEPARATED BY space.
-  IF p_test IS INITIAL.
-    CONCATENATE lv_tmp 'PURGE' INTO lv_tmp SEPARATED BY space.
-  ENDIF.
-  PERFORM call_cmd USING 'ZIMAP_LIST' lv_tmp
+  PERFORM list_arguments USING lv_key ls_prof-revision p_test
+                         CHANGING lv_tmp.
+  PERFORM call_cmd USING 'ZCHE_IMAP_LIST' lv_tmp
                    CHANGING lt_out lv_ok lv_msg.
   IF lv_ok IS INITIAL.
     PERFORM write_error USING lv_msg.
@@ -192,13 +195,13 @@ ENDFORM.
 * One mail: fetch, read, run the business logic, move.
 * cv_work = 'X': real work was done (counts towards MAXMAIL).
 *---------------------------------------------------------------
-FORM process_one USING    is_prof TYPE zimap_profile
+FORM process_one USING    is_prof TYPE zche_imap_profile
                           iv_uidv TYPE c
                           iv_uid  TYPE n
                  CHANGING cv_work TYPE c.
-  DATA: ls_log       TYPE zimap_log,
-        ls_mail      TYPE zimap_s_mail,
-        ls_input     TYPE zimap_s_mail,
+  DATA: ls_log       TYPE zche_imap_log,
+        ls_mail      TYPE zche_imap_s_mail,
+        ls_input     TYPE zche_imap_s_mail,
         lt_body      TYPE ty_t_line,
         lt_att       TYPE ty_t_att,
         lt_out       TYPE ty_t_line,
@@ -211,13 +214,15 @@ FORM process_one USING    is_prof TYPE zimap_profile
         lv_msg(255)  TYPE c,
         lv_key(28)   TYPE c,
         lv_status(1) TYPE c,
-        lv_logmsg(255) TYPE c.
+        lv_logmsg(255) TYPE c,
+        lv_limit_text(255) TYPE c,
+        lv_limit TYPE i.
 
   CLEAR cv_work.
   lv_uidc = iv_uid.
   SHIFT lv_uidc LEFT DELETING LEADING '0'.
 
-  SELECT SINGLE * FROM zimap_log INTO ls_log
+  SELECT SINGLE * FROM zche_imap_log INTO ls_log
     WHERE profile     = is_prof-profile
       AND uidvalidity = iv_uidv
       AND mailuid     = iv_uid.
@@ -229,6 +234,21 @@ FORM process_one USING    is_prof TYPE zimap_profile
         cv_work = 'X'.
       ENDIF.
       EXIT.
+    ENDIF.
+    IF ls_log-status = 'E'.
+      SELECT SINGLE pvalue FROM zche_imap_param
+        INTO lv_limit_text WHERE param = 'MAX_ATTEMPTS'.
+      lv_limit = 3.
+      IF sy-subrc = 0 AND lv_limit_text CO '0123456789 '.
+        lv_limit = lv_limit_text.
+      ENDIF.
+      IF lv_limit < 1.
+        lv_limit = 3.
+      ENDIF.
+      IF ls_log-attempts >= lv_limit.
+        gv_skip = gv_skip + 1.
+        EXIT.
+      ENDIF.
     ENDIF.
     IF ls_log-status = 'E' AND p_retry IS INITIAL.
       gv_skip = gv_skip + 1.
@@ -253,7 +273,7 @@ FORM process_one USING    is_prof TYPE zimap_profile
   PERFORM storage_key USING is_prof-profile CHANGING lv_key.
   CONCATENATE lv_key lv_uidc iv_uidv is_prof-revision INTO lv_par
               SEPARATED BY space.
-  PERFORM call_cmd USING 'ZIMAP_FETCH' lv_par
+  PERFORM call_cmd USING 'ZCHE_IMAP_FETCH' lv_par
                    CHANGING lt_out lv_ok lv_msg.
   IF lv_ok IS INITIAL.
     WRITE: / '  UID', lv_uidc, 'could not be fetched.'.
@@ -279,10 +299,18 @@ FORM process_one USING    is_prof TYPE zimap_profile
   lv_prog = is_prof-hprog.
   lv_form = is_prof-hform.
   IF lv_prog IS INITIAL.
-    lv_prog = 'ZIMAP_HANDLER_DEMO'.
+    lv_prog = 'ZCHE_IMAP_HANDLER_DEMO'.
   ENDIF.
   IF lv_form IS INITIAL.
     lv_form = 'HANDLE_MAIL'.
+  ENDIF.
+  PERFORM handler_allowed USING lv_prog lv_form CHANGING lv_ok.
+  IF lv_ok IS INITIAL.
+    lv_msg = 'Handler rejected by server-owned prefix policy'.
+    PERFORM set_status USING ls_mail 'E' lv_msg
+                       CHANGING lv_status lv_logmsg.
+    gv_fail = gv_fail + 1.
+    EXIT.
   ENDIF.
 * If the handler is not found, lv_ok stays empty and this
 * message is logged
@@ -329,11 +357,11 @@ FORM process_one USING    is_prof TYPE zimap_profile
 ENDFORM.
 
 *---------------------------------------------------------------
-FORM finish_mail USING is_prof TYPE zimap_profile
+FORM finish_mail USING is_prof TYPE zche_imap_profile
                        iv_uidv TYPE c
                        iv_uid  TYPE n.
   DATA: lt_out      TYPE ty_t_line,
-        ls_mail     TYPE zimap_s_mail,
+        ls_mail     TYPE zche_imap_s_mail,
         lv_uidc(10) TYPE c,
         lv_uidv(20) TYPE c,
         lv_par(128) TYPE c,
@@ -350,7 +378,7 @@ FORM finish_mail USING is_prof TYPE zimap_profile
   PERFORM storage_key USING is_prof-profile CHANGING lv_key.
   CONCATENATE lv_key lv_uidc lv_uidv is_prof-revision INTO lv_par
               SEPARATED BY space.
-  PERFORM call_cmd USING 'ZIMAP_DONE' lv_par
+  PERFORM call_cmd USING 'ZCHE_IMAP_DONE' lv_par
                    CHANGING lt_out lv_ok lv_msg.
   IF lv_ok IS INITIAL.
 *   Status stays H; the next run only retries the move
@@ -375,11 +403,15 @@ FORM finish_mail USING is_prof TYPE zimap_profile
 ENDFORM.
 
 *---------------------------------------------------------------
-FORM set_status USING is_mail   TYPE zimap_s_mail
+FORM set_status USING is_mail   TYPE zche_imap_s_mail
                       iv_status TYPE c
                       iv_msg    TYPE c
                 CHANGING cv_ok TYPE c cv_msg TYPE c.
-  DATA ls_log TYPE zimap_log.
+  DATA: ls_log TYPE zche_imap_log,
+        lt_marker TYPE ty_t_line,
+        ls_marker TYPE zche_imap_s_line,
+        lv_dir(255) TYPE c, lv_path(255) TYPE c,
+        lv_marker_ok TYPE c, lv_marker_msg(255) TYPE c.
 
   CLEAR: cv_ok, cv_msg.
   IF NOT p_test IS INITIAL.
@@ -387,7 +419,7 @@ FORM set_status USING is_mail   TYPE zimap_s_mail
     EXIT.
   ENDIF.
 
-  SELECT SINGLE * FROM zimap_log INTO ls_log
+  SELECT SINGLE * FROM zche_imap_log INTO ls_log
     WHERE profile     = is_mail-profile
       AND uidvalidity = is_mail-uidvalidity
       AND mailuid     = is_mail-mailuid.
@@ -405,12 +437,15 @@ FORM set_status USING is_mail   TYPE zimap_s_mail
     ls_log-maildate  = is_mail-maildate.
     ls_log-attcnt    = is_mail-attcnt.
   ENDIF.
+  IF iv_status = 'E' AND ls_log-attempts < 9999.
+    ls_log-attempts = ls_log-attempts + 1.
+  ENDIF.
   ls_log-status  = iv_status.
   ls_log-message = iv_msg.
   ls_log-chdat   = sy-datum.
   ls_log-chtim   = sy-uzeit.
   ls_log-uname   = sy-uname.
-  MODIFY zimap_log FROM ls_log.
+  MODIFY zche_imap_log FROM ls_log.
   IF sy-subrc <> 0.
     ROLLBACK WORK.
     cv_msg = 'Could not persist mail status; no move attempted'.
@@ -422,6 +457,15 @@ FORM set_status USING is_mail   TYPE zimap_s_mail
     cv_msg = 'Mail transaction failed; no move attempted'.
     WRITE: / cv_msg.
     EXIT.
+  ENDIF.
+  IF iv_status = 'E'.
+    PERFORM mail_dir USING space is_mail-profile
+      is_mail-uidvalidity is_mail-mailuid CHANGING lv_dir.
+    CONCATENATE lv_dir 'failed.utc' INTO lv_path.
+    ls_marker-text = 'E'.
+    APPEND ls_marker TO lt_marker.
+    PERFORM write_text_file USING lv_path lt_marker
+      CHANGING lv_marker_ok lv_marker_msg.
   ENDIF.
   cv_ok = 'X'.
 ENDFORM.

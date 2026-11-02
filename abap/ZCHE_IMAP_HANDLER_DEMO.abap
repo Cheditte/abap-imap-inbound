@@ -1,20 +1,21 @@
+* Project: abap-imap-inbound
 *---------------------------------------------------------------
-* ZIMAP_HANDLER_DEMO - sample business logic (subroutine pool)
+* ZCHE_IMAP_HANDLER_DEMO - sample business logic (subroutine pool)
 *
 * For a new handler, copy this program (for example
-* ZIMAP_HANDLER_INVOICE) and enter it in the "Handler program"
-* field of the profile in ZIMAP_CONFIG. Keep the FORM interface.
+* ZCHE_IMAP_HANDLER_INVOICE) and enter it in the "Handler program"
+* field of the profile in ZCHE_IMAP_CONFIG. Keep the FORM interface.
 *
 * is_mail : profile, UID, sender, recipient, subject, date, folder
-* it_body : plain text body (ZIMAP_S_LINE)
-* it_att  : attachments (ZIMAP_S_ATT); path is the full file path.
+* it_body : plain text body (ZCHE_IMAP_S_LINE)
+* it_att  : attachments (ZCHE_IMAP_S_ATT); path is the full file path.
 *           For binary content use the form READ_BINARY_FILE.
 *           disp = 'inline' is usually a signature image.
 *
 * cv_ok = 'X' : success; the mail is moved to the processed folder.
-* cv_ok = ' ' : error; cv_msg is written to ZIMAP_LOG, the mail
+* cv_ok = ' ' : error; cv_msg is written to ZCHE_IMAP_LOG, the mail
 *               stays in the mailbox and can be reprocessed from
-*               ZIMAP_MONITOR.
+*               ZCHE_IMAP_MONITOR.
 *
 * The processor uses local V1 update tasks and commits H together
 * with business changes. Do not COMMIT/ROLLBACK WORK in a handler.
@@ -25,18 +26,17 @@
 * Demo behavior: a mail with TEST-ERROR in the subject fails on
 * purpose (to try the error scenario).
 *---------------------------------------------------------------
-PROGRAM zimap_handler_demo.
+PROGRAM zche_imap_handler_demo.
 
-INCLUDE zimap_common.
-INCLUDE zimap_io.
+INCLUDE zche_imap_common.
 
 *---------------------------------------------------------------
-FORM handle_mail USING    is_mail TYPE zimap_s_mail
+FORM handle_mail USING    is_mail TYPE zche_imap_s_mail
                           it_body TYPE STANDARD TABLE
                           it_att  TYPE STANDARD TABLE
                  CHANGING cv_ok   TYPE c
                           cv_msg  TYPE c.
-  DATA: ls_att   TYPE zimap_s_att,
+  DATA: ls_att   TYPE zche_imap_s_att,
         lt_bin   TYPE ty_t_bin,
         lv_len   TYPE i,
         lv_ok(1) TYPE c.

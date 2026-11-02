@@ -38,7 +38,7 @@ if ($RequestArgs.Count -gt 2) { $Arg2 = [string]$RequestArgs[2] }
 if ($RequestArgs.Count -gt 3) { $Arg3 = [string]$RequestArgs[3] }
 if ($RequestArgs.Count -gt 4) { $Arg4 = [string]$RequestArgs[4] }
 
-$Version = '1.1.0'
+$Version = '0.9.0'
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
 
@@ -107,8 +107,7 @@ function Assert-Digits([string]$Value, [string]$What) {
 # --- policy (Basis) ----------------------------------------------------------
 
 function Read-Policy {
-    $path = $env:SAPIMAP_POLICY
-    if (-not $path) { $path = Join-Path $PSScriptRoot 'policy.psd1' }
+    $path = Join-Path $PSScriptRoot 'policy.psd1'
     if (-not (Test-Path $path)) { Stop-WithError 'CFG' "policy.psd1 not found: $path" }
     # Parsed like Import-PowerShellDataFile, but without that cmdlet: it
     # lives in a module that is not found when PSModulePath points to
@@ -133,19 +132,28 @@ function Read-Policy {
         if ($OnWindows) { $p.CurlPath = Join-Path $env:SystemRoot 'System32\curl.exe' }
         else { $p.CurlPath = '/usr/bin/curl' }
     }
+    $versionLines = @(& $p.CurlPath --version)
+    $versionText = $versionLines[0]
+    if ($LASTEXITCODE -ne 0 -or $versionText -notmatch '^curl ([0-9]+)\.([0-9]+)\.') { throw 'CFG: cannot determine curl version' }
+    if ([int]$Matches[1] -lt 8) { throw 'CFG: curl 8.0.0 or newer is required' }
     $p.AllowedHosts = @($p.AllowedHosts | ForEach-Object { ([string]$_).Trim().ToLowerInvariant() })
     $p
 }
 
 # KEY=VALUE file. SAP writes it in the system code page: UTF-8 is tried
-# first, then Windows-1254. The value is the rest of the line (it may
+# from the declared CODEPAGE. The value is the rest of the line (it may
 # contain '='); spaces are kept.
-function Read-KeyValueFile([string]$Path) {
+function Read-KeyValueFile([string]$Path, [int]$Codepage = 0) {
     $h = @{}
     if ($Policy) { $null = Assert-ManagedPath $Path }
     $bytes = [System.IO.File]::ReadAllBytes($Path)
-    try { $text = $Utf8Strict.GetString($bytes) }
-    catch { $text = [System.Text.Encoding]::GetEncoding(1254).GetString($bytes) }
+    if (-not $Codepage) {
+        $declared = [regex]::Match($Latin1.GetString($bytes), '(?m)^CODEPAGE=([0-9]+)\r?$')
+        if (-not $declared.Success) { throw 'CFG: missing CODEPAGE' }
+        $Codepage = [int]$declared.Groups[1].Value
+    }
+    try { $text = [Text.Encoding]::GetEncoding($Codepage).GetString($bytes) }
+    catch { throw 'CFG: unsupported profile code page' }
     foreach ($line in ($text -split '\r?\n')) {
         if ($line -cmatch '^\s*(#|$)') { continue }
         $i = $line.IndexOf('=')
@@ -167,7 +175,7 @@ function Get-Int($Value, [int]$Default) {
 function Read-Profile([string]$Name, [string]$Revision) {
     $confPath = Join-Path (Join-Path $Policy.WorkDir 'conf') "${Name}_$Revision.conf"
     if (-not (Test-Path $confPath)) {
-        Stop-WithError 'CFG' "no profile settings: $Name (save them with ZIMAP_CONFIG)"
+        Stop-WithError 'CFG' "no profile settings: $Name (save them with ZCHE_IMAP_CONFIG)"
     }
     $c = Read-KeyValueFile $confPath
     if ($c['PROFILE'] -cne $Name -or $c['REVISION'] -cne $Revision) {
@@ -226,14 +234,14 @@ function Read-Profile([string]$Name, [string]$Revision) {
         $credName = "${Name}_$credRev.cred"
     } elseif ($c['CREDSRC'] -cne 'O') { Stop-WithError 'CFG' 'invalid credential source' }
     $credPath = Join-Path (Join-Path $Policy.WorkDir 'secret') $credName
-    if (-not (Test-Path $credPath)) { Stop-WithError 'CFG' 'password not set (ZIMAP_CONFIG > Password)' }
-    $cr = Read-KeyValueFile $credPath
+    if (-not (Test-Path $credPath)) { Stop-WithError 'CFG' 'password not set (ZCHE_IMAP_CONFIG > Password)' }
+    $cr = Read-KeyValueFile $credPath $p.Codepage
     if ($cr.ContainsKey('USER') -and ([string]$cr['USER']).Trim() -cne $p.User) {
         Stop-WithError 'CFG' 'credential user differs from the profile user'
     }
     $p.Password = [string]$cr['PASSWORD']
     if (-not $p.User) { Stop-WithError 'CFG' 'user name not set' }
-    if (-not $p.Password) { Stop-WithError 'CFG' 'password not set (ZIMAP_CONFIG > Password)' }
+    if (-not $p.Password) { Stop-WithError 'CFG' 'password not set (ZCHE_IMAP_CONFIG > Password)' }
     if (($p.User + $p.Password) -cmatch '[\x00-\x1F]') { Stop-WithError 'CFG' 'credentials contain a control character' }
     $p
 }
@@ -414,6 +422,47 @@ function Remove-OldDone {
     }
 }
 
+# Explicit local cache retention; never removes a pending committed move.
+function Remove-OldInboxCache {
+    $days = Get-Int $Policy.InCacheRetentionDays 30
+    if ($days -lt 1) { return }
+    $limit = [DateTime]::UtcNow.AddDays(-$days)
+    foreach ($candidate in (Get-ChildItem -LiteralPath (Get-WorkPath 'in') -Directory)) {
+        if ($candidate.Name -cnotmatch '^[0-9]{1,10}-[0-9]{1,10}$') { continue }
+        $path = Assert-ManagedPath $candidate.FullName
+        # Operators mark only E caches; H requires its payload for move recovery.
+        $marker = Assert-ManagedPath (Join-Path $path 'failed.utc')
+        if (-not (Test-Path -LiteralPath $marker)) { continue }
+        if ((Get-Item -LiteralPath $marker).LastWriteTimeUtc -ge $limit) { continue }
+        if (Test-Path -LiteralPath (Join-Path $path 'remote.done')) { continue }
+        Remove-FailedCache $path
+    }
+}
+
+function Remove-FailedCache([string]$Path) {
+    $path = Assert-ManagedPath $Path
+    $parent = [IO.Path]::GetFullPath((Get-WorkPath 'in')).TrimEnd([IO.Path]::DirectorySeparatorChar)
+    if ([IO.Path]::GetDirectoryName($path) -cne $parent) { throw 'CFG: invalid failed cache path' }
+    $files = @()
+    foreach ($entry in (Get-ChildItem -LiteralPath $path -Force)) {
+        $null = Assert-ManagedPath $entry.FullName
+        if ($entry.PSIsContainer) {
+            if ($entry.Name -cne 'att') { throw 'CFG: unknown cache directory' }
+            foreach ($att in (Get-ChildItem -LiteralPath $entry.FullName -Force)) {
+                $null = Assert-ManagedPath $att.FullName
+                if ($att.PSIsContainer) { throw 'CFG: nested cache directory' }
+                $files += $att.FullName
+            }
+        } elseif ($entry.Name -cin @('header.txt','body.txt','attach.txt','mail.eml','ready.flg','identity.txt','failed.utc')) {
+            $files += $entry.FullName
+        } else { throw 'CFG: unknown cache file' }
+    }
+    foreach ($file in $files) { [IO.File]::Delete($file) }
+    $attDir = Join-Path $path 'att'
+    if (Test-Path -LiteralPath $attDir) { [IO.Directory]::Delete($attDir) }
+    [IO.Directory]::Delete($path)
+}
+
 function Invoke-List {
     $uidv = $null
     foreach ($l in (Invoke-Curl @((Get-BaseUrl), '-X', "STATUS $($Prof.MAILBOX) (UIDVALIDITY)"))) {
@@ -485,6 +534,8 @@ function Invoke-Fetch([string]$Uid, [string]$Uidv) {
     $present = Get-SearchUids $Uidv "UID SEARCH UID $Uid"
     if (Test-Path -LiteralPath $dest) {
         Assert-MailFolder $dest $Uid $Uidv
+        $failureMarker = Assert-ManagedPath (Join-Path $dest 'failed.utc')
+        if (Test-Path -LiteralPath $failureMarker) { [IO.File]::Delete($failureMarker) }
         Stop-Ok
     }
     if ($present -notcontains $Uid) { Stop-WithError 'NOMAIL' 'mail no longer exists' }
@@ -501,7 +552,7 @@ function Invoke-Fetch([string]$Uid, [string]$Uidv) {
     if (-not (Test-Path -LiteralPath $tmp)) { New-Item -ItemType Directory -Path $tmp | Out-Null }
     $token = [Guid]::NewGuid().ToString('N')
     $eml = Assert-ManagedPath (Join-Path $tmp "$token.eml")
-    # Default UID downloads work on old curl versions as well. BODY[] may
+    # UID download is checked against the server-declared byte count. BODY[] may
     # set Seen; SAP test mode only lists UIDs and never invokes this action.
     $url = (Get-MailboxUrl $Prof.MAILBOX $Uidv) + "/;UID=$Uid"
     $stage = Assert-ManagedPath (Join-Path $tmp "$token.parsed")
@@ -509,6 +560,7 @@ function Invoke-Fetch([string]$Uid, [string]$Uidv) {
         Invoke-Curl @($url, '--max-filesize', [string]$Prof.MaxBytes, '-o', $eml) | Out-Null
         if (-not (Test-Path -LiteralPath $eml) -or (Get-Item -LiteralPath $eml).Length -eq 0) { throw 'NOMAIL: mail not found' }
         if ((Get-Item -LiteralPath $eml).Length -gt $Prof.MaxBytes) { throw 'SIZE: mail exceeds the size limit' }
+        if ((Get-Item -LiteralPath $eml).Length -ne $declaredSize) { throw ('SIZE: downloaded {0} bytes, expected {1}; UID transfer rejected' -f (Get-Item -LiteralPath $eml).Length, $declaredSize) }
         $MimeLimits.MaxBytes = $Prof.MaxBytes
         Expand-Mail $eml $stage
         [IO.File]::WriteAllLines((Join-Path $stage 'identity.txt'), [string[]](Get-MailIdentity $Uid $Uidv), $Utf8NoBom)
@@ -543,7 +595,7 @@ function Invoke-Done([string]$Uid, [string]$Uidv) {
     }
     [IO.File]::WriteAllText((Join-Path $src 'completed.utc'), [DateTime]::UtcNow.ToString('o'), $Utf8NoBom)
     Move-ManagedDirectory $src $dst
-    try { Remove-OldDone } catch { Write-Log ('retention: ' + $_.Exception.Message) }
+    try { Remove-OldDone; Remove-OldInboxCache } catch { Write-Log ('retention: ' + $_.Exception.Message) }
     Stop-Ok
 }
 
@@ -647,7 +699,7 @@ try {
     switch ($Action) {
         'list' {
             if ($Arg3 -ceq 'PURGE') {
-                try { Remove-OldDone } catch { Write-Log ('retention: ' + $_.Exception.Message) }
+                try { Remove-OldDone; Remove-OldInboxCache } catch { Write-Log ('retention: ' + $_.Exception.Message) }
             }
             Invoke-List
         }

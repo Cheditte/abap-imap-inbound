@@ -2,7 +2,7 @@
 
 > **English** | [Türkçe](tr/TECHNICAL-REFERENCE.md) · [Project overview](../README.md) · [Installation](WALKTHROUGH.md) · [Code examples](TECHNICAL-GUIDE.md)
 
-This file is for Basis and email teams preparing installation, and developers who want the details. It describes **1.1.0 sources and script protocol 2**. Use the [walkthrough](WALKTHROUGH.md) for installation in order, and the [developer guide](TECHNICAL-GUIDE.md) to add your business logic.
+This file is for Basis and email teams preparing installation, and developers who want the details. It describes **0.9.0 sources and script protocol 2**. Use the [walkthrough](WALKTHROUGH.md) for installation in order, and the [developer guide](TECHNICAL-GUIDE.md) to add your business logic.
 
 For the SAP steps, you are assumed to be able to create, activate and run programs in SE38. Here, **Basis / server administrator** means the person or team responsible for the server; this can be you if you hold the necessary permissions. The same distinction applies to email administration. [Preparation when you hold those permissions](SELF-MANAGED-SETUP.md).
 
@@ -23,7 +23,7 @@ For the SAP steps, you are assumed to be able to create, activate and run progra
 |---|---|
 | IMAP | A connection method that lets a program read messages and folders on a mail server. |
 | Profile | A saved set of mailbox server, user, folder and processing settings in SAP. |
-| Handler | The ABAP program that decides what to do with each message. Use the supplied `ZIMAP_HANDLER_DEMO` for your first trial. |
+| Handler | The ABAP program that decides what to do with each message. Use the supplied `ZCHE_IMAP_HANDLER_DEMO` for your first trial. |
 | Application server | The Windows or Linux machine running SAP. Server installation commands run there, rather than on your own computer. |
 | Background job | A program SAP runs automatically on a schedule, for example to check for mail regularly. |
 
@@ -69,17 +69,17 @@ This is a roadmap. The screens and commands are in the [step-by-step installatio
 1. **Download the project files.** Use **Code → Download ZIP** on the repository home page and unpack the entire archive. Git is not required. Use server and SAP files from the same download.
 2. **Prepare the test mailbox.** Obtain the settings above and select an existing mailbox folder for processed messages.
 3. **Prepare the server or ask its administrator.** Processing runs on the SAP application server. Two helper tools, PowerShell and `curl`, retrieve mail there; no separate integration server is needed. Basis prepares network access and a protected working folder, then gives you its full path. [Server preparation](WALKTHROUGH.md#2-prepare-the-machine-running-sap).
-4. **Install the SAP programs.** Create `ZIMAP_INSTALL` in **SE38**, load the matching source file from this project, activate it and run it. It creates the required SAP programs and tables. [SAP installation steps](WALKTHROUGH.md#31-create-the-installer-program).
-5. **Save a mailbox profile.** In `ZIMAP_CONFIG`, choose a profile name and enter your actual server, user and folder settings. For the first trial, select `ZIMAP_HANDLER_DEMO` as the handler and `MOVE` as the move method. Password source `S` means entering the password in SAP; `O` means Basis saves it on the server. **F8** saves the settings and tests the connection; saved settings alone do not prove the connection works. [Mailbox profile setup](WALKTHROUGH.md#33-set-up-a-mailbox-profile).
+4. **Install the SAP programs.** Create `ZCHE_IMAP_INSTALL` in **SE38**, load the matching source file from this project, activate it and run it. It creates the required SAP programs and tables. [SAP installation steps](WALKTHROUGH.md#31-create-the-installer-program).
+5. **Save a mailbox profile.** In `ZCHE_IMAP_CONFIG`, choose a profile name and enter your actual server, user and folder settings. For the first trial, select `ZCHE_IMAP_HANDLER_DEMO` as the handler and `MOVE` as the move method. Password source `S` means entering the password in SAP; `O` means Basis saves it on the server. **F8** saves the settings and tests the connection; saved settings alone do not prove the connection works. [Mailbox profile setup](WALKTHROUGH.md#33-set-up-a-mailbox-profile).
 
-For maintained use, create a customer package such as `ZIMAP` or use one assigned to the project. The installer currently creates its objects in the local trial area `$TMP`; saving the installer in a package does not change that. Plan [package and transport steps](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport) with Basis and development to move the objects to test and production systems.
+For maintained use, create a customer package such as `ZCHE_IMAP` or use one assigned to the project. The installer currently creates its objects in the local trial area `$TMP`; saving the installer in a package does not change that. Plan [package and transport steps](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport) with Basis and development to move the objects to test and production systems.
 
 ## What should you do in the first trial?
 
 1. Send an email with a small PDF or text attachment to the test mailbox.
-2. Open `ZIMAP_INBOUND` through **SE38** in SAP and enter the profile name you saved. Select **List only (no downloads/changes)** and run it. This lists eligible message numbers (`UID`); it does not show content or attachments, or move messages.
-3. If listing succeeds, run the same test profile with `ZIMAP_HANDLER_DEMO`, this time **with List only cleared**. It now retrieves the message and attachments, records the example program's result and moves successful mail to the processed folder.
-4. Open `ZIMAP_MONITOR` to inspect the result and attachments. A completed message has status `S`; it should also appear in the processed folder you selected in the mailbox.
+2. Open `ZCHE_IMAP_INBOUND` through **SE38** in SAP and enter the profile name you saved. Select **List only (no downloads/changes)** and run it. This lists eligible message numbers (`UID`); it does not show content or attachments, or move messages.
+3. If listing succeeds, run the same test profile with `ZCHE_IMAP_HANDLER_DEMO`, this time **with List only cleared**. It now retrieves the message and attachments, records the example program's result and moves successful mail to the processed folder.
+4. Open `ZCHE_IMAP_MONITOR` to inspect the result and attachments. A completed message has status `S`; it should also appear in the processed folder you selected in the mailbox.
 5. After the trial, add your business rules. Ask Basis to schedule regular runs as a background job on the **same SAP application server** used for installation.
 
 Do not expect the supplied example to create an invoice or purchase order in SAP. The trial checks the mail connection, file retrieval and viewing of results.
@@ -103,7 +103,7 @@ When asking for help, share the step and error text, without passwords. Detailed
 
 This project has SAP periodically connect to an existing mailbox and collect messages. SAPconnect/SMTP provides another workflow, where mail is delivered to SAP. The choice depends on your requirements; see [SAP's inbound communication explanation](https://help.sap.com/saphelp_snc700_ehp01/helpdata/en/2b/d9260b4b8a11d1894c0000e8323c4f/content.htm?no_cache=true).
 
-The source targets **4.6C–7.5x** compatibility on classical ABAP systems. This is not a certification; compilation and runtime tests on your target SAP release are required.
+The source targets **7.00 and later** compatibility on classical ABAP systems. This is not a certification; compilation and runtime tests on your target SAP release are required.
 
 ## Access and operating boundaries
 
@@ -111,9 +111,9 @@ Basis assigns permissions to the intended users and table authorization groups. 
 
 | Role | Required access |
 |---|---|
-| Job user | Display `ZIMAP_PROFILE`; change `ZIMAP_LOG`; execute `ZIMAP_LIST`, `ZIMAP_FETCH`, `ZIMAP_DONE` through `S_LOG_COM`; read the input mail files through `S_DATASET`; handler-specific permissions. |
-| Profile administrator | Display/change `ZIMAP_PROFILE`; execute `ZIMAP_TEST`; write profile and credential files through `S_DATASET` for `ZIMAP_CONFIG`. |
-| Monitor user | Display `ZIMAP_LOG`; read input/archive files for `ZIMAP_MONITOR`. Retry additionally requires change access to `ZIMAP_LOG`. |
+| Job user | Display `ZCHE_IMAP_PROFILE`; change `ZCHE_IMAP_LOG`; execute `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE` through `S_LOG_COM`; read the input mail files through `S_DATASET`; handler-specific permissions. |
+| Profile administrator | Display/change `ZCHE_IMAP_PROFILE`; execute `ZCHE_IMAP_TEST`; write profile and credential files through `S_DATASET` for `ZCHE_IMAP_CONFIG`. |
+| Monitor user | Display `ZCHE_IMAP_LOG`; read input/archive files for `ZCHE_IMAP_MONITOR`. Retry additionally requires change access to `ZCHE_IMAP_LOG`. |
 | Installer | Development permissions for the project objects and the permissions needed to maintain and test SM69 commands. Uninstall has additional cross-client checks. |
 
 - The project does **not** put passwords in its SAP tables. Credentials are plain-text files protected by OS permissions, accessible to the SAP service account and privileged administrators. The application does not display saved passwords.
@@ -121,7 +121,7 @@ Basis assigns permissions to the intended users and table authorization groups. 
 - Basis controls allowed mail hosts, TLS exceptions, size limits and timeouts in `bin/policy.psd1`. SAP's service account has read/execute access to `bin`.
 - Profile files are separated by system, client and profile, and published as revisions. A profile with mail history cannot be repointed to another mailbox or deleted; deactivate it and create a new profile instead.
 - The installation is pinned to one application-server host. It does not provide automatic sharing of local files across application servers.
-- Retention expires eligible, completed **local archives** during normal processing. Read-only test mode does not expire them. It does not purge `ZIMAP_LOG` or delete mail from the remote processed folder.
+- Retention expires eligible, completed **local archives** during normal processing. Read-only test mode does not expire them. It does not purge `ZCHE_IMAP_LOG` or delete mail from the remote processed folder.
 
 ## Known limits
 
@@ -134,24 +134,13 @@ HTML conversion accepts at most 2,097,152 UTF-16 characters, 20,000 tokens and 1
 - Malformed or unsupported MIME, excessive nesting/part counts, and metadata that cannot fit the SAP file format are rejected instead of being reported as complete.
 - The monitor displays at most 1,000 rows per query. Narrow the date, profile or status selection when needed.
 
-## What has been verified
+## Validation / Doğrulama
 
-The distinction below applies to the **1.1.0 sources**:
-
-| Area | Evidence |
-|---|---|
-| Parser and IMAP flow | Local regression runs on Windows with PowerShell 5.1/7 and Linux with PowerShell 7.4, against GreenMail 2.1.14. Includes identity/revision checks, retries, interrupted moves, retention, malformed MIME and size limits. |
-| Linux setup | Isolated container setup, self-test and permissions using a separate OS account representing SAP. |
-| Source/build | ABAP ASCII/72-column checks, eight-file abaplint grammar check targeting 7.02, PowerShell parsing, Windows native-helper compilation, Bash checks and reproducible installer generation. |
-| Actual SAP runtime | The updated 1.1.0 SAP installer, screens and transactions still require validation on SAP. Earlier screenshots show a 1.0 demo on SAP ABAP Platform Trial 2025. |
-| Older/non-Unicode SAP | Compatibility target only; not verified on 4.6C–7.0. |
-| Windows server setup | Updated setup logic has not been exercised on a real SAP Windows server. |
-
-Checks are run manually; this repository does not include an automated CI workflow. A grammar check does not replace the SAP compiler or runtime tests.
+See [current validation](../VALIDATION.md).
 
 ## Updating an existing installation
 
-Read the [upgrade procedure](TECHNICAL-REFERENCE.md#8-update-an-existing-installation) before replacing files. Version 1.1.0 changes the script protocol, profile namespacing and revision storage.
+Read the [upgrade procedure](TECHNICAL-REFERENCE.md#8-update-an-existing-installation) before replacing files. Version 0.9.0 changes the script protocol, profile namespacing and revision storage.
 
 Update SAP and **both server modules together**. Re-save profiles and re-enter source `S` passwords; Basis-managed credentials use the full system/client/profile key. Old mail directories are preserved but **not automatically migrated**. Pending `H` records and their files need a controlled migration plan.
 
@@ -177,7 +166,7 @@ pwsh -NoProfile -File installer/build.ps1
 
 The installation is pinned to one SAP application server; configuration, processing and monitoring must run on that server. Basis should provide the appropriate server-specific SAP connection. Project programs and SM69 commands are shared across clients; coordinate changes with other owners.
 
-**How to use the commands:** copy the complete block for your operating system, including its opening and closing braces. At each prompt, enter only your own value and press Enter; do not add quotation marks or square brackets. Obtain hostname/port values from the mail team and the SAP account/folder from Basis. Each block asks for its own values again and does not depend on a previous terminal session. `ZIMAP_INSTALL`, `ZIMAP_CONFIG`, `ZIMAP_INBOUND`, `ZIMAP_MONITOR` and `ZIMAP_HANDLER_DEMO` are actual program names; keep them unchanged.
+**How to use the commands:** copy the complete block for your operating system, including its opening and closing braces. At each prompt, enter only your own value and press Enter; do not add quotation marks or square brackets. Obtain hostname/port values from the mail team and the SAP account/folder from Basis. Each block asks for its own values again and does not depend on a previous terminal session. `ZCHE_IMAP_INSTALL`, `ZCHE_IMAP_CONFIG`, `ZCHE_IMAP_INBOUND`, `ZCHE_IMAP_MONITOR` and `ZCHE_IMAP_HANDLER_DEMO` are actual program names; keep them unchanged.
 
 **Run these commands on the SAP application server, not on the consultant's laptop.** Use the current repository's `server` and `script` folders together. Setup deploys both `imap.ps1` and `mime.ps1`.
 
@@ -233,7 +222,7 @@ Run the self-test. When prompted, enter the same full folder path you used durin
 }
 ```
 
-Success identifies `PROTOCOL 2`, `VERSION 1.1.0` and the chosen root, then ends in `OK`. An administrator's self-test is useful, but the later SAP installer check must pass under SAP's actual execution account too.
+Success identifies `PROTOCOL 2`, `VERSION 0.9.0` and the chosen root, then ends in `OK`. An administrator's self-test is useful, but the later SAP installer check must pass under SAP's actual execution account too.
 
 ### Linux
 
@@ -266,7 +255,7 @@ Test with the SAP execution user and chosen root. Answer both prompts with the L
 }
 ```
 
-The result must identify protocol `2`, version `1.1.0` and the chosen root, then end in `OK`. It checks local prerequisites; SAP installation and mailbox access are checked later.
+The result must identify protocol `2`, version `0.9.0` and the chosen root, then end in `OK`. It checks local prerequisites; SAP installation and mailbox access are checked later.
 
 ### Certificates and handover
 
@@ -276,9 +265,8 @@ Basis hands over the root path, selected SAP host and confirmation of the self-t
 
 ## SAP installation options and checks
 
-In **SE38**, enter `ZIMAP_INSTALL` and choose **Execute (F8)**.
+In **SE38**, enter `ZCHE_IMAP_INSTALL` and choose **Execute (F8)**.
 
-![Installer screen from the earlier 1.0 demonstration](screenshots/02-install-screen.png)
 
 For a first installation in development:
 
@@ -301,9 +289,9 @@ Development permissions are checked even in SM69/server-only mode. The installer
 
 `$TMP` is suitable for an experiment; its objects do not enter the normal package transport route. For maintained use, ask development and Basis to use your organization's customer package and transport process.
 
-1. **In development**, create a package such as `ZIMAP` using **SE21** or **SE80**, with the transport layer agreed by Basis.
+1. **In development**, create a package such as `ZCHE_IMAP` using **SE21** or **SE80**, with the transport layer agreed by Basis.
 2. Install and test there. The current installer generates its objects in `$TMP`.
-3. Inventory the actual project objects: installer, programs/includes, tables/structures, data elements and domains, plus your custom handler. Do not blindly select unrelated objects matching `ZIMAP*`.
+3. Inventory the actual project objects: installer, programs/includes, tables/structures, data elements and domains, plus your custom handler. Do not blindly select unrelated objects matching `ZCHE_IMAP*`.
 4. Reassign the project's objects through **SE03 → Change Object Directory Entries**, or the applicable **SE80 → Reassign** action. Assign the package and collect objects in a transport request. Verify it contains the definitions and dependencies, not only the installer.
 5. Import to the **test system**, prepare its server and local settings, and repeat the first-run checks. Then follow the approved production import process.
 
@@ -327,7 +315,7 @@ SAP references: [Object Directory and package reassignment](https://help.sap.com
 | Folder to read | Default `INBOX` | Reads the inbox. To read another folder in the same mailbox, enter its actual IMAP name/path; only the selected folder is read. |
 | Processed folder | Name of the mail folder you select | You can use an existing folder. Replace the initial `SAP-Processed` value with its actual IMAP name/path. |
 | Move mode | `MOVE` | Requires UID MOVE support. |
-| Handler program | `ZIMAP_HANDLER_DEMO` | Supplied demonstration; no business document creation. |
+| Handler program | `ZCHE_IMAP_HANDLER_DEMO` | Supplied demonstration; no business document creation. |
 | Maximum mails | `50` | Example upper limit per run. |
 | Maximum size | `20` | Example MiB per message; server policy can impose a lower limit. |
 | Timeout | `120` | Example network timeout in seconds. |
@@ -370,7 +358,7 @@ If a server credential contains `USER`, it must be empty or match the profile us
 
 ## Retention and retry details
 
-Log records can outlive their local files. Retention expires eligible completed local archives, but does not clean up `ZIMAP_LOG` or remote processed mail. Agree their retention separately with the data owners.
+Log records can outlive their local files. Retention expires eligible completed local archives, but does not clean up `ZCHE_IMAP_LOG` or remote processed mail. Agree their retention separately with the data owners.
 
 ### Try an error and retry
 
@@ -387,16 +375,16 @@ This optional reference is for Basis/development diagnosis, not a request to run
 
 | SM69 name | Script action and positional arguments |
 |---|---|
-| `ZIMAP_TEST` | `test`, optionally `KEY REVISION` for a profile test. |
-| `ZIMAP_LIST` | `list KEY REVISION`; normal SAP runs add `PURGE` to expire eligible completed local archives. Otherwise listing is read-only. |
-| `ZIMAP_FETCH` | `fetch KEY UID UIDVALIDITY REVISION` |
-| `ZIMAP_DONE` | `done KEY UID UIDVALIDITY REVISION` |
+| `ZCHE_IMAP_TEST` | `test`, optionally `KEY REVISION` for a profile test. |
+| `ZCHE_IMAP_LIST` | `list KEY REVISION`; normal SAP runs add `PURGE` to expire eligible completed local archives. Otherwise listing is read-only. |
+| `ZCHE_IMAP_FETCH` | `fetch KEY UID UIDVALIDITY REVISION` |
+| `ZCHE_IMAP_DONE` | `done KEY UID UIDVALIDITY REVISION` |
 
 `KEY` includes SID, client and profile. SAP manages revisions; do not edit them manually. MIME parser tests have a separate local test entry point, not a production SM69 command.
 
 ## 8. Update an existing installation
 
-Version 1.1.0 changes the script protocol, profile file names and revision storage. Plan a 1.0 upgrade in development/test first.
+Version 0.9.0 changes the script protocol, profile file names and revision storage. Review the ZIMAP_ to ZCHE_IMAP_ migration before enabling jobs.
 
 1. Stop scheduled processing and coordinate all clients sharing the installation. Back up SAP objects/settings/logs, policy, credentials and mail directories through your approved process.
 2. Review pending `H` records with Basis/development. Old unscoped directories are preserved but **not automatically migrated**. Plan reconciliation before resuming; do not delete them or rerun completed business logic to get past the upgrade.
@@ -406,11 +394,10 @@ Version 1.1.0 changes the script protocol, profile file names and revision stora
 
 A profile with mail history cannot be redirected to another mailbox or deleted. Deactivate it and create a new profile when mailbox identity changes.
 
-See [verification limits](TECHNICAL-REFERENCE.md#what-has-been-verified) and the [developer guide](TECHNICAL-GUIDE.md). Other reference documents may contain older 1.0 examples; this is the current installation procedure.
 
 ## Background job scheduling (Basis)
 
-Ask Basis to schedule `ZIMAP_INBOUND` through **SM36**, using a variant for the intended profile with **list-only cleared**. Agree the interval with operations.
+Ask Basis to schedule `ZCHE_IMAP_INBOUND` through **SM36**, using a variant for the intended profile with **list-only cleared**. Agree the interval with operations.
 
 Use the installation's application server. Test with the actual restricted job user; a developer's successful foreground run is insufficient. Basis checks external-command, file, table and handler-specific permissions. See the [role outline](TECHNICAL-REFERENCE.md#access-and-operating-boundaries).
 
@@ -421,9 +408,13 @@ Before handling real business mail, implement and validate your business rules. 
 Profile and credential revisions are not automatically removed because an in-flight operation may still need them. Profile deletion attempts to remove current configuration/credential files and warns that older revisions require administrator cleanup.
 
 1. Stop the profile's scheduled jobs and wait for foreground processing to finish. Coordinate with systems/clients sharing the host.
-2. Confirm `REVISION`, `CREDSRC` and `CREDREV` in `ZIMAP_PROFILE` for the intended system/client. Do not display or log the password.
+2. Confirm `REVISION`, `CREDSRC` and `CREDREV` in `ZCHE_IMAP_PROFILE` for the intended system/client. Do not display or log the password.
 3. Preserve the active `conf/KEY_REVISION.conf` and its referenced credential: `secret/KEY_CREDREV.cred` for `S`, or `secret/KEY.cred` for `O`. Do not assume a file left by a failed save is active.
 4. Remove only exact old revision filenames confirmed unused and unnecessary for rollback, following your retention policy. Do not delete the entire `conf` or `secret` directory. Do not reuse a profile name with SAP processing history.
 5. Repeat connection and list-only tests before restarting jobs. Old `tmp` files left by terminated processes also need separate ownership/use checks; do not delete pending `in`/`done` data.
 
 If an old profile used the same source and destination folder, stop automatic processing. Reconcile business documents and pending records before replaying messages under a new profile; updating the code does not automatically correct earlier duplicates.
+
+## Release candidate security changes
+
+[Current profile authorization, handler allowlist, credentials and retry/cache policy](../SECURITY.md). Installer DDIC interface probing is retained where kernel APIs use different structure types; old runtime view/GUI probes were removed.

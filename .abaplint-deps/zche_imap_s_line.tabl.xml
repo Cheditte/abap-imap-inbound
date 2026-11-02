@@ -1,0 +1,1 @@
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_TABL"><asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0"><asx:values><DD02V><TABNAME>ZCHE_IMAP_S_LINE</TABNAME><TABCLASS>TRANSP</TABCLASS></DD02V><DD03P_TABLE><DD03P><FIELDNAME>TEXT</FIELDNAME><KEYFLAG></KEYFLAG><DATATYPE>CHAR</DATATYPE><LENG>255</LENG></DD03P></DD03P_TABLE></asx:values></asx:abap></abapGit>

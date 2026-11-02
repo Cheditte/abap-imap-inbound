@@ -22,13 +22,13 @@ RDP/SSH ile kendiniz bağlanacaksanız [kendi sistemini yönetenler için rehber
 
 **Deneme SAP sistemi ve deneme posta kutusu kullanın.** Normal işlem iletileri okundu işaretleyebilir ve başka klasöre taşıyabilir. Hazır örnek fatura oluşturmaz.
 
-Bu rehber 1.1.0 kaynakları içindir; güncel sürümün gerçek SAP kabul testleri henüz tamamlanmadı. Görseller önceki 1.0 demosundandır, alanlar farklı olabilir. [Test durumu](TECHNICAL-REFERENCE.md#neler-doğrulandı).
+Bu rehber 0.9.0 kaynakları içindir; güncel sürümün gerçek SAP kabul testleri henüz tamamlanmadı. Görseller önceki 1.0 demosundandır, alanlar farklı olabilir. [Test durumu](TECHNICAL-REFERENCE.md#neler-doğrulandı).
 
 ### Dosyaları indirin
 
 [GitHub deposunu](https://github.com/Cheditte/abap-imap-inbound) açın, **Code → Download ZIP** seçin ve arşivin tamamını bir klasöre çıkartın. Git kurmanız gerekmez.
 
-Klasör yapısını koruyun; farklı sürümlerden dosyaları karıştırmayın. SAP adımlarında ana klasördeki `ZIMAP_INSTALL.abap` dosyasını kullanacaksınız. Sunucu hazırlığını başka biri yapacaksa aynı paketi onunla paylaşın; `server` ve `script` klasörleri birlikte gerekir.
+Klasör yapısını koruyun; farklı sürümlerden dosyaları karıştırmayın. SAP adımlarında ana klasördeki `ZCHE_IMAP_INSTALL.abap` dosyasını kullanacaksınız. Sunucu hazırlığını başka biri yapacaksa aynı paketi onunla paylaşın; `server` ve `script` klasörleri birlikte gerekir.
 
 ## 1. Posta sunucusunu hazırlayın
 
@@ -77,13 +77,12 @@ Posta bilgileri ve sunucu hazırlığı tamamlandı. Şimdi SAP GUI içinde prog
 
 SE38 üzerinden aşağıdaki programı oluşturun.
 
-1. Program adı olarak **`ZIMAP_INSTALL`** yazıp **Create / Oluştur** seçin.
+1. Program adı olarak **`ZCHE_IMAP_INSTALL`** yazıp **Create / Oluştur** seçin.
 2. Açıklama girin; tür olarak **Executable program / Çalıştırılabilir program** seçin.
-3. Kaydederken kendi oluşturduğunuz veya projeye ayrılmış müşteri paketini kullanın; örneğin `ZIMAP`. Yalnız geçici denemede **Local Object / Yerel Nesne** seçilebilir.
-4. İndirdiğiniz [ZIMAP_INSTALL.abap](../../ZIMAP_INSTALL.abap) dosyasının **tamamını** açıp SAP editörüne yapıştırın.
+3. Kaydederken kendi oluşturduğunuz veya projeye ayrılmış müşteri paketini kullanın; örneğin `ZCHE_IMAP`. Yalnız geçici denemede **Local Object / Yerel Nesne** seçilebilir.
+4. İndirdiğiniz [ZCHE_IMAP_INSTALL.abap](../../ZCHE_IMAP_INSTALL.abap) dosyasının **tamamını** açıp SAP editörüne yapıştırın.
 5. Kaydedin, sözdizimi kontrolünü yapın ve **Activate / Etkinleştir** seçin.
 
-![SE38'de kurulum programını oluşturma — önceki demo](../screenshots/01-se38-create.png)
 
 **Ne zaman devam edebilirsiniz?** Program hata vermeden etkinleştiğinde. Sözdizimi veya etkinleştirme hatası varsa çözmeden sonraki adıma geçmeyin. Program adını aynen kullanın.
 
@@ -91,9 +90,8 @@ SE38 üzerinden aşağıdaki programı oluşturun.
 
 **Ne yapıyoruz?** Kurulum programı gerekli SAP ekranlarını, tablolarını ve sunucuyla bağlantı için gereken tanımları oluşturacak.
 
-SE38'de **`ZIMAP_INSTALL`** açıp **Execute / Çalıştır (F8)** seçin.
+SE38'de **`ZCHE_IMAP_INSTALL`** açıp **Execute / Çalıştır (F8)** seçin.
 
-![Kurulum seçenekleri — önceki demo](../screenshots/02-install-screen.png)
 
 - İlk kurulumda **DDIC objects**, **Programs**, **SM69 commands** ve **Server check** seçili kalsın. Bunlar tabloları, programları, sunucu komutlarını ve son kontrolü kapsar.
 - **Server folder** alanına Basis'in verdiği **tam klasör yolunu** girin. Ekrandaki örnek yolun size uygun olduğunu varsaymayın.
@@ -108,9 +106,8 @@ SE38'de **`ZIMAP_INSTALL`** açıp **Execute / Çalıştır (F8)** seçin.
 
 **Ne yapıyoruz?** Hangi posta hesabına bağlanacağımızı ve hangi klasördeki iletileri okuyacağımızı SAP'ye söylüyoruz. Bu ayarların birlikte kaydedilmiş haline **profil** denir.
 
-SE38'de **`ZIMAP_CONFIG`** açıp **F8** ile çalıştırın. Basis'in hazırladığı sunucuya bağlı SAP oturumunu kullanın; emin değilseniz Basis kontrol etsin.
+SE38'de **`ZCHE_IMAP_CONFIG`** açıp **F8** ile çalıştırın. Basis'in hazırladığı sunucuya bağlı SAP oturumunu kullanın; emin değilseniz Basis kontrol etsin.
 
-![Posta ayarları — önceki demo; görseldeki bağlantı bilgilerini kopyalamayın](../screenshots/04-config-profile.png)
 
 | Alan | Ne yazacaksınız / seçeceksiniz? |
 |---|---|
@@ -121,7 +118,7 @@ SE38'de **`ZIMAP_CONFIG`** açıp **F8** ile çalıştırın. Basis'in hazırlad
 | Okunacak klasör | Varsayılan `INBOX`, Gelen Kutusu'nu okur. Başka klasör için onun gerçek adını/yolunu girin. |
 | İşlenmiş klasörü | Başarılı iletilerin taşınacağı, aynı posta hesabındaki, okunacak klasörden farklı seçtiğiniz klasörün gerçek adı/yolu. `SAP-Processed` adı zorunlu değildir. |
 | Taşıma yöntemi | İlk denemede `MOVE` seçin. |
-| Handler programı | **`ZIMAP_HANDLER_DEMO`** kalsın. Bu, her e-posta için çalışacak hazır örnek programdır. |
+| Handler programı | **`ZCHE_IMAP_HANDLER_DEMO`** kalsın. Bu, her e-posta için çalışacak hazır örnek programdır. |
 
 İlk denemede ileti sayısı, boyut ve zaman aşımı gibi diğer sınırları Basis ile kontrol edip başlangıç değerlerinde bırakabilirsiniz. Ayrıntılı alanlar ve sunucuda parola kaydetme işlemi [teknik rehberde](TECHNICAL-REFERENCE.md#profil-alanları-ve-sunucuda-parola-yönetimi).
 
@@ -139,12 +136,11 @@ SE38'de **`ZIMAP_CONFIG`** açıp **F8** ile çalıştırın. Basis'in hazırlad
 
 Deneme posta kutusuna küçük bir PDF veya metin eki bulunan e-posta gönderin. Gelen Kutusu yerine başka klasör seçtiyseniz iletiyi o klasöre koyun.
 
-1. SE38'de **`ZIMAP_INBOUND`** açıp çalıştırın.
+1. SE38'de **`ZCHE_IMAP_INBOUND`** açıp çalıştırın.
 2. Önceki adımda kaydettiğiniz **profil adını** girin.
 3. **List only (no downloads/changes)**, yani **yalnız listele** seçeneğini işaretleyip **F8** basın. Uygun iletilerin numaraları listelenir; içerik ve ekler henüz alınmaz, iletiler taşınmaz.
 4. Listeleme başarılıysa geri dönün, **yalnız listele işaretini kaldırın** ve tekrar çalıştırın. Bu kez e-posta ve ekleri alınır, hazır örnek çalışır ve başarılı ileti seçtiğiniz işlenmiş klasörüne taşınır.
 
-![İşleme ekranı — önceki demo; güncel listeleme modu içerik göstermez](../screenshots/06-inbound-screen.png)
 
 **Ne zaman devam edebilirsiniz?** Çalıştırma tamamlandığında. Şimdi sonucu SAP'de ve posta kutusunda kontrol edeceğiz.
 
@@ -152,12 +148,11 @@ Deneme posta kutusuna küçük bir PDF veya metin eki bulunan e-posta gönderin.
 
 **Ne yapıyoruz?** İşlemin sonucunu görüyor ve ekin SAP'den erişilebilir olduğunu kontrol ediyoruz.
 
-1. SE38'de **`ZIMAP_MONITOR`** açıp çalıştırın.
+1. SE38'de **`ZCHE_IMAP_MONITOR`** açıp çalıştırın.
 2. Profilinizi ve deneme gününü kapsayan tarih aralığını seçip **F8** basın.
 3. Deneme iletinizin kaydını açın; metnini ve eklerini inceleyin.
 4. Posta hesabınızı da açın. Başarılı ileti seçtiğiniz işlenmiş klasöründe bulunmalı.
 
-![Sonuçları izleme ekranı — önceki demo](../screenshots/08-monitor-list.png)
 
 | Durum | Kısaca anlamı |
 |---|---|
@@ -182,7 +177,7 @@ Hata metnini ve kaldığınız adımı paylaşın; parola paylaşmayın. Yetkili
 
 **Ne yapıyoruz?** Başarılı denemeden sonra posta kontrolünün elle başlatılmadan, belirlenen aralıklarla çalışmasını sağlıyoruz.
 
-SM36 yetkiniz varsa `ZIMAP_INBOUND` için bir **arka plan işi** oluşturun; bu yetki başka ekipteyse Basis'ten planlamasını isteyin. Doğru profil kullanılmalı, yalnız listeleme kapalı olmalı ve iş hazırladığımız **aynı SAP makinesinde** çalışmalıdır. İşi çalıştıracak kullanıcıyla da deneme yapın veya ilgili ekibe yaptırın.
+SM36 yetkiniz varsa `ZCHE_IMAP_INBOUND` için bir **arka plan işi** oluşturun; bu yetki başka ekipteyse Basis'ten planlamasını isteyin. Doğru profil kullanılmalı, yalnız listeleme kapalı olmalı ve iş hazırladığımız **aynı SAP makinesinde** çalışmalıdır. İşi çalıştıracak kullanıcıyla da deneme yapın veya ilgili ekibe yaptırın.
 
 Gerçek iş adımını süreç sorumlusuyla belirleyip uygulayın. Örneğin eki bir siparişe bağlama işlemi [geliştirici rehberindeki](TECHNICAL-GUIDE.md) bağlantı noktasıyla eklenir. Canlı kullanımdan önce iş kurallarını, yetkileri ve paketle taşıma sürecini test sisteminizde doğrulayın.
 

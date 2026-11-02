@@ -1,15 +1,16 @@
+* Project: abap-imap-inbound
 *---------------------------------------------------------------
-* ZIMAP_COMMON - shared types and helper forms (INCLUDE)
-* Used by ZIMAP_INBOUND, ZIMAP_CONFIG, ZIMAP_MONITOR and the
-* handler programs. Included together with ZIMAP_IO.
+* ZCHE_IMAP_COMMON - shared types and helper forms (INCLUDE)
+* Used by ZCHE_IMAP_INBOUND, ZCHE_IMAP_CONFIG, ZCHE_IMAP_MONITOR and the
+* handler programs. Included together with ZCHE_IMAP_IO.
 *
-* Compatible with old releases (4.6C and later): no inline
-* declarations, string templates, TRY/CATCH or new Open SQL;
+* Classic ABAP 7.00: no inline
+* declarations, constructor expressions or string templates;
 * lines at most 72 characters; ASCII only.
 *---------------------------------------------------------------
-TYPES: ty_t_line TYPE STANDARD TABLE OF zimap_s_line
+TYPES: ty_t_line TYPE STANDARD TABLE OF zche_imap_s_line
                  WITH DEFAULT KEY.
-TYPES: ty_t_att TYPE STANDARD TABLE OF zimap_s_att
+TYPES: ty_t_att TYPE STANDARD TABLE OF zche_imap_s_att
                 WITH DEFAULT KEY.
 TYPES: BEGIN OF ty_bin,
          data(1024) TYPE x,
@@ -22,15 +23,15 @@ TYPES: BEGIN OF ty_uid,
 TYPES: ty_t_uid TYPE STANDARD TABLE OF ty_uid
                 WITH DEFAULT KEY.
 
-CONSTANTS: gc_version(10) TYPE c VALUE '1.1.0'.
+CONSTANTS: gc_version(10) TYPE c VALUE '0.9.0'.
 
 DATA: gv_root(200)  TYPE c,
       gv_sep(1)     TYPE c,
       gv_filecp(10) TYPE c.
 
 *---------------------------------------------------------------
-* Setup settings (ZIMAP_PARAM): server folder and file code
-* page. Written by ZIMAP_INSTALL.
+* Setup settings (ZCHE_IMAP_PARAM): server folder and file code
+* page. Written by ZCHE_IMAP_INSTALL.
 *---------------------------------------------------------------
 FORM get_setup CHANGING cv_ok TYPE c.
   DATA: lv_val(255) TYPE c,
@@ -38,12 +39,12 @@ FORM get_setup CHANGING cv_ok TYPE c.
 
   CLEAR: cv_ok, gv_root, gv_sep, gv_filecp.
 * Files are local to one explicitly selected application server.
-  SELECT SINGLE pvalue FROM zimap_param INTO lv_val
+  SELECT SINGLE pvalue FROM zche_imap_param INTO lv_val
     WHERE param = 'EXEC_HOST'.
   IF sy-subrc <> 0 OR lv_val <> sy-host.
     EXIT.
   ENDIF.
-  SELECT SINGLE pvalue FROM zimap_param INTO lv_val
+  SELECT SINGLE pvalue FROM zche_imap_param INTO lv_val
     WHERE param = 'ROOT'.
   IF sy-subrc <> 0 OR lv_val IS INITIAL.
     EXIT.
@@ -62,7 +63,7 @@ FORM get_setup CHANGING cv_ok TYPE c.
   IF gv_root+lv_len(1) <> gv_sep.
     CONCATENATE gv_root gv_sep INTO gv_root.
   ENDIF.
-  SELECT SINGLE pvalue FROM zimap_param INTO lv_val
+  SELECT SINGLE pvalue FROM zche_imap_param INTO lv_val
     WHERE param = 'FILECP'.
   IF sy-subrc <> 0 OR lv_val IS INITIAL.
     EXIT.
@@ -118,7 +119,8 @@ FORM profile_valid USING iv_prof TYPE c CHANGING cv_ok TYPE c.
   cv_ok = 'X'.
 ENDFORM.
 
-* Scope 1 keeps the lock across commits and local updates.
+* Scope 1 locks one SID/client/profile across commits.
+* E_TABLE is intentional: no generated lock FM is required.
 FORM profile_lock USING iv_prof TYPE c CHANGING cv_ok TYPE c.
   DATA: lv_key(28) TYPE c,
         lv_varkey LIKE rstable-varkey.
@@ -128,7 +130,7 @@ FORM profile_lock USING iv_prof TYPE c CHANGING cv_ok TYPE c.
   lv_varkey = lv_key.
   CALL FUNCTION 'ENQUEUE_E_TABLE'
     EXPORTING
-      tabname = 'ZIMAP_PROFILE'
+      tabname = 'ZCHE_IMAP_PROFILE'
       varkey  = lv_varkey
       _scope  = '1'
     EXCEPTIONS
@@ -146,7 +148,7 @@ FORM profile_unlock USING iv_prof TYPE c.
   lv_varkey = lv_key.
   CALL FUNCTION 'DEQUEUE_E_TABLE'
     EXPORTING
-      tabname = 'ZIMAP_PROFILE'
+      tabname = 'ZCHE_IMAP_PROFILE'
       varkey  = lv_varkey
       _scope  = '1'.
 ENDFORM.
@@ -161,23 +163,6 @@ FORM table_auth USING iv_table TYPE c iv_action TYPE c
         lv_action(1) TYPE c.
 
   CLEAR cv_ok.
-  PERFORM fm_exists USING 'VIEW_AUTHORITY_CHECK'
-                    CHANGING lv_exists.
-  IF lv_exists IS INITIAL.
-    EXIT.
-  ENDIF.
-  SELECT SINGLE parameter FROM fupararef INTO lv_param
-    WHERE funcname = 'VIEW_AUTHORITY_CHECK'
-      AND parameter = 'VIEW_NAME'.
-  IF sy-subrc <> 0.
-    EXIT.
-  ENDIF.
-  SELECT SINGLE parameter FROM fupararef INTO lv_param
-    WHERE funcname = 'VIEW_AUTHORITY_CHECK'
-      AND parameter = 'VIEW_ACTION'.
-  IF sy-subrc <> 0.
-    EXIT.
-  ENDIF.
   lv_table = iv_table.
   lv_action = iv_action.
   CALL FUNCTION 'VIEW_AUTHORITY_CHECK'
@@ -192,13 +177,11 @@ FORM table_auth USING iv_table TYPE c iv_action TYPE c
 ENDFORM.
 
 *---------------------------------------------------------------
-FORM fm_exists USING    iv_func TYPE c
-               CHANGING cv_ok   TYPE c.
-  DATA lv_func(30) TYPE c.
-
+FORM fm_exists USING iv_func TYPE c CHANGING cv_ok TYPE c.
   CLEAR cv_ok.
-  SELECT SINGLE funcname FROM tfdir INTO lv_func
-    WHERE funcname = iv_func.
+  CALL FUNCTION 'FUNCTION_EXISTS'
+    EXPORTING funcname = iv_func
+    EXCEPTIONS function_not_exist = 1 OTHERS = 2.
   IF sy-subrc = 0.
     cv_ok = 'X'.
   ENDIF.
@@ -229,7 +212,7 @@ FORM call_cmd USING    iv_cmd   TYPE c
                        cv_msg   TYPE c.
   DATA: lt_prot      TYPE STANDARD TABLE OF btcxpm,
         ls_prot      TYPE btcxpm,
-        ls_out       TYPE zimap_s_line,
+        ls_out       TYPE zche_imap_s_line,
         lv_cmd       LIKE sxpgcolist-name,
         lv_par       LIKE sxpgcolist-parameters,
         lv_rc(4)     TYPE c,
@@ -242,6 +225,10 @@ FORM call_cmd USING    iv_cmd   TYPE c
   CLEAR: ct_out, cv_ok, cv_msg.
   lv_cmd = iv_cmd.
   lv_par = iv_param.
+  IF lv_par <> iv_param OR lv_cmd <> iv_cmd.
+    cv_msg = 'ERR ARG SM69 parameters exceed the target field'.
+    EXIT.
+  ENDIF.
 
 * Only parameters that exist in every release are used. A
 * parameter missing from the interface stops the program at
@@ -322,7 +309,7 @@ FORM call_cmd USING    iv_cmd   TYPE c
   ENDIF.
   IF NOT cv_ok IS INITIAL AND lv_protocol <> 1.
     CLEAR cv_ok.
-    cv_msg = 'ERR CFG Script protocol mismatch; install v1.1.0'.
+    cv_msg = 'ERR CFG Script protocol mismatch; install v0.9.0'.
   ENDIF.
 ENDFORM.
 
@@ -346,7 +333,7 @@ FORM map_error USING    iv_line   TYPE c
   CASE lv_code.
     WHEN 'AUTH'.
       cv_text = 'Wrong user name or password.'.
-      cv_hint = 'ZIMAP_CONFIG: enter the password again.'.
+      cv_hint = 'ZCHE_IMAP_CONFIG: enter the password again.'.
     WHEN 'CONNECT'.
       cv_text = 'Cannot reach the mail server.'.
       cv_hint = 'Check server name and port; firewall (Basis).'.
@@ -358,7 +345,7 @@ FORM map_error USING    iv_line   TYPE c
       cv_hint = 'Basis: bin/policy.psd1 (allowed servers).'.
     WHEN 'CFG'.
       cv_text = 'Profile settings are missing or invalid.'.
-      cv_hint = 'Save the profile with ZIMAP_CONFIG.'.
+      cv_hint = 'Save the profile with ZCHE_IMAP_CONFIG.'.
     WHEN 'MAILBOX'.
       cv_text = 'IMAP folder not found.'.
       cv_hint = 'Check the inbox and processed folder names.'.
@@ -366,7 +353,7 @@ FORM map_error USING    iv_line   TYPE c
       cv_text = 'Mail not found on the server (may be deleted).'.
     WHEN 'SIZE'.
       cv_text = 'Mail exceeds the size limit.'.
-      cv_hint = 'ZIMAP_CONFIG: increase the max mail size (MB).'.
+      cv_hint = 'ZCHE_IMAP_CONFIG: increase the max mail size (MB).'.
     WHEN 'PARSE'.
       cv_text = 'Mail content is invalid or exceeds parser limits.'.
       cv_hint = 'Review MIME/HTML detail; ask for a corrected mail.'.
@@ -374,10 +361,10 @@ FORM map_error USING    iv_line   TYPE c
       cv_text = 'Invalid parameter passed to the script.'.
     WHEN 'SXPG1'.
       cv_text = 'No authorization for the OS command.'.
-      cv_hint = 'Authorization object S_LOG_COM (ZIMAP_*).'.
+      cv_hint = 'Authorization object S_LOG_COM (ZCHE_IMAP_*).'.
     WHEN 'SXPG2'.
       cv_text = 'SM69 command is not defined.'.
-      cv_hint = 'Run the program ZIMAP_INSTALL.'.
+      cv_hint = 'Run the program ZCHE_IMAP_INSTALL.'.
     WHEN OTHERS.
       IF lv_code(4) = 'SXPG'.
         cv_text = 'SM69 command could not be run.'.
@@ -411,14 +398,14 @@ ENDFORM.
 * Reads the parsed mail folder (header, body, attach).
 *---------------------------------------------------------------
 FORM read_mail_dir USING    iv_dir  TYPE c
-                   CHANGING cs_mail TYPE zimap_s_mail
+                   CHANGING cs_mail TYPE zche_imap_s_mail
                             ct_body TYPE ty_t_line
                             ct_att  TYPE ty_t_att
                             cv_ok   TYPE c
                             cv_msg  TYPE c.
   DATA: lt_lines     TYPE ty_t_line,
-        ls_line      TYPE zimap_s_line,
-        ls_att       TYPE zimap_s_att,
+        ls_line      TYPE zche_imap_s_line,
+        ls_att       TYPE zche_imap_s_att,
         lv_path(255) TYPE c,
         lv_key(20)   TYPE c,
         lv_val(255)  TYPE c.
@@ -441,18 +428,7 @@ FORM read_mail_dir USING    iv_dir  TYPE c
     EXIT.
   ENDIF.
   LOOP AT lt_lines INTO ls_line.
-    CLEAR: lv_key, lv_val.
-*   The last field takes the rest of the text, '=' signs included
-    SPLIT ls_line-text AT '=' INTO lv_key lv_val.
-    CASE lv_key.
-      WHEN 'FROM'.      cs_mail-sender    = lv_val.
-      WHEN 'TO'.        cs_mail-recipient = lv_val.
-      WHEN 'CC'.        cs_mail-copy_to   = lv_val.
-      WHEN 'SUBJECT'.   cs_mail-subject   = lv_val.
-      WHEN 'DATE'.      cs_mail-maildate  = lv_val.
-      WHEN 'MESSAGEID'. cs_mail-messageid = lv_val.
-      WHEN 'ATTCOUNT'.  cs_mail-attcnt    = lv_val.
-    ENDCASE.
+    PERFORM apply_header_line USING ls_line-text CHANGING cs_mail.
   ENDLOOP.
 
   CONCATENATE iv_dir 'body.txt' INTO lv_path.
@@ -477,6 +453,23 @@ FORM read_mail_dir USING    iv_dir  TYPE c
   ENDLOOP.
 ENDFORM.
 
+FORM apply_header_line USING iv_line TYPE c
+                       CHANGING cs_mail TYPE zche_imap_s_mail.
+  DATA: lv_key(20) TYPE c, lv_val(255) TYPE c.
+    CLEAR: lv_key, lv_val.
+*   The last field takes the rest of the text, '=' signs included
+    SPLIT iv_line AT '=' INTO lv_key lv_val.
+    CASE lv_key.
+      WHEN 'FROM'.      cs_mail-sender    = lv_val.
+      WHEN 'TO'.        cs_mail-recipient = lv_val.
+      WHEN 'CC'.        cs_mail-copy_to   = lv_val.
+      WHEN 'SUBJECT'.   cs_mail-subject   = lv_val.
+      WHEN 'DATE'.      cs_mail-maildate  = lv_val.
+      WHEN 'MESSAGEID'. cs_mail-messageid = lv_val.
+      WHEN 'ATTCOUNT'.  cs_mail-attcnt    = lv_val.
+    ENDCASE.
+ENDFORM.
+
 *---------------------------------------------------------------
 * Splits a long text into chunks of 50 for the screen message
 * (message 00/001: &1&2&3&4).
@@ -490,3 +483,100 @@ FORM show_msg USING iv_type TYPE c
           WITH lv_text(50) lv_text+50(50) lv_text+100(50)
                lv_text+150(50).
 ENDFORM.
+
+* Both the configuration UI and processor enforce this server-owned prefix.
+FORM handler_allowed USING iv_prog TYPE c iv_form TYPE c
+                     CHANGING cv_ok TYPE c.
+  DATA: lv_prefix(255) TYPE c, lv_pattern(256) TYPE c,
+        lv_length TYPE i.
+  CLEAR cv_ok.
+  SELECT SINGLE pvalue FROM zche_imap_param INTO lv_prefix
+    WHERE param = 'HANDLER_PREFIX'.
+  IF sy-subrc <> 0 OR lv_prefix IS INITIAL.
+    EXIT.
+  ENDIF.
+  lv_length = STRLEN( lv_prefix ).
+  IF lv_prefix(1) <> 'Z' AND lv_prefix(1) <> 'Y'.
+    EXIT.
+  ENDIF.
+  IF lv_prefix(lv_length) CN 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'.
+    EXIT.
+  ENDIF.
+  CONCATENATE lv_prefix '*' INTO lv_pattern.
+  IF iv_prog NP lv_pattern OR iv_form IS INITIAL.
+    EXIT.
+  ENDIF.
+  lv_length = STRLEN( iv_form ).
+  IF iv_form(lv_length) CN 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'.
+    EXIT.
+  ENDIF.
+  cv_ok = 'X'.
+ENDFORM.
+
+FORM profile_auth USING iv_prof TYPE c iv_activity TYPE c
+                  CHANGING cv_ok TYPE c.
+  CLEAR cv_ok.
+  AUTHORITY-CHECK OBJECT 'ZCHE_IMAP'
+    ID 'ZCHE_PROF' FIELD iv_prof
+    ID 'ACTVT' FIELD iv_activity.
+  IF sy-subrc = 0.
+    cv_ok = 'X'.
+  ENDIF.
+ENDFORM.
+
+FORM list_arguments USING iv_key TYPE c iv_revision TYPE c
+                          iv_test TYPE c CHANGING cv_args TYPE c.
+  CONCATENATE iv_key iv_revision INTO cv_args SEPARATED BY space.
+  IF iv_test IS INITIAL.
+    CONCATENATE cv_args 'PURGE' INTO cv_args SEPARATED BY space.
+  ENDIF.
+ENDFORM.
+
+INCLUDE zche_imap_io.
+
+CLASS ltc_protocol DEFINITION FOR TESTING. "#AU Risk_Level Harmless
+  PRIVATE SECTION.
+    METHODS long_profile_purge FOR TESTING.
+    METHODS dry_run_no_purge FOR TESTING.
+    METHODS invalid_profile FOR TESTING.
+    METHODS metadata_equals_preserved FOR TESTING.
+    METHODS metadata_unknown_ignored FOR TESTING.
+ENDCLASS.
+CLASS ltc_protocol IMPLEMENTATION.
+  METHOD metadata_equals_preserved.
+    DATA ls_mail TYPE zche_imap_s_mail.
+    PERFORM apply_header_line USING 'SUBJECT=Amount=42'
+      CHANGING ls_mail.
+    cl_aunit_assert=>assert_equals(
+      act = ls_mail-subject exp = 'Amount=42' ).
+  ENDMETHOD.
+  METHOD metadata_unknown_ignored.
+    DATA ls_mail TYPE zche_imap_s_mail.
+    ls_mail-subject = 'Keep'.
+    PERFORM apply_header_line USING 'OTHER=Ignore'
+      CHANGING ls_mail.
+    cl_aunit_assert=>assert_equals(
+      act = ls_mail-subject exp = 'Keep' ).
+  ENDMETHOD.
+
+  METHOD long_profile_purge.
+    DATA lv_args(128) TYPE c.
+    PERFORM list_arguments USING 'TST_001_ABCDEFGHIJKLMNOPQRST'
+      '0000000001' space CHANGING lv_args.
+    cl_aunit_assert=>assert_equals(
+      act = lv_args
+      exp = 'TST_001_ABCDEFGHIJKLMNOPQRST 0000000001 PURGE' ).
+  ENDMETHOD.
+  METHOD dry_run_no_purge.
+    DATA lv_args(128) TYPE c.
+    PERFORM list_arguments USING 'TST_001_DEMO' '0000000001'
+      'X' CHANGING lv_args.
+    cl_aunit_assert=>assert_equals(
+      act = lv_args exp = 'TST_001_DEMO 0000000001' ).
+  ENDMETHOD.
+  METHOD invalid_profile.
+    DATA lv_ok TYPE c.
+    PERFORM profile_valid USING '../MAIL' CHANGING lv_ok.
+    cl_aunit_assert=>assert_initial( lv_ok ).
+  ENDMETHOD.
+ENDCLASS.

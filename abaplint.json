@@ -3,9 +3,17 @@
     "files": "/src/**/*.abap"
   },
   "syntax": {
-    "version": "v702"
+    "version": "v700",
+    "errorNamespace": "^(ZCHE_|LC[XL]|LTC_)"
   },
   "rules": {
-    "parser_error": true
-  }
+    "parser_error": true,
+    "check_syntax": true
+  },
+  "dependencies": [
+    {
+      "folder": "/deps",
+      "files": "/**/*.xml"
+    }
+  ]
 }

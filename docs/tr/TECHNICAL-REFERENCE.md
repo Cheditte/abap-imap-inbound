@@ -2,7 +2,7 @@
 
 > [English](../TECHNICAL-REFERENCE.md) | **Türkçe** · [Projeyi tanıyın](../../README.tr.md) · [Kurulum](WALKTHROUGH.md) · [Kod örnekleri](TECHNICAL-GUIDE.md)
 
-Bu dosya, kurulumu hazırlayan Basis ve e-posta ekipleri ile ayrıntıları incelemek isteyen geliştiriciler içindir. **1.1.0 kaynaklarını ve betik protokolü 2'yi** anlatır. Sırayla kurulum yapmak için [adım adım rehberi](WALKTHROUGH.md), kendi iş mantığınızı eklemek için [geliştirici rehberini](TECHNICAL-GUIDE.md) kullanın.
+Bu dosya, kurulumu hazırlayan Basis ve e-posta ekipleri ile ayrıntıları incelemek isteyen geliştiriciler içindir. **0.9.0 kaynaklarını ve betik protokolü 2'yi** anlatır. Sırayla kurulum yapmak için [adım adım rehberi](WALKTHROUGH.md), kendi iş mantığınızı eklemek için [geliştirici rehberini](TECHNICAL-GUIDE.md) kullanın.
 
 SAP adımlarında okuyucunun SE38 ile program oluşturup etkinleştirebildiği ve çalıştırabildiği varsayılır. Bu rehberde **Basis / sunucu yöneticisi**, sunucunun yönetim sorumluluğunu üstlenen kişi veya ekibi ifade eder; gerekli yetkilere sahipseniz bu kişi siz olabilirsiniz. Posta yönetimi için de aynı ayrım geçerlidir. [Yetkiler sizdeyse hazırlık adımları](SELF-MANAGED-SETUP.md).
 
@@ -23,7 +23,7 @@ SAP adımlarında okuyucunun SE38 ile program oluşturup etkinleştirebildiği v
 |---|---|
 | IMAP | Bir programın posta sunucusundaki iletileri ve klasörleri okumasını sağlayan bağlantı yöntemi. |
 | Profil | Bir posta kutusunun sunucu, kullanıcı, klasör ve işleme ayarlarını SAP'de birlikte kaydettiğiniz tanım. |
-| Handler | Her e-postayla ne yapılacağını belirleyen ABAP programı. İlk denemede hazır `ZIMAP_HANDLER_DEMO` örneği kullanılır. |
+| Handler | Her e-postayla ne yapılacağını belirleyen ABAP programı. İlk denemede hazır `ZCHE_IMAP_HANDLER_DEMO` örneği kullanılır. |
 | Uygulama sunucusu | SAP'nin çalıştığı Windows veya Linux makine. Kurulum komutları kendi bilgisayarınızda değil, bu makinede çalıştırılır. |
 | Arka plan işi / job | SAP'nin belirlediğiniz aralıklarla otomatik çalıştırdığı program. Örneğin posta kutusunu düzenli kontrol etmek için kullanılır. |
 
@@ -69,17 +69,17 @@ Aşağıdaki liste bir yol haritasıdır. Ekran adımları ve çalıştırılaca
 1. **Proje dosyalarını indirin.** Deponun ana sayfasındaki **Code → Download ZIP** ile indirip arşivin tamamını açın. Git kurmanız gerekmez. Sunucu ve SAP dosyalarını aynı indirmeden kullanın.
 2. **Deneme posta kutusunu hazırlayın veya yöneticisinden isteyin.** Yukarıdaki bağlantı bilgilerini alın ve işlenen iletiler için posta kutusundaki mevcut bir klasörü seçin.
 3. **Sunucuyu hazırlayın veya yöneticisine hazırlatın.** İşlem SAP uygulama sunucusunda çalışır. PowerShell ve `curl` adlı yardımcı araçlar burada e-postayı alır; ayrı bir entegrasyon sunucusu gerekmez. Basis ağ erişimini ve korumalı çalışma klasörünü hazırlar, klasörün tam yolunu size verir. [Sunucu hazırlığı](WALKTHROUGH.md#2-sapnin-kurulu-olduğu-makineyi-hazırlayın).
-4. **SAP programlarını kurun.** **SE38** içinde `ZIMAP_INSTALL` programını oluşturup projedeki aynı adlı kaynağı yükleyin, etkinleştirin ve çalıştırın. Bu program gerekli SAP programlarını ve tablolarını oluşturur. [SAP kurulum adımları](WALKTHROUGH.md#31-kurulum-programını-oluşturun).
-5. **Bir posta profili kaydedin.** `ZIMAP_CONFIG` içinde bir ad seçip gerçek sunucu, kullanıcı ve klasör bilgilerinizi girin. İlk denemede handler olarak `ZIMAP_HANDLER_DEMO`, taşıma yöntemi olarak `MOVE` seçin. Parola kaynağı `S`, parolayı SAP ekranından girmeniz; `O`, Basis'in sunucuda kaydetmesi anlamına gelir. **F8** ayarları kaydeder ve bağlantıyı test eder; yalnız kaydın oluşması başarılı bağlantı demek değildir. [Profil tanımlama](WALKTHROUGH.md#33-posta-kutusu-profilini-tanımlayın).
+4. **SAP programlarını kurun.** **SE38** içinde `ZCHE_IMAP_INSTALL` programını oluşturup projedeki aynı adlı kaynağı yükleyin, etkinleştirin ve çalıştırın. Bu program gerekli SAP programlarını ve tablolarını oluşturur. [SAP kurulum adımları](WALKTHROUGH.md#31-kurulum-programını-oluşturun).
+5. **Bir posta profili kaydedin.** `ZCHE_IMAP_CONFIG` içinde bir ad seçip gerçek sunucu, kullanıcı ve klasör bilgilerinizi girin. İlk denemede handler olarak `ZCHE_IMAP_HANDLER_DEMO`, taşıma yöntemi olarak `MOVE` seçin. Parola kaynağı `S`, parolayı SAP ekranından girmeniz; `O`, Basis'in sunucuda kaydetmesi anlamına gelir. **F8** ayarları kaydeder ve bağlantıyı test eder; yalnız kaydın oluşması başarılı bağlantı demek değildir. [Profil tanımlama](WALKTHROUGH.md#33-posta-kutusu-profilini-tanımlayın).
 
-Kalıcı kullanım için `ZIMAP` gibi bir müşteri paketi oluşturun veya projeye ayrılmış paketi kullanın. Installer şu anda ürettiği nesneleri `$TMP` adlı yerel deneme alanına koyar; installer'ı pakete kaydetmek tek başına bunu değiştirmez. Test ve canlı sisteme taşıma için [paket ve transport adımlarını](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) Basis ve geliştiriciyle planlayın.
+Kalıcı kullanım için `ZCHE_IMAP` gibi bir müşteri paketi oluşturun veya projeye ayrılmış paketi kullanın. Installer şu anda ürettiği nesneleri `$TMP` adlı yerel deneme alanına koyar; installer'ı pakete kaydetmek tek başına bunu değiştirmez. Test ve canlı sisteme taşıma için [paket ve transport adımlarını](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) Basis ve geliştiriciyle planlayın.
 
 ## İlk denemede ne yapacaksınız?
 
 1. Deneme posta kutusuna küçük bir PDF veya metin eki bulunan e-posta gönderin.
-2. SAP'de **SE38** üzerinden `ZIMAP_INBOUND` programını açın. Kaydettiğiniz profil adını girin. **List only (no downloads/changes)** seçeneğini işaretleyip çalıştırın. Bu adım uygun iletilerin numaralarını (`UID`) listeler; içerik ve ekleri göstermez, e-postaları taşımaz.
-3. Listeleme başarılıysa aynı deneme profilini `ZIMAP_HANDLER_DEMO` ile, bu kez **List only seçeneği kapalı** çalıştırın. Artık ileti ve ekleri gerçekten alınır; örnek programın sonucu kaydedilir ve başarılı ileti işlenmiş klasörüne taşınır.
-4. `ZIMAP_MONITOR` programında sonucu ve ekleri inceleyin. Başarıyla tamamlanan ileti `S` durumunda görünür; posta kutusunda da seçtiğiniz işlenmiş klasöründe bulunmalıdır.
+2. SAP'de **SE38** üzerinden `ZCHE_IMAP_INBOUND` programını açın. Kaydettiğiniz profil adını girin. **List only (no downloads/changes)** seçeneğini işaretleyip çalıştırın. Bu adım uygun iletilerin numaralarını (`UID`) listeler; içerik ve ekleri göstermez, e-postaları taşımaz.
+3. Listeleme başarılıysa aynı deneme profilini `ZCHE_IMAP_HANDLER_DEMO` ile, bu kez **List only seçeneği kapalı** çalıştırın. Artık ileti ve ekleri gerçekten alınır; örnek programın sonucu kaydedilir ve başarılı ileti işlenmiş klasörüne taşınır.
+4. `ZCHE_IMAP_MONITOR` programında sonucu ve ekleri inceleyin. Başarıyla tamamlanan ileti `S` durumunda görünür; posta kutusunda da seçtiğiniz işlenmiş klasöründe bulunmalıdır.
 5. Deneme tamamlandıktan sonra kendi iş kurallarınızı ekleyin. Düzenli çalışmayı Basis, kurulum yapılan **aynı SAP uygulama sunucusunda** bir arka plan işi olarak planlasın.
 
 Hazır örnekte SAP'de bir fatura veya sipariş oluşmasını beklemeyin. Bu denemenin amacı posta bağlantısını, dosyaların alınmasını ve sonucu izlemeyi doğrulamaktır.
@@ -103,7 +103,7 @@ Destek isterken hangi adımda kaldığınızı ve hata metnini paylaşın; parol
 
 Bu proje, SAP'nin belirli aralıklarla mevcut bir posta kutusuna bağlanıp iletileri almasını sağlar. SAPconnect/SMTP ise e-postaların SAP'ye teslim edildiği başka bir akıştır. Seçim kurumunuzun ihtiyacına bağlıdır; [SAP'nin gelen ileti açıklamasına](https://help.sap.com/saphelp_snc700_ehp01/helpdata/en/2b/d9260b4b8a11d1894c0000e8323c4f/content.htm?no_cache=true) bakabilirsiniz.
 
-Kaynaklar klasik ABAP sistemleri için **4.6C–7.5x** uyumluluğunu hedefler. Bu bir uyumluluk sertifikası değildir; hedef SAP sürümünüzde derleme ve çalışma testi gerekir.
+Kaynaklar klasik ABAP sistemleri için **7.00 and later** uyumluluğunu hedefler. Bu bir uyumluluk sertifikası değildir; hedef SAP sürümünüzde derleme ve çalışma testi gerekir.
 
 ## Yetkiler ve işletim sınırları
 
@@ -111,9 +111,9 @@ Basis, yetkileri ilgili kullanıcılara ve tablo yetki gruplarına göre tanıml
 
 | Rol | Gerekli erişim |
 |---|---|
-| Job kullanıcısı | `ZIMAP_PROFILE` görüntüleme; `ZIMAP_LOG` değiştirme; `S_LOG_COM` üzerinden `ZIMAP_LIST`, `ZIMAP_FETCH`, `ZIMAP_DONE`; `S_DATASET` üzerinden gelen mail dosyalarını okuma; handler'ın ihtiyaç duyduğu yetkiler. |
-| Profil yöneticisi | `ZIMAP_PROFILE` görüntüleme/değiştirme; `ZIMAP_TEST` çalıştırma; `ZIMAP_CONFIG` için profil ve kimlik bilgisi dosyalarına `S_DATASET` yazma erişimi. |
-| İzleme kullanıcısı | `ZIMAP_LOG` görüntüleme; `ZIMAP_MONITOR` için gelen/arşiv dosyalarını okuma. Yeniden işleme ayrıca `ZIMAP_LOG` değiştirme yetkisi gerektirir. |
+| Job kullanıcısı | `ZCHE_IMAP_PROFILE` görüntüleme; `ZCHE_IMAP_LOG` değiştirme; `S_LOG_COM` üzerinden `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE`; `S_DATASET` üzerinden gelen mail dosyalarını okuma; handler'ın ihtiyaç duyduğu yetkiler. |
+| Profil yöneticisi | `ZCHE_IMAP_PROFILE` görüntüleme/değiştirme; `ZCHE_IMAP_TEST` çalıştırma; `ZCHE_IMAP_CONFIG` için profil ve kimlik bilgisi dosyalarına `S_DATASET` yazma erişimi. |
+| İzleme kullanıcısı | `ZCHE_IMAP_LOG` görüntüleme; `ZCHE_IMAP_MONITOR` için gelen/arşiv dosyalarını okuma. Yeniden işleme ayrıca `ZCHE_IMAP_LOG` değiştirme yetkisi gerektirir. |
 | Kurulumu yapan | Proje nesneleri için geliştirme yetkileri ve SM69 komutlarını yönetip test etme yetkileri. Kaldırmada ek client kontrolleri vardır. |
 
 - Proje şifreleri **kendi SAP tablolarına yazmaz**. Kimlik bilgileri işletim sistemi izinleriyle korunan düz metin dosyalardır; SAP servis hesabı ve ayrıcalıklı yöneticiler erişebilir. Uygulama kaydedilmiş şifreyi göstermez.
@@ -121,7 +121,7 @@ Basis, yetkileri ilgili kullanıcılara ve tablo yetki gruplarına göre tanıml
 - İzinli mail sunucuları, TLS istisnaları, boyut sınırları ve zaman aşımı `bin/policy.psd1` içinde Basis tarafından belirlenir. SAP servis hesabının `bin` erişimi okuma/çalıştırmayla sınırlıdır.
 - Profil dosyaları sistem, client ve profil adına göre ayrılır; revizyon olarak yayımlanır. Mail geçmişi olan profil başka posta kutusuna yönlendirilemez veya silinemez; devre dışı bırakıp yeni profil oluşturun.
 - Kurulum tek bir uygulama sunucusuna bağlıdır. Yerel dosyalar uygulama sunucuları arasında otomatik paylaşılmaz.
-- Saklama süresi dolan uygun, tamamlanmış **yerel arşivler** normal çalışma sırasında temizlenir. Salt okunur test modu bu temizliği yapmaz. Bu işlem `ZIMAP_LOG` kayıtlarını veya uzaktaki işlenenler klasörünü silmez.
+- Saklama süresi dolan uygun, tamamlanmış **yerel arşivler** normal çalışma sırasında temizlenir. Salt okunur test modu bu temizliği yapmaz. Bu işlem `ZCHE_IMAP_LOG` kayıtlarını veya uzaktaki işlenenler klasörünü silmez.
 
 ## Bilinen sınırlar
 
@@ -134,24 +134,13 @@ HTML dönüşümü en fazla 2.097.152 UTF-16 karakteri, 20.000 etiket ve etiket 
 - Bozuk veya desteklenmeyen MIME, aşırı iç içe yapı/parça sayısı ve SAP dosya biçimine sığmayan metadata, tamamlanmış gibi gösterilmek yerine reddedilir.
 - Monitör sorgu başına en fazla 1.000 satır gösterir. Gerektiğinde tarih, profil veya durum seçimini daraltın.
 
-## Neler doğrulandı?
+## Validation / Doğrulama
 
-Aşağıdaki ayrım **1.1.0 kaynakları** için geçerlidir:
-
-| Alan | Kanıt |
-|---|---|
-| Ayrıştırıcı ve IMAP akışı | Windows PowerShell 5.1/7 ve Linux PowerShell 7.4 üzerinde GreenMail 2.1.14 ile yerel regresyon koşuları. Kimlik/revizyon, yeniden deneme, yarım kalan taşıma, retention, bozuk MIME ve boyut sınırlarını kapsar. |
-| Linux kurulumu | SAP'yi temsil eden ayrı bir işletim sistemi hesabıyla izole konteynerde kurulum, self-test ve izin denetimleri. |
-| Kaynak ve build | ABAP ASCII/72 sütun kontrolü, 7.02 hedefli sekiz dosyalık abaplint ayrıştırması, PowerShell ayrıştırması, Windows native yardımcı kodunun derlenmesi, Bash denetimleri ve tekrarlanabilir installer üretimi. |
-| Gerçek SAP çalışma zamanı | Güncellenmiş 1.1.0 installer, ekran ve transaction akışları SAP üzerinde doğrulanmayı bekliyor. Mevcut ekran görüntüleri SAP ABAP Platform Trial 2025 üzerindeki 1.0 demosundan. |
-| Eski/Unicode olmayan SAP | Uyumluluk hedefi; 4.6C–7.0 üzerinde doğrulanmadı. |
-| Windows sunucu kurulumu | Güncellenmiş kurulum mantığı gerçek bir SAP Windows sunucusunda çalıştırılmadı. |
-
-Kontroller elle çalıştırılır; depoda otomatik CI iş akışı bulunmaz. Ayrıştırma kontrolü SAP derleyicisinin veya çalışma zamanı testinin yerini tutmaz.
+See [current validation](../../VALIDATION.md).
 
 ## Mevcut kurulumu güncelleme
 
-Dosyaları değiştirmeden önce [güncelleme adımlarını](TECHNICAL-REFERENCE.md#8-mevcut-kurulumu-güncelleyin) okuyun. 1.1.0; betik protokolünü, profil adlandırmasını ve revizyonlu dosya yapısını değiştirir.
+Dosyaları değiştirmeden önce [güncelleme adımlarını](TECHNICAL-REFERENCE.md#8-mevcut-kurulumu-güncelleyin) okuyun. 0.9.0; betik protokolünü, profil adlandırmasını ve revizyonlu dosya yapısını değiştirir.
 
 SAP kaynaklarıyla **iki sunucu modülünü birlikte** güncelleyin. Profilleri yeniden kaydedin; `S` şifrelerini yeniden girin. Basis'in yönettiği kimlik bilgileri tam sistem/client/profil anahtarını kullanır. Eski mail dizinleri korunur, **otomatik taşınmaz**. Bekleyen `H` kayıtları ve dosyaları için kontrollü geçiş planı gerekir.
 
@@ -177,7 +166,7 @@ pwsh -NoProfile -File installer/build.ps1
 
 Kurulum tek SAP uygulama sunucusuna bağlıdır; ayarlar, işleme ve izleme aynı sunucuda çalışmalıdır. Basis sunucuya özel SAP bağlantısını sağlamalıdır. Proje programları ve SM69 komutları mandantlar arasında ortaktır; değişiklikleri diğer sahiplerle koordine edin.
 
-**Komutları nasıl kullanacaksınız?** İşletim sisteminize uygun bloğun tamamını, açılış ve kapanış süslü parantezleriyle birlikte kopyalayın. Sorulduğunda yalnız kendi değerinizi yazıp Enter basın; yanıtın etrafına tırnak veya köşeli parantez eklemeyin. Sunucu/port posta ekibinden, SAP hesabı ve klasör Basis'ten alınır. Her blok bilgileri tekrar sorar; önceki terminal değişkenlerine bağlı değildir. `ZIMAP_INSTALL`, `ZIMAP_CONFIG`, `ZIMAP_INBOUND`, `ZIMAP_MONITOR` ve `ZIMAP_HANDLER_DEMO` gerçek program adlarıdır ve değiştirilmez.
+**Komutları nasıl kullanacaksınız?** İşletim sisteminize uygun bloğun tamamını, açılış ve kapanış süslü parantezleriyle birlikte kopyalayın. Sorulduğunda yalnız kendi değerinizi yazıp Enter basın; yanıtın etrafına tırnak veya köşeli parantez eklemeyin. Sunucu/port posta ekibinden, SAP hesabı ve klasör Basis'ten alınır. Her blok bilgileri tekrar sorar; önceki terminal değişkenlerine bağlı değildir. `ZCHE_IMAP_INSTALL`, `ZCHE_IMAP_CONFIG`, `ZCHE_IMAP_INBOUND`, `ZCHE_IMAP_MONITOR` ve `ZCHE_IMAP_HANDLER_DEMO` gerçek program adlarıdır ve değiştirilmez.
 
 **Komutları SAP uygulama sunucusunda çalıştırın; SAP GUI kullandığınız bilgisayar farklı olabilir.** Güncel deponun `server` ve `script` klasörlerini birlikte kullanın. Kurulum hem `imap.ps1` hem `mime.ps1` dosyasını yerleştirir.
 
@@ -233,7 +222,7 @@ Varsayılan kök klasör `C:\sapimap`. Yukarıdaki blok klasör yolunu ayrıca s
 }
 ```
 
-Başarılı çıktı `PROTOCOL 2`, `VERSION 1.1.0` ve seçilen kökü belirtir; `OK` ile biter. Yönetici hesabıyla bu test yararlıdır; ileride SAP kurulum programının testi gerçek SAP çalışma hesabıyla da geçmelidir.
+Başarılı çıktı `PROTOCOL 2`, `VERSION 0.9.0` ve seçilen kökü belirtir; `OK` ile biter. Yönetici hesabıyla bu test yararlıdır; ileride SAP kurulum programının testi gerçek SAP çalışma hesabıyla da geçmelidir.
 
 ### Linux
 
@@ -266,7 +255,7 @@ Seçilen kökü SAP'nin çalışma kullanıcısıyla test edin. İki soruya önc
 }
 ```
 
-Çıktı protokol `2`, sürüm `1.1.0` ve seçilen kökü belirtip `OK` ile bitmelidir. Bu yerel ön koşulları kontrol eder; SAP kurulumu ve posta bağlantısı sonraki adımlardadır.
+Çıktı protokol `2`, sürüm `0.9.0` ve seçilen kökü belirtip `OK` ile bitmelidir. Bu yerel ön koşulları kontrol eder; SAP kurulumu ve posta bağlantısı sonraki adımlardadır.
 
 ### Sertifika ve danışmana teslim
 
@@ -276,9 +265,8 @@ Basis, danışmana kök klasörü, seçilen SAP sunucusunu ve öz testin başar�
 
 ## SAP kurulum seçenekleri ve kontrolleri
 
-**SE38** içinde `ZIMAP_INSTALL` girip **Execute / Çalıştır (F8)** seçin.
+**SE38** içinde `ZCHE_IMAP_INSTALL` girip **Execute / Çalıştır (F8)** seçin.
 
-![Önceki 1.0 demosunun kurulum ekranı](../screenshots/02-install-screen.png)
 
 Geliştirme sistemindeki ilk kurulum için:
 
@@ -301,9 +289,9 @@ Yalnız SM69/sunucu adımları seçilse de geliştirme yetkileri kontrol edilir.
 
 `$TMP` deneme için uygundur; nesneleri normal paket transport sürecine girmez. Kalıcı kullanım için geliştirme ve Basis ekibiyle kurumunuzun müşteri paketini ve taşıma sürecini kullanın.
 
-1. **Geliştirme sisteminde**, **SE21** veya **SE80** üzerinden `ZIMAP` gibi bir paket oluşturun. Transport katmanını Basis belirlesin.
+1. **Geliştirme sisteminde**, **SE21** veya **SE80** üzerinden `ZCHE_IMAP` gibi bir paket oluşturun. Transport katmanını Basis belirlesin.
 2. Burada kurup test edin. Mevcut installer ürettiği nesneleri `$TMP` içine koyar.
-3. Proje nesnelerini listeleyin: installer, program/include'lar, tablo/yapılar, veri elemanları, domain'ler ve kendi handler'ınız. `ZIMAP*` ile eşleşen ilgisiz nesneleri körlemesine seçmeyin.
+3. Proje nesnelerini listeleyin: installer, program/include'lar, tablo/yapılar, veri elemanları, domain'ler ve kendi handler'ınız. `ZCHE_IMAP*` ile eşleşen ilgisiz nesneleri körlemesine seçmeyin.
 4. **SE03 → Change Object Directory Entries** veya uygun **SE80 → Reassign** işlemiyle projeye ait nesneleri pakete atayın ve transport talebinde toplayın. Talep yalnız installer'ı değil, tanımları ve bağımlılıkları da içermelidir.
 5. **Test sistemine** aktarın, o sistemin sunucusunu ve yerel ayarlarını hazırlayın, ilk kullanım kontrollerini tekrarlayın. Ardından onaylı canlıya taşıma sürecini izleyin.
 
@@ -327,7 +315,7 @@ SAP kaynakları: [Nesne dizini ve paket değiştirme](https://help.sap.com/docs/
 | Okunacak klasör | Varsayılan `INBOX` | Gelen Kutusu okunur. Başka bir klasörü okumak istiyorsanız aynı posta kutusundaki o klasörün gerçek IMAP adını/yolunu girin; yalnız seçilen klasör okunur. |
 | İşlenmiş klasörü | Seçtiğiniz posta klasörünün adı | Mevcut bir klasörü kullanabilirsiniz. Başlangıçtaki `SAP-Processed` değerini seçtiğiniz klasörün gerçek IMAP adı/yoluyla değiştirin. |
 | Taşıma modu | `MOVE` | UID MOVE desteği gerekir. |
-| Handler programı | `ZIMAP_HANDLER_DEMO` | Hazır örnek; iş belgesi oluşturmaz. |
+| Handler programı | `ZCHE_IMAP_HANDLER_DEMO` | Hazır örnek; iş belgesi oluşturmaz. |
 | En çok ileti | `50` | Bir çalıştırmadaki örnek üst sınır. |
 | En çok boyut | `20` | İleti başına örnek MiB sınırı; sunucu politikası daha düşük olabilir. |
 | Zaman aşımı | `120` | Örnek ağ zaman aşımı, saniye. |
@@ -370,7 +358,7 @@ Sunucudaki parola dosyası `USER` içeriyorsa boş olmalı veya profildeki kulla
 
 ## Saklama ve yeniden deneme ayrıntıları
 
-Log kayıtları dosyalardan daha uzun süre kalabilir. Saklama süresi tamamlanmış yerel arşivleri temizler; `ZIMAP_LOG` veya uzak işlenmiş klasörünü temizlemez. Bunların saklama süresini veri sahipleriyle ayrıca belirleyin.
+Log kayıtları dosyalardan daha uzun süre kalabilir. Saklama süresi tamamlanmış yerel arşivleri temizler; `ZCHE_IMAP_LOG` veya uzak işlenmiş klasörünü temizlemez. Bunların saklama süresini veri sahipleriyle ayrıca belirleyin.
 
 ### Hata ve yeniden deneme alıştırması
 
@@ -387,16 +375,16 @@ Bu isteğe bağlı bölüm Basis/geliştirme ekibinin teşhisi içindir; canlı 
 
 | SM69 adı | Script işlemi ve sıralı parametreleri |
 |---|---|
-| `ZIMAP_TEST` | `test`; profil testi için isteğe bağlı `KEY REVISION`. |
-| `ZIMAP_LIST` | `list KEY REVISION`; normal SAP çalışması tamamlanmış yerel arşiv temizliği için `PURGE` ekler. Diğer durumda listeleme salt okunurdur. |
-| `ZIMAP_FETCH` | `fetch KEY UID UIDVALIDITY REVISION` |
-| `ZIMAP_DONE` | `done KEY UID UIDVALIDITY REVISION` |
+| `ZCHE_IMAP_TEST` | `test`; profil testi için isteğe bağlı `KEY REVISION`. |
+| `ZCHE_IMAP_LIST` | `list KEY REVISION`; normal SAP çalışması tamamlanmış yerel arşiv temizliği için `PURGE` ekler. Diğer durumda listeleme salt okunurdur. |
+| `ZCHE_IMAP_FETCH` | `fetch KEY UID UIDVALIDITY REVISION` |
+| `ZCHE_IMAP_DONE` | `done KEY UID UIDVALIDITY REVISION` |
 
 `KEY`, SID/mandant/profil içerir. Revizyonları SAP yönetir; elle değiştirmeyin. MIME testlerinin ayrı yerel giriş noktası vardır; üretim SM69 komutu değildir.
 
 ## 8. Mevcut kurulumu güncelleyin
 
-1.1.0 script protokolünü, profil dosya adlarını ve revizyon saklamasını değiştirir. 1.0 güncellemesini önce geliştirme/testte planlayın.
+0.9.0 script protokolünü, profil dosya adlarını ve revizyon saklamasını değiştirir. ZIMAP_ → ZCHE_IMAP_ geçişini iş açmadan önce inceleyin.
 
 1. Zamanlanmış işlemeyi durdurun; ortak kurulumu kullanan mandantlarla koordine edin. SAP nesneleri/ayarları/logları, politika, parolalar ve posta klasörlerini onaylı yöntemle yedekleyin.
 2. Bekleyen `H` kayıtlarını Basis/geliştirme ekibiyle inceleyin. Eski, sistem/mandant ayrımı olmayan klasörler korunur; **otomatik taşınmaz**. Devam etmeden kayıt/dosya eşleştirmesini planlayın; silerek veya tamamlanmış iş mantığını tekrar çalıştırarak geçmeyin.
@@ -406,11 +394,10 @@ Bu isteğe bağlı bölüm Basis/geliştirme ekibinin teşhisi içindir; canlı 
 
 Posta geçmişi olan profil başka kutuya yönlendirilemez veya silinemez. Posta kimliği değişecekse profili pasifleştirip yenisini oluşturun.
 
-[Doğrulama sınırları](TECHNICAL-REFERENCE.md#neler-doğrulandı) ve [geliştirici rehberine](TECHNICAL-GUIDE.md) bakın. Diğer başvuru belgelerinde eski 1.0 örnekleri bulunabilir; güncel kurulum yolu bu rehberdir.
 
 ## Arka plan işi planlama (Basis)
 
-Basis'ten **SM36** ile `ZIMAP_INBOUND` job'ı oluşturmasını isteyin. Varyantta doğru profil seçili, **yalnız listeleme kapalı** olmalıdır. Sıklığı operasyon ekibiyle belirleyin.
+Basis'ten **SM36** ile `ZCHE_IMAP_INBOUND` job'ı oluşturmasını isteyin. Varyantta doğru profil seçili, **yalnız listeleme kapalı** olmalıdır. Sıklığı operasyon ekibiyle belirleyin.
 
 Kurulumun uygulama sunucusunu kullanın. Gerçek, kısıtlı job kullanıcısıyla test edin; geliştirici hesabında önden çalışması yeterli değildir. Basis harici komut, dosya, tablo ve handler'a özel yetkileri kontrol eder. [Rol özeti](TECHNICAL-REFERENCE.md#yetkiler-ve-işletim-sınırları) teknik başvuru rehberindedir.
 
@@ -421,9 +408,13 @@ Gerçek iş postalarından önce iş kurallarınızı uygulayıp doğrulayın. A
 Profil ve parola revizyonları çalışan bir işlemin kullandığı dosyayı erken silmemek için otomatik temizlenmez. Profil silme işlemi yalnız etkin ayar/parola dosyalarını kaldırmayı dener; eski revizyonlar için yöneticiye bakım uyarısı verir.
 
 1. İlgili profilin zamanlanmış işlerini durdurun ve bu profille çalışan ön plan işlemlerinin tamamlanmasını bekleyin. Ortak sunucuyu kullanan sistem/mandantlarla koordine edin.
-2. Doğru sistem/mandanttaki `ZIMAP_PROFILE` kaydından `REVISION`, `CREDSRC` ve `CREDREV` değerlerini doğrulayın. Parolayı görüntülemeyin veya günlüğe yazmayın.
+2. Doğru sistem/mandanttaki `ZCHE_IMAP_PROFILE` kaydından `REVISION`, `CREDSRC` ve `CREDREV` değerlerini doğrulayın. Parolayı görüntülemeyin veya günlüğe yazmayın.
 3. Etkin `conf/KEY_REVISION.conf` dosyasını ve onun referans verdiği parolayı koruyun: `S` için `secret/KEY_CREDREV.cred`, `O` için `secret/KEY.cred`. Başarısız kaydetmeden kalan bir dosyanın etkin olduğunu varsaymayın.
 4. Artık kullanılmadığı ve geri dönüş planında gerekmediği doğrulanan eski revizyon dosyalarını kurumunuzun saklama politikasına göre, yalnız tam dosya adlarını seçerek kaldırın. `conf` veya `secret` klasörünün tamamını silmeyin. SAP geçmişi olan profilin adını yeniden kullanmayın.
 5. İşleri yeniden açmadan bağlantı ve yalnız listeleme testini tekrarlayın. Sonlandırılmış işlemlerden kalan eski `tmp` dosyaları için de sahiplik ve kullanım kontrolüyle ayrı bakım yapın; bekleyen `in`/`done` verisini silmeyin.
 
 Aynı klasörü kaynak ve hedef olarak kullanan eski bir profil varsa otomatik işlemeyi durdurun. Mevcut iş belgelerini ve bekleyen kayıtları incelemeden yeni profille tüm iletileri yeniden oynatmayın; daha önce oluşmuş mükerrer kayıtlar kod güncellemesiyle otomatik düzelmez.
+
+## Release candidate security changes
+
+[Current profile authorization, handler allowlist, credentials and retry/cache policy](../../SECURITY.md). Installer DDIC interface probing is retained where kernel APIs use different structure types; old runtime view/GUI probes were removed.

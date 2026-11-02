@@ -1,5 +1,6 @@
+* Project: abap-imap-inbound
 *---------------------------------------------------------------
-* ZIMAP_MONITOR - processed and failed mails
+* ZCHE_IMAP_MONITOR - processed and failed mails
 *
 * List: by profile, status and date. Double-click a line to see
 * the headers, body and attachments of the mail.
@@ -8,29 +9,32 @@
 *   types, including original mail, are downloaded only.
 *   "Reprocess": a failed mail is processed in the next run.
 *
-* 4.6C compatible; lines at most 72 characters; ASCII only.
+* Classic ABAP 7.00 syntax target.
 * Uses the new SAP GUI classes if they exist, otherwise the WS_*
 * functions.
 *---------------------------------------------------------------
-REPORT zimap_monitor LINE-SIZE 200 NO STANDARD PAGE HEADING.
+REPORT zche_imap_monitor LINE-SIZE 200 NO STANDARD PAGE HEADING.
 
-TABLES zimap_log.
+TABLES zche_imap_log.
 
-INCLUDE zimap_common.
-INCLUDE zimap_io.
+INCLUDE zche_imap_common.
 
-SELECT-OPTIONS: s_prof FOR zimap_log-profile,
-                s_stat FOR zimap_log-status,
-                s_date FOR zimap_log-chdat.
+SELECT-OPTIONS: s_prof FOR zche_imap_log-profile,
+                s_stat FOR zche_imap_log-status,
+                s_date FOR zche_imap_log-chdat.
 PARAMETERS p_limit TYPE i DEFAULT 1000.
 
-DATA: gt_log       TYPE STANDARD TABLE OF zimap_log,
-      gs_log       TYPE zimap_log,
+DATA: gt_log       TYPE STANDARD TABLE OF zche_imap_log,
+      gs_log       TYPE zche_imap_log,
       gv_kind(1)   TYPE c,
       gv_path(255) TYPE c,
       gv_name(150) TYPE c,
       gv_setup(1)  TYPE c,
       gv_auth(1)   TYPE c.
+DATA: gt_allowed TYPE RANGE OF zche_imap_log-profile,
+      gs_allowed LIKE LINE OF gt_allowed,
+      gt_profiles TYPE STANDARD TABLE OF zche_imap_profile,
+      gs_profile TYPE zche_imap_profile.
 
 INITIALIZATION.
   s_date-sign   = 'I'.
@@ -40,7 +44,7 @@ INITIALIZATION.
   APPEND s_date.
 
 START-OF-SELECTION.
-  PERFORM table_auth USING 'ZIMAP_LOG' 'S' CHANGING gv_auth.
+  PERFORM table_auth USING 'ZCHE_IMAP_LOG' 'S' CHANGING gv_auth.
   IF gv_auth IS INITIAL.
     WRITE: / 'No log display authorization (S_TABU_DIS).'.
     EXIT.
@@ -53,9 +57,25 @@ START-OF-SELECTION.
     WRITE: / 'Setup missing or this is the wrong execution host.'.
     EXIT.
   ENDIF.
-  SELECT * FROM zimap_log INTO TABLE gt_log
+  SELECT * FROM zche_imap_profile INTO TABLE gt_profiles
+    WHERE profile IN s_prof.
+  LOOP AT gt_profiles INTO gs_profile.
+    PERFORM profile_auth USING gs_profile-profile '03'
+                         CHANGING gv_auth.
+    IF gv_auth = 'X'.
+      gs_allowed-sign = 'I'.
+      gs_allowed-option = 'EQ'.
+      gs_allowed-low = gs_profile-profile.
+      APPEND gs_allowed TO gt_allowed.
+    ENDIF.
+  ENDLOOP.
+  IF gt_allowed IS INITIAL.
+    WRITE: / 'No authorized profiles'.
+    EXIT.
+  ENDIF.
+  SELECT * FROM zche_imap_log INTO TABLE gt_log
     UP TO p_limit ROWS
-    WHERE profile IN s_prof
+    WHERE profile IN gt_allowed
       AND status  IN s_stat
       AND chdat   IN s_date
     ORDER BY chdat DESCENDING chtim DESCENDING
@@ -165,12 +185,12 @@ ENDFORM.
 
 *---------------------------------------------------------------
 FORM show_detail.
-  DATA: ls_log       TYPE zimap_log,
-        ls_mail      TYPE zimap_s_mail,
+  DATA: ls_log       TYPE zche_imap_log,
+        ls_mail      TYPE zche_imap_s_mail,
         lt_body      TYPE ty_t_line,
-        ls_line      TYPE zimap_s_line,
+        ls_line      TYPE zche_imap_s_line,
         lt_att       TYPE ty_t_att,
-        ls_att       TYPE zimap_s_att,
+        ls_att       TYPE zche_imap_s_att,
         lv_dir(255)  TYPE c,
         lv_ok(1)     TYPE c,
         lv_msg(255)  TYPE c,
@@ -178,7 +198,12 @@ FORM show_detail.
         lv_uidc(10)  TYPE c,
         lv_size(12)  TYPE c.
 
-  SELECT SINGLE * FROM zimap_log INTO ls_log
+  PERFORM profile_auth USING gs_log-profile '03'
+                       CHANGING lv_ok.
+  IF lv_ok IS INITIAL.
+    EXIT.
+  ENDIF.
+  SELECT SINGLE * FROM zche_imap_log INTO ls_log
     WHERE profile     = gs_log-profile
       AND uidvalidity = gs_log-uidvalidity
       AND mailuid     = gs_log-mailuid.
@@ -203,7 +228,7 @@ FORM show_detail.
   ENDIF.
 
   IF gv_setup IS INITIAL.
-    WRITE: / 'No setup settings (ZIMAP_PARAM).'.
+    WRITE: / 'No setup settings (ZCHE_IMAP_PARAM).'.
     EXIT.
   ENDIF.
   PERFORM mail_dir USING ls_log-status ls_log-profile
@@ -288,7 +313,12 @@ ENDFORM.
 FORM mark_retry.
   DATA lv_ok(1) TYPE c.
 
-  PERFORM table_auth USING 'ZIMAP_LOG' 'U' CHANGING lv_ok.
+  PERFORM profile_auth USING gs_log-profile '02'
+                       CHANGING lv_ok.
+  IF lv_ok IS INITIAL.
+    EXIT.
+  ENDIF.
+  PERFORM table_auth USING 'ZCHE_IMAP_LOG' 'U' CHANGING lv_ok.
   IF lv_ok IS INITIAL.
     PERFORM show_msg USING 'S' 'No log change authorization'.
     EXIT.
@@ -298,7 +328,7 @@ FORM mark_retry.
     PERFORM show_msg USING 'S' 'Profile in use; try again'.
     EXIT.
   ENDIF.
-  UPDATE zimap_log SET status  = 'R'
+  UPDATE zche_imap_log SET status  = 'R'
                        message = 'Marked for reprocessing'
                        chdat   = sy-datum
                        chtim   = sy-uzeit
@@ -310,7 +340,7 @@ FORM mark_retry.
   IF sy-subrc = 0.
     COMMIT WORK.
     PERFORM show_msg USING 'S'
-      'Mail will be processed in the next ZIMAP_INBOUND run.'.
+      'Mail will be processed in the next ZCHE_IMAP_INBOUND run.'.
   ELSE.
     ROLLBACK WORK.
     PERFORM show_msg USING 'S' 'Mail status changed; refresh list'.
@@ -342,6 +372,11 @@ FORM open_on_pc USING iv_path TYPE c
         lv_ext(8) TYPE c,
         lv_idx TYPE i.
 
+  PERFORM profile_auth USING gs_log-profile '03'
+                       CHANGING lv_ok.
+  IF lv_ok IS INITIAL.
+    EXIT.
+  ENDIF.
   PERFORM read_binary_file USING iv_path
                            CHANGING lt_bin lv_len lv_ok.
   IF lv_ok IS INITIAL.
@@ -372,7 +407,7 @@ FORM open_on_pc USING iv_path TYPE c
   lv_uidc = gs_log-mailuid.
   SHIFT lv_uidc LEFT DELETING LEADING '0'.
   PERFORM storage_key USING gs_log-profile CHANGING lv_key.
-  CONCATENATE lv_tmp '\zimap_' lv_key '_'
+  CONCATENATE lv_tmp '\zche_imap_' lv_key '_'
               gs_log-uidvalidity '_' lv_uidc '_'
               iv_name INTO lv_fstr.
   IF STRLEN( lv_fstr ) > 255.
@@ -381,42 +416,12 @@ FORM open_on_pc USING iv_path TYPE c
   ENDIF.
   lv_file = lv_fstr.
 
-* Download: GUI_DOWNLOAD (file name STRING), else WS_DOWNLOAD
-  PERFORM fm_exists USING 'GUI_DOWNLOAD' CHANGING lv_fm.
-  IF NOT lv_fm IS INITIAL.
-    SELECT SINGLE structure FROM fupararef INTO lv_type
-      WHERE funcname = 'GUI_DOWNLOAD' AND parameter = 'FILENAME'.
-    IF lv_type <> 'STRING'.
-      CLEAR lv_fm.
-    ENDIF.
-  ENDIF.
-  IF NOT lv_fm IS INITIAL.
-    CALL FUNCTION 'GUI_DOWNLOAD'
-      EXPORTING
-        bin_filesize = lv_len
-        filename     = lv_fstr
-        filetype     = 'BIN'
-      TABLES
-        data_tab     = lt_bin
-      EXCEPTIONS
-        OTHERS       = 1.
-  ELSE.
-    lv_wsname = lv_file.
-    IF lv_wsname <> lv_file.
-      PERFORM show_msg USING 'S'
-        'File path exceeds the legacy download API limit'.
-      EXIT.
-    ENDIF.
-    CALL FUNCTION 'WS_DOWNLOAD'
-      EXPORTING
-        bin_filesize = lv_len
-        filename     = lv_wsname
-        filetype     = 'BIN'
-      TABLES
-        data_tab     = lt_bin
-      EXCEPTIONS
-        OTHERS       = 1.
-  ENDIF.
+* ABAP 7.00 frontend API accepts a STRING filename.
+  CALL FUNCTION 'GUI_DOWNLOAD'
+    EXPORTING bin_filesize = lv_len filename = lv_fstr
+              filetype = 'BIN'
+    TABLES data_tab = lt_bin
+    EXCEPTIONS OTHERS = 1.
   IF sy-subrc <> 0.
     PERFORM show_msg USING 'S' 'Could not download the file to the PC.'.
     EXIT.

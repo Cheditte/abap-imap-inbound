@@ -8,22 +8,22 @@ Mevcut bağlantı noktası dışarıya açılmış bir sınıf değil, **`FORM` 
 
 ## 1. Hazır handler'dan başlayın
 
-1. Deneme kutusunda `ZIMAP_HANDLER_DEMO` ile başarılı bir çalıştırma yapın.
-2. **SE38** içinde kurulu programı `ZIMAP_HANDLER_CUSTOM` gibi müşteri adına kopyalayın. Türü **subroutine pool** olarak koruyun ve transport edilebilir müşteri paketinizi atayın.
-3. `INCLUDE zimap_common`, `INCLUDE zimap_io` ve `HANDLE_MAIL` arayüzünü koruyun. Kurulum, SAP sistemine uygun `ZIMAP_IO` uygulamasını seçer.
-4. `ZIMAP_CONFIG` içindeki **Handler program** alanına programınızı, **Handler FORM** alanına `HANDLE_MAIL` girin. Kaydedip bağlantı sonucunu kontrol edin.
+1. Deneme kutusunda `ZCHE_IMAP_HANDLER_DEMO` ile başarılı bir çalıştırma yapın.
+2. **SE38** içinde kurulu programı `ZCHE_IMAP_HANDLER_CUSTOM` gibi müşteri adına kopyalayın. Türü **subroutine pool** olarak koruyun ve transport edilebilir müşteri paketinizi atayın.
+3. `INCLUDE zche_imap_common`, `INCLUDE zche_imap_io` ve `HANDLE_MAIL` arayüzünü koruyun. Kurulum, SAP sistemine uygun `ZCHE_IMAP_IO` uygulamasını seçer.
+4. `ZCHE_IMAP_CONFIG` içindeki **Handler program** alanına programınızı, **Handler FORM** alanına `HANDLE_MAIL` girin. Kaydedip bağlantı sonucunu kontrol edin.
 5. İşlemeyi zamanlamadan önce yetkilendirilmiş job kullanıcısıyla test edip monitörü inceleyin.
 
 Installer kendi demo handler'ını içerir; özel kopyanızı içermez. İş kodunuzu ayrı program/pakette tutup transport'a ekleyin. [Paket ve transport adımına](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport) bakın.
 
 ## 2. Girdileri ve sonucu tanıyın
 
-`ZIMAP_HANDLER_CUSTOM` oluşturacağınız program için örnek addır. Başka ad seçerseniz SE38'de, örneğin `PROGRAM` satırında ve profilin handler alanında aynı adı kullanın. Kurulu include adlarını ve `HANDLE_MAIL` arayüzünü gösterildiği gibi koruyun.
+`ZCHE_IMAP_HANDLER_CUSTOM` oluşturacağınız program için örnek addır. Başka ad seçerseniz SE38'de, örneğin `PROGRAM` satırında ve profilin handler alanında aynı adı kullanın. Kurulu include adlarını ve `HANDLE_MAIL` arayüzünü gösterildiği gibi koruyun.
 
 İş mantığı gereken her uygun ileti için işlemci şu arayüzü dinamik olarak çağırır:
 
 ```abap
-FORM handle_mail USING    is_mail TYPE zimap_s_mail
+FORM handle_mail USING    is_mail TYPE zche_imap_s_mail
                           it_body TYPE STANDARD TABLE
                           it_att  TYPE STANDARD TABLE
                  CHANGING cv_ok   TYPE c
@@ -32,9 +32,9 @@ FORM handle_mail USING    is_mail TYPE zimap_s_mail
 
 | Parametre | İçerik / sorumluluk |
 |---|---|
-| `is_mail` | `ZIMAP_S_MAIL`: profil, UIDVALIDITY, UID, gönderen, alıcı, bilgi alıcıları, konu, tarih, Message-ID, çalışma klasörü ve ek sayısı. Girdi olarak değerlendirin. |
-| `it_body` | `ZIMAP_S_LINE` satırları, metin `TEXT` alanında. Düz metin gövde; yoksa metne çevrilmiş HTML. |
-| `it_att` | `ZIMAP_S_ATT` satırları: yerel `PATH`, güvenli `NAME`, özgün ad `ORIG`, bayt boyutu `ATTSIZE`, MIME türü ve `DISP`. |
+| `is_mail` | `ZCHE_IMAP_S_MAIL`: profil, UIDVALIDITY, UID, gönderen, alıcı, bilgi alıcıları, konu, tarih, Message-ID, çalışma klasörü ve ek sayısı. Girdi olarak değerlendirin. |
+| `it_body` | `ZCHE_IMAP_S_LINE` satırları, metin `TEXT` alanında. Düz metin gövde; yoksa metne çevrilmiş HTML. |
+| `it_att` | `ZCHE_IMAP_S_ATT` satırları: yerel `PATH`, güvenli `NAME`, özgün ad `ORIG`, bayt boyutu `ATTSIZE`, MIME türü ve `DISP`. |
 | `cv_ok` | İşiniz gerçekten başarılıysa tam olarak `'X'` atayın. Diğer değerler hatadır. |
 | `cv_msg` | Hata durumunda anlamlı mesaj; çağıranın 255 karakterlik alanı kadar. Parola ve gereksiz kişisel veri eklemeyin. |
 
@@ -45,17 +45,17 @@ Ek yolu olarak işlemcinin verdiği `PATH` kullanın; gönderenin özgün dosya 
 Bu tam subroutine pool en az bir boş olmayan, inline dışı PDF'nin okunabildiğini kontrol eder. **Öğrenme örneğidir**; fatura doğrulama, zararlı yazılım tarama veya belge oluşturma yapmaz. İletinin bildirdiği MIME türü dosyanın geçerli PDF olduğunu kanıtlamaz.
 
 ```abap
-PROGRAM zimap_handler_custom.
+PROGRAM zche_imap_handler_custom.
 
-INCLUDE zimap_common.
-INCLUDE zimap_io.
+INCLUDE zche_imap_common.
+INCLUDE zche_imap_io.
 
-FORM handle_mail USING    is_mail TYPE zimap_s_mail
+FORM handle_mail USING    is_mail TYPE zche_imap_s_mail
                           it_body TYPE STANDARD TABLE
                           it_att  TYPE STANDARD TABLE
                  CHANGING cv_ok   TYPE c
                           cv_msg  TYPE c.
-  DATA: ls_att   TYPE zimap_s_att,
+  DATA: ls_att   TYPE zche_imap_s_att,
         lt_bin   TYPE ty_t_bin,
         lv_len   TYPE i,
         lv_ok(1) TYPE c,
@@ -95,7 +95,7 @@ Gerçek handler'da `cv_ok = 'X'` atamadan gönderen/iş bağlamını ve belgeyi 
 
 ## 4. İşlem sözleşmesi: commit işlemciye aittir
 
-`ZIMAP_INBOUND`, handler çağrısından önce **yerel V1 update** etkinleştirir. Başarıda `H` durumunu yazıp `COMMIT WORK AND WAIT` çalıştırır; uyumlu iş veritabanı değişiklikleri ve yerel V1 update'ler aynı veritabanı LUW'suna aittir. Handler hata döndürürse hata durumunu yazmadan önce iş değişikliklerini geri alır.
+`ZCHE_IMAP_INBOUND`, handler çağrısından önce **yerel V1 update** etkinleştirir. Başarıda `H` durumunu yazıp `COMMIT WORK AND WAIT` çalıştırır; uyumlu iş veritabanı değişiklikleri ve yerel V1 update'ler aynı veritabanı LUW'suna aittir. Handler hata döndürürse hata durumunu yazmadan önce iş değişikliklerini geri alır.
 
 Handler ve çağırdığı bütün API'ler bu sözleşmeye uymalıdır:
 
@@ -124,17 +124,17 @@ Yeniden çalıştırmak için log veya önbellek dosyalarını değiştirmeyin/s
 
 ## 6. Başka programdan işlemeyi başlatın
 
-Normal giriş noktası ayrı zamanlanmış `ZIMAP_INBOUND` job'ıdır. **Bekleyen iş değişikliği olmayan temiz işlem bağlamında** bir ön plan denemesi için:
+Normal giriş noktası ayrı zamanlanmış `ZCHE_IMAP_INBOUND` job'ıdır. **Bekleyen iş değişikliği olmayan temiz işlem bağlamında** bir ön plan denemesi için:
 
-Aşağıdaki rapor `P_PROF` alanında profil sorar. `ZIMAP_CONFIG` içinde gerçekten kaydettiğiniz adı girin; sabit bir `INVOICE` profili yoktur. `ZIMAP_START_DEMO` önerilen rapor adıdır; başka ad seçerseniz SE38 adıyla `REPORT` satırını eşleştirin.
+Aşağıdaki rapor `P_PROF` alanında profil sorar. `ZCHE_IMAP_CONFIG` içinde gerçekten kaydettiğiniz adı girin; sabit bir `INVOICE` profili yoktur. `ZCHE_IMAP_START_DEMO` önerilen rapor adıdır; başka ad seçerseniz SE38 adıyla `REPORT` satırını eşleştirin.
 
 ```abap
-REPORT zimap_start_demo.
+REPORT zche_imap_start_demo.
 
-PARAMETERS p_prof LIKE zimap_profile-profile OBLIGATORY.
+PARAMETERS p_prof LIKE zche_imap_profile-profile OBLIGATORY.
 
 START-OF-SELECTION.
-SUBMIT zimap_inbound
+SUBMIT zche_imap_inbound
   WITH s_prof EQ p_prof
   WITH p_test EQ 'X'
   AND RETURN.

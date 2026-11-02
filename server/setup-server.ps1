@@ -190,7 +190,7 @@ if ($SetPassword) {
     if (-not (Test-Path -LiteralPath (Join-Path $Root 'secret') -PathType Container)) {
         Fail 'Run server setup first.'
     }
-    $user = Read-Host 'Mail user name (empty: the one in ZIMAP_CONFIG is used)'
+    $user = Read-Host 'Mail user name (empty: the one in ZCHE_IMAP_CONFIG is used)'
     $sec = Read-Host 'Password' -AsSecureString
     $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($sec)
     try { $pw = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr) }
@@ -285,5 +285,5 @@ if ($out.Count -eq 0 -or $out[-1] -cne 'OK') { Fail 'Installation test failed.' 
 
 Write-Host ''
 Write-Host 'Server ready. On the SAP side:' -ForegroundColor Green
-Write-Host "  SE38 > ZIMAP_INSTALL > Server folder: $Root\"
-Write-Host '  Then define the mailbox profile with ZIMAP_CONFIG.'
+Write-Host "  SE38 > ZCHE_IMAP_INSTALL > Server folder: $Root\"
+Write-Host '  Then define the mailbox profile with ZCHE_IMAP_CONFIG.'

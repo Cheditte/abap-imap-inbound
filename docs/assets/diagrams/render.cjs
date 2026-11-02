@@ -27,14 +27,14 @@ const content={
     setup:[['1. Posta sunucusu',['Hesap ve IMAP erişimi','Okunacak ve hedef klasör']],[["2. SAP'nin kurulu olduğu",'makine'],['PowerShell, curl ve proje dosyaları']],['3. SAP ERP',['Programlar ve posta ayarları','İlk deneme']]],
     'mail-flow':[['Okunacak posta klasörü',['Varsayılan: INBOX','İsterseniz başka klasör seçin']],['SAP içinde işleme',['E-postayı ve eklerini alın']],['Başarıyla işlenen iletiler',['Hedef: aynı hesapta farklı bir klasör','SAP-Processed adı zorunlu değildir']]],
     'host-prep':[["SAP'nin çalıştığı makine",['Windows veya Linux']],['Gerekli araçlar ve dosyalar',['PowerShell + curl','Projenin sunucu dosyaları']],['Korumalı çalışma klasörü',['E-postalar, ekler ve bağlantı ayarları']]],
-    'sap-steps':[['3.1. Programı oluşturun',['SE38 → ZIMAP_INSTALL']],['3.2. Kurulumu çalıştırın',['ZIMAP_INSTALL']],['3.3. Postayı tanımlayın',['ZIMAP_CONFIG']]]
+    'sap-steps':[['3.1. Programı oluşturun',['SE38 → ZCHE_IMAP_INSTALL']],['3.2. Kurulumu çalıştırın',['ZCHE_IMAP_INSTALL']],['3.3. Postayı tanımlayın',['ZCHE_IMAP_CONFIG']]]
   },
   en:{
     usage:['Mail server',['Emails and attachments'],'View the emails',['and read them'],'Process attachments',['With your ABAP code']],
     setup:[['1. Mail server',['Account and IMAP access','Source and destination folders']],[['2. Machine','running SAP'],['PowerShell, curl and project files']],['3. SAP ERP',['Programs and mailbox settings','First trial']]],
     'mail-flow':[['Source mail folder',['Default: INBOX','Or select another folder']],['Processing in SAP',['Retrieve messages and attachments']],['Destination for successful mail',['A different folder in the same account','The name SAP-Processed is optional']]],
     'host-prep':[['Machine running SAP',['Windows or Linux']],['Required tools and files',['PowerShell + curl','Project server files']],['Protected working folder',['Emails, attachments and connection settings']]],
-    'sap-steps':[['3.1. Create the program',['SE38 → ZIMAP_INSTALL']],['3.2. Run the installation',['ZIMAP_INSTALL']],['3.3. Configure the mailbox',['ZIMAP_CONFIG']]]
+    'sap-steps':[['3.1. Create the program',['SE38 → ZCHE_IMAP_INSTALL']],['3.2. Run the installation',['ZCHE_IMAP_INSTALL']],['3.3. Configure the mailbox',['ZCHE_IMAP_CONFIG']]]
   }
 };
 for(const [lang,data] of Object.entries(content)){

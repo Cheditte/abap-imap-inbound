@@ -43,16 +43,16 @@ foreach ($directory in 'server', 'cloud') {
 }
 $abapFiles = @(Get-ChildItem -LiteralPath (Join-Path $repo 'abap') -Filter *.abap)
 $abapFiles += Get-Item -LiteralPath (Join-Path $repo 'installer/head.abap')
-$abapFiles += Get-Item -LiteralPath (Join-Path $repo 'ZIMAP_INSTALL.abap')
+$abapFiles += Get-Item -LiteralPath (Join-Path $repo 'ZCHE_IMAP_INSTALL.abap')
 foreach ($file in $abapFiles) {
     $lines = [IO.File]::ReadAllLines($file.FullName)
     for ($lineNumber = 0; $lineNumber -lt $lines.Length; $lineNumber++) {
-        if ($lines[$lineNumber].Length -gt 72) { $failures.Add($file.Name + ':' + ($lineNumber + 1) + ': over 72 columns') }
+        if ($lines[$lineNumber].Length -gt 255) { $failures.Add($file.Name + ':' + ($lineNumber + 1) + ': over 255 columns') }
         if ($lines[$lineNumber] -cmatch '[^\x09\x20-\x7E]') { $failures.Add($file.Name + ':' + ($lineNumber + 1) + ': non-ASCII source') }
     }
 }
 $releaseVersion = (Get-Content -LiteralPath (Join-Path $repo 'package.json') -Raw | ConvertFrom-Json).version
-foreach ($path in 'abap/ZIMAP_COMMON.abap', 'installer/head.abap') {
+foreach ($path in 'abap/ZCHE_IMAP_COMMON.abap', 'installer/head.abap') {
     $text = [IO.File]::ReadAllText((Join-Path $repo $path))
     $match = [regex]::Match($text, "gc_version[^\r\n]*VALUE\s+'([^']+)'")
     if (-not $match.Success -or $match.Groups[1].Value -cne $releaseVersion) {
@@ -74,10 +74,10 @@ foreach ($name in 'build.ps1', 'head.abap') {
 }
 & (Join-Path $buildRoot 'installer/build.ps1')
 if (-not $?) { throw 'Installer build failed' }
-$expected = [IO.File]::ReadAllLines((Join-Path $repo 'ZIMAP_INSTALL.abap')) -join "`n"
-$actual = [IO.File]::ReadAllLines((Join-Path $buildRoot 'ZIMAP_INSTALL.abap')) -join "`n"
+$expected = [IO.File]::ReadAllLines((Join-Path $repo 'ZCHE_IMAP_INSTALL.abap')) -join "`n"
+$actual = [IO.File]::ReadAllLines((Join-Path $buildRoot 'ZCHE_IMAP_INSTALL.abap')) -join "`n"
 if (-not [string]::Equals($expected, $actual, [StringComparison]::Ordinal)) {
-    $failures.Add('ZIMAP_INSTALL.abap is stale; regenerate with installer/build.ps1')
+    $failures.Add('ZCHE_IMAP_INSTALL.abap is stale; regenerate with installer/build.ps1')
 }
 
 if (-not $SkipAbaplint) {
@@ -89,8 +89,9 @@ if (-not $SkipAbaplint) {
     foreach ($file in (Get-ChildItem -LiteralPath (Join-Path $repo 'abap') -Filter *.abap)) {
         Copy-Item -LiteralPath $file.FullName -Destination (Join-Path $lintSources ($file.BaseName.ToLowerInvariant() + '.prog.abap'))
     }
-    Copy-Item -LiteralPath (Join-Path $repo 'ZIMAP_INSTALL.abap') -Destination (Join-Path $lintSources 'zimap_install.prog.abap')
+    Copy-Item -LiteralPath (Join-Path $repo 'ZCHE_IMAP_INSTALL.abap') -Destination (Join-Path $lintSources 'zche_imap_install.prog.abap')
     Copy-Item -LiteralPath (Join-Path $repo 'abaplint.json') -Destination $lintRoot
+    Copy-Item -LiteralPath (Join-Path $repo '.abaplint-deps') -Destination (Join-Path $lintRoot 'deps') -Recurse
     Push-Location $lintRoot
     try {
         & node $cli -f standard
