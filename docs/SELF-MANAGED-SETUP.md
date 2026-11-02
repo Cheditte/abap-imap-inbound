@@ -8,7 +8,7 @@ You are assumed to have the skills and permissions to create, activate and run p
 
 Being able to sign in to SAP GUI does not give you Windows/Linux administrator rights. Opening a mailbox in webmail does not give you mail-server administration rights either. If access is missing, involve the machine or email service owner.
 
-**Start with a test system and test mailbox.** Installation and runtime tests for the current 0.9.1 version on an actual SAP system are still pending. [Verification status](../VALIDATION.md).
+**Start with a test system and test mailbox.** Installation and runtime tests for the current 0.9.2 version on an actual SAP system are still pending. [Verification status](../VALIDATION.md).
 
 ## 1. Which machine should you connect to?
 
@@ -123,7 +123,7 @@ Follow the instructions for your operating system:
 - [Windows server setup block and self-test](TECHNICAL-REFERENCE.md#windows)
 - [Linux server setup block and self-test](TECHNICAL-REFERENCE.md#linux)
 
-The blocks ask for the actual IMAP server, SAP service account and chosen working folder. They prepare protected folders and permissions and deploy both `imap.ps1` and `mime.ps1`. Confirm that the self-test ends in `OK` and reports protocol `2` and version `0.9.1`. Record the full working-folder path; use the same path in the SAP installer.
+The blocks ask for the actual IMAP server, SAP service account and chosen working folder. They prepare protected folders and permissions and deploy both `imap.ps1` and `mime.ps1`. Confirm that the self-test ends in `OK` and reports protocol `2` and version `0.9.2`. Record the full working-folder path; use the same path in the SAP installer.
 
 The mail server must be reachable **from the SAP machine**. For certificate errors, correct the actual hostname and trusted certificates; keep certificate verification enabled.
 

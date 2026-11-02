@@ -2,7 +2,7 @@
 
 > **English** | [Türkçe](tr/TECHNICAL-REFERENCE.md) · [Project overview](../README.md) · [Installation](WALKTHROUGH.md) · [Code examples](TECHNICAL-GUIDE.md)
 
-This file is for Basis and email teams preparing installation, and developers who want the details. It describes **0.9.1 sources and script protocol 2**. Use the [walkthrough](WALKTHROUGH.md) for installation in order, and the [developer guide](TECHNICAL-GUIDE.md) to add your business logic.
+This file is for Basis and email teams preparing installation, and developers who want the details. It describes **0.9.2 sources and script protocol 2**. Use the [walkthrough](WALKTHROUGH.md) for installation in order, and the [developer guide](TECHNICAL-GUIDE.md) to add your business logic.
 
 For the SAP steps, you are assumed to be able to create, activate and run programs in SE38. Here, **Basis / server administrator** means the person or team responsible for the server; this can be you if you hold the necessary permissions. The same distinction applies to email administration. [Preparation when you hold those permissions](SELF-MANAGED-SETUP.md).
 
@@ -222,7 +222,7 @@ Run the self-test. When prompted, enter the same full folder path you used durin
 }
 ```
 
-Success identifies `PROTOCOL 2`, `VERSION 0.9.1` and the chosen root, then ends in `OK`. An administrator's self-test is useful, but the later SAP installer check must pass under SAP's actual execution account too.
+Success identifies `PROTOCOL 2`, `VERSION 0.9.2` and the chosen root, then ends in `OK`. An administrator's self-test is useful, but the later SAP installer check must pass under SAP's actual execution account too.
 
 ### Linux
 
@@ -255,7 +255,7 @@ Test with the SAP execution user and chosen root. Answer both prompts with the L
 }
 ```
 
-The result must identify protocol `2`, version `0.9.1` and the chosen root, then end in `OK`. It checks local prerequisites; SAP installation and mailbox access are checked later.
+The result must identify protocol `2`, version `0.9.2` and the chosen root, then end in `OK`. It checks local prerequisites; SAP installation and mailbox access are checked later.
 
 ### Certificates and handover
 
@@ -391,6 +391,8 @@ Version 0.9.0 changes the script protocol, profile file names and revision stora
 3. Deploy **both** `imap.ps1` and `mime.ps1` from the same version, reviewing/preserving policy. Update SAP objects and commands through the tested package/transport procedure. SAP and script must both use protocol `2`.
 4. Check the selected host, roles and profiles. Re-save profiles and re-enter source `S` passwords. Recreate source `O` credentials using the full `SID_CLIENT_PROFILE` key.
 5. Repeat server, connection, read-only list, normal demo, error/retry and pending-move recovery checks. Validate the job user and business handler before restarting jobs.
+
+**Within 0.9.x** (for example 0.9.1 to 0.9.2) the protocol and storage do not change. After steps 1–3, replace the source of `ZCHE_IMAP_INSTALL` in SE38 with the new file, activate it and run it with **Programs**, **Overwrite existing programs (update)** and **Server check** selected. Without **Overwrite** the installer stops because the programs differ. A rerun keeps the existing handler prefix and retry limit.
 
 A profile with mail history cannot be redirected to another mailbox or deleted. Deactivate it and create a new profile when mailbox identity changes.
 

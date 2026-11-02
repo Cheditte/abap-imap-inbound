@@ -23,7 +23,7 @@ TYPES: BEGIN OF ty_uid,
 TYPES: ty_t_uid TYPE STANDARD TABLE OF ty_uid
                 WITH DEFAULT KEY.
 
-CONSTANTS: gc_version(10) TYPE c VALUE '0.9.1'.
+CONSTANTS: gc_version(10) TYPE c VALUE '0.9.2'.
 
 DATA: gv_root(200)  TYPE c,
       gv_sep(1)     TYPE c,
@@ -309,7 +309,7 @@ FORM call_cmd USING    iv_cmd   TYPE c
   ENDIF.
   IF NOT cv_ok IS INITIAL AND lv_protocol <> 1.
     CLEAR cv_ok.
-    cv_msg = 'ERR CFG Script protocol mismatch; install v0.9.1'.
+    cv_msg = 'ERR CFG Script protocol mismatch; install v0.9.2'.
   ENDIF.
 ENDFORM.
 

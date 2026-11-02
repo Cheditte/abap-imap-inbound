@@ -22,7 +22,7 @@ For authorized RDP/SSH access and file transfer, use the [self-managed setup gui
 
 **Use a test SAP system and test mailbox.** Normal processing may mark mail as read and move it. The example does not create invoices.
 
-This guide covers the 0.9.1 sources; actual SAP acceptance tests for this version are still pending. [Test status](../VALIDATION.md).
+This guide covers the 0.9.2 sources; actual SAP acceptance tests for this version are still pending. [Test status](../VALIDATION.md).
 
 ### Download the files
 
