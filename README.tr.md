@@ -35,7 +35,7 @@ Ana kurulum yolu **tek installer’ı kopyala/yapıştır** yöntemidir. [abapGi
 | Windows | Windows PowerShell 5.1 veya PowerShell 7; curl 8.0.0+. |
 | Linux | PowerShell 7.4+; curl 8.0.0+. |
 | Posta sunucusu | TLS, UID MOVE ve parola/uygulama şifresi. |
-| Doğrulama | Önceki `ZIMAP_` sürümü SAP A4H'de mailleri okudu ve ekleri açtı. 0.9.1 henüz SAP'de çalıştırılmadı; geri bildirime açık. [Doğrulama kaydı](VALIDATION.md). |
+| Doğrulama | Önceki `ZIMAP_` sürümü SAP A4H'de mailleri okudu ve ekleri açtı. 0.9.2 henüz SAP'de çalıştırılmadı; geri bildirime açık. [Doğrulama kaydı](VALIDATION.md). |
 
 curl 7.55.1 kabul edilmez. İndirilen dosyanın boyutu UID için bildirilen RFC822.SIZE ile aynı olmalıdır; aynı boyut tek başına kimliği kanıtlamaz. GreenMail testlerinde ardışık olmayan UID’ler ve içerik kontrol edilir.
 

@@ -22,7 +22,7 @@ RDP/SSH ile kendiniz bağlanacaksanız [kendi sistemini yönetenler için rehber
 
 **Deneme SAP sistemi ve deneme posta kutusu kullanın.** Normal işlem iletileri okundu işaretleyebilir ve başka klasöre taşıyabilir. Hazır örnek fatura oluşturmaz.
 
-Bu rehber 0.9.1 kaynakları içindir; güncel sürümün gerçek SAP kabul testleri henüz tamamlanmadı. [Test durumu](../../VALIDATION.md).
+Bu rehber 0.9.2 kaynakları içindir; güncel sürümün gerçek SAP kabul testleri henüz tamamlanmadı. [Test durumu](../../VALIDATION.md).
 
 ### Dosyaları indirin
 
