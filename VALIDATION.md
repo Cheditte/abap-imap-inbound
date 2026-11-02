@@ -16,6 +16,4 @@ This record applies to the 0.9.2 release candidate. Code reviews after release f
 
 The DDIC fixtures are development-only and must never be installed into SAP. Real authorization enforcement, database LUWs, installer APIs and file permissions still require SAP acceptance before production use.
 
-The walkthrough includes real standard SE38 and SM36 preparation screens, captured on 2 November 2026 without saving programs or jobs. They do not validate IMAP installation, mail processing or background execution. Current IMAP program screenshots remain pending. See [screenshot scope](docs/screenshots/README.md).
-
 Bu kayıt 0.9.2 sürüm adayı içindir. 0.9.x henüz SAP'de çalıştırılmadı; tablodaki SAP satırları açıktır. Önceki `ZIMAP_` sürümü A4H'de mailleri işledi ve ekleri açtı. Yerel ve CI kontrolleri (abaplint v700, PowerShell testleri, GreenMail ile IMAP testleri) 0.9.2 için geçti.

@@ -8,7 +8,7 @@ SAP tarafında SE38 ile program oluşturma, etkinleştirme ve çalıştırma bil
 
 SAP GUI'ye giriş yapmak, Windows/Linux makinesinde yönetici yetkisi vermez. Posta kutusunu webden açabilmek de posta sunucusunun yönetim paneline erişim vermez. Gerekli erişiminiz yoksa makinenin veya posta hizmetinin sahibinden destek alın.
 
-**Önce deneme sistemi ve deneme posta kutusu kullanın.** Güncel 0.9.2 sürümünün gerçek SAP sistemindeki kurulum ve çalışma testleri henüz tamamlanmadı. [Doğrulama durumu](../../VALIDATION.md).
+**Önce deneme sistemi ve deneme posta kutusu kullanın.** [Doğrulama durumu](../../VALIDATION.md).
 
 ## 1. Hangi makineye bağlanacaksınız?
 

@@ -16,7 +16,7 @@
 | Add my business action | [Developer guide](TECHNICAL-GUIDE.md) | Your validated ABAP action replaces the demonstration. |
 | Run automatically | [Path C — Variant and job](#daily-use) | Job runs on the selected host; log and spool reviewed. |
 
-This guide describes the `v0.9.2` release candidate. Current SAP runtime acceptance remains pending. Images are real A4H standard SAP screens; they do not demonstrate a completed IMAP installation or successful processing. [Validation record](../VALIDATION.md) · [Screenshot scope](screenshots/README.md).
+This guide describes the `v0.9.2` release candidate. [Validation record](../VALIDATION.md).
 
 <a id="prepare"></a>
 ## Three preparations before you start
@@ -68,11 +68,7 @@ If you hold administrator access, follow the [RDP/SSH and file transfer guide](S
 4. Replace the starter code with the **entire source** from [the installer file](../ZCHE_IMAP_INSTALL.abap). Do not upload the GitHub page saved as HTML.
 5. Save, check syntax and activate with **Ctrl+F3**.
 
-![SE38 with the installer name entered before choosing Create](screenshots/sap-se38-installer-entry.png)
-
-![Initial program attributes; choose Executable program in Type](screenshots/sap-program-attributes.png)
-
-The attributes image shows the initial unfilled dialog; select Type yourself. **Continue when:** the program is active without syntax errors.
+**Continue when:** the program is active without syntax errors.
 
 ### 3.2. Run the installer
 
@@ -179,10 +175,6 @@ In INBOUND, enter your profile, **select List only**, and leave retry cleared. S
 2. Use **Job Class C** unless your organization specifies another class.
 3. Set **Target** to the installation's application server. In a multi-server system, do not leave host selection to chance.
 4. Choose **Step → ABAP program**; enter `ZCHE_IMAP_INBOUND` and your list-only variant. Check the execution user and save the step.
-
-![SM36 job definition with Job Name, Target, Step and Start condition](screenshots/sap-sm36-job-definition.png)
-
-This is an unsaved preparation screen. Target, step and start condition have not been selected; it does not show a completed job.
 
 ### C3. Set the start condition and inspect the result
 
