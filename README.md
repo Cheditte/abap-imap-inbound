@@ -45,6 +45,10 @@ The default source is **the inbox (`INBOX`)**; you can select another folder. Su
 
 [Follow the illustrated steps from SE38 installation to SM36 job definition](docs/WALKTHROUGH.md#install).
 
+![A4H mail monitor showing the message body and links to a PDF and a JPG attachment](docs/screenshots/sap-monitor-details.png)
+
+In the A4H demonstration, this message was processed, its body displayed and its JPG opened. [See the steps and screenshots](docs/WALKTHROUGH.md#first-mail). The captures show the corrected source before its version label was raised to 0.9.3; [source and test context](docs/screenshots/README.md).
+
 Normal processing may mark mail as read and move it. Start with **a test SAP system and a dedicated test mailbox**.
 
 ## Status and details

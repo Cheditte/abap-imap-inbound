@@ -1,1 +1,46 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="476" viewBox="0 0 720 476" role="img" aria-labelledby="title"><title id="title">setup (tr)</title><defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#456b96"/></marker></defs><rect width="720" height="476" fill="#fff"/><g font-family="Arial, Helvetica, sans-serif" text-anchor="middle" fill="#183c68"><rect x="55" y="20" width="610" height="116" rx="12" fill="#edf4fc" stroke="#6e94bc" stroke-width="2"/><text x="360" y="58.5" font-size="24" font-weight="700">1. Posta sunucusu</text><text x="360" y="93.5" font-size="20" fill="#405b78">Hesap ve IMAP erişimi</text><text x="360" y="118.5" font-size="20" fill="#405b78">Okunacak ve hedef klasör</text><path d="M360 136 V174" fill="none" stroke="#456b96" stroke-width="2.5" marker-end="url(#arrow)"/><rect x="55" y="180" width="610" height="116" rx="12" fill="#edf4fc" stroke="#6e94bc" stroke-width="2"/><text x="360" y="217" font-size="24" font-weight="700">2. SAP'nin kurulu olduğu</text><text x="360" y="245" font-size="24" font-weight="700">makine</text><text x="360" y="280" font-size="20" fill="#405b78">PowerShell, curl ve proje dosyaları</text><path d="M360 296 V334" fill="none" stroke="#456b96" stroke-width="2.5" marker-end="url(#arrow)"/><rect x="55" y="340" width="610" height="116" rx="12" fill="#edf4fc" stroke="#6e94bc" stroke-width="2"/><text x="360" y="378.5" font-size="24" font-weight="700">3. SAP ERP</text><text x="360" y="413.5" font-size="20" fill="#405b78">Programlar ve posta ayarları</text><text x="360" y="438.5" font-size="20" fill="#405b78">İlk deneme</text></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="680" viewBox="0 0 1440 680" role="img" aria-labelledby="title desc">
+<title id="title">Üç hazırlık alanı</title><desc id="desc">Üç hazırlık alanı. ABAP IMAP Inbound.</desc>
+<rect x="0" y="0" width="1440" height="680" rx="0" fill="#102639"/>
+<rect x="56" y="44" width="30" height="4" rx="2" fill="#087F8C"/>
+<text x="100" y="53" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#B9CBD8">KURULUM HARİTASI</text>
+<text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="600" fill="#FFFFFF">Üç hazırlık alanı. Tek bir akış.</text>
+<text x="56" y="169" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#B9CBD8">Önce büyük resmi görün; sonra her parçayı sırayla hazırlayın.</text>
+<rect x="56" y="218" width="416" height="316" rx="18" fill="#FFFFFF"/>
+<rect x="84" y="246" width="68" height="62" rx="12" fill="#E6F4F4"/>
+<rect x="96" y="261" width="44" height="30" rx="4" fill="none" stroke="#087F8C" stroke-width="2"/>
+<polyline points="98,264 118,278 138,264" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="385" y="284" font-family="Segoe UI, Arial, sans-serif" font-size="32" font-weight="600" fill="#B3C5D1">01</text>
+<text x="84" y="363" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">Posta hesabı</text>
+<text x="84" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#536A7B">Hesap ve IMAP erişimi</text>
+<text x="84" y="499" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#536A7B">Kaynak ve hedef klasörler</text>
+<polyline points="481,379 503,379" fill="none" stroke="#6DB9C0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="495,372 503,379 495,386" fill="none" stroke="#6DB9C0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="512" y="218" width="416" height="316" rx="18" fill="#FFFFFF"/>
+<rect x="540" y="246" width="68" height="62" rx="12" fill="#E6F4F4"/>
+<rect x="552" y="261" width="44" height="14" rx="3" fill="none" stroke="#087F8C" stroke-width="2"/>
+<circle cx="559" cy="268" r="2" fill="#087F8C"/>
+<polyline points="568,268 587,268" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="552" y="280" width="44" height="14" rx="3" fill="none" stroke="#087F8C" stroke-width="2"/>
+<circle cx="559" cy="287" r="2" fill="#087F8C"/>
+<polyline points="568,287 587,287" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="841" y="284" font-family="Segoe UI, Arial, sans-serif" font-size="32" font-weight="600" fill="#B3C5D1">02</text>
+<text x="540" y="363" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">SAP’nin çalıştığı</text>
+<text x="540" y="405" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">makine</text>
+<text x="540" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#536A7B">PowerShell + curl</text>
+<text x="540" y="499" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#536A7B">Proje dosyaları ve korumalı alan</text>
+<polyline points="937,379 959,379" fill="none" stroke="#6DB9C0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="951,372 959,379 951,386" fill="none" stroke="#6DB9C0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="968" y="218" width="416" height="316" rx="18" fill="#FFFFFF"/>
+<rect x="996" y="246" width="68" height="62" rx="12" fill="#E6F4F4"/>
+<rect x="1008" y="261" width="44" height="34" rx="4" fill="none" stroke="#087F8C" stroke-width="2"/>
+<polyline points="1008,271 1052,271" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1018,280 1029,280 1029,288 1042,288" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1297" y="284" font-family="Segoe UI, Arial, sans-serif" font-size="32" font-weight="600" fill="#B3C5D1">03</text>
+<text x="996" y="363" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">SAP ERP</text>
+<text x="996" y="466" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#536A7B">Tek kurulum programı</text>
+<text x="996" y="499" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#536A7B">Posta profili ve ilk deneme</text>
+<rect x="56" y="566" width="1328" height="50" rx="10" fill="#1C394D"/>
+<text x="80" y="599" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#DCE9F0">Mevcut posta hizmetinizi ve SAP sunucunuzu kullanabilirsiniz.</text>
+<text x="56" y="653" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#A7BFCD">Cheditte / abap-imap-inbound</text>
+<text x="1234" y="653" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#A7BFCD">ABAP / IMAP</text>
+</svg>

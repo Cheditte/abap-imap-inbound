@@ -1,1 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="430" viewBox="0 0 720 430" role="img" aria-labelledby="title"><title id="title">Start with your goal</title><rect width="720" height="430" rx="18" fill="#122739"/><text x="32" y="49" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#f4f8fa">Start with your goal</text><rect x="24" y="76" width="672" height="94" rx="12" fill="#f4f8fa"/><circle cx="65" cy="122" r="23" fill="#d8f2eb"/><text x="65" y="130" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#176b62">A</text><text x="106" y="112" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#183c53">Check the connection and list</text><text x="106" y="142" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#425f70">List only; no content download.</text><rect x="24" y="186" width="672" height="94" rx="12" fill="#f4f8fa"/><circle cx="65" cy="232" r="23" fill="#d8f2eb"/><text x="65" y="240" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#176b62">B</text><text x="106" y="222" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#183c53">Open the first mail and attachment</text><text x="106" y="252" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#425f70">Normal processing; successful mail moves.</text><rect x="24" y="296" width="672" height="94" rx="12" fill="#f4f8fa"/><circle cx="65" cy="342" r="23" fill="#d8f2eb"/><text x="65" y="350" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#176b62">C</text><text x="106" y="332" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#183c53">Run automatically</text><text x="106" y="362" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#425f70">Variant and job; inspect the results.</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="630" viewBox="0 0 1440 630" role="img" aria-labelledby="title desc">
+<title id="title">First-use paths</title><desc id="desc">First-use paths. ABAP IMAP Inbound.</desc>
+<rect x="0" y="0" width="1440" height="630" rx="0" fill="#F4F7FA"/>
+<rect x="56" y="44" width="30" height="4" rx="2" fill="#087F8C"/>
+<text x="100" y="53" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">FIRST USE</text>
+<text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="600" fill="#183448">Choose your next step.</text>
+<text x="56" y="169" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#536A7B">From connectivity to the first attachment, then scheduled use.</text>
+<rect x="56" y="213" width="416" height="314" rx="18" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<rect x="80" y="237" width="44" height="44" rx="10" fill="#087F8C"/>
+<text x="91" y="269" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="600" fill="#FFFFFF">A</text>
+<text x="80" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">Check the</text>
+<text x="80" y="367" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">connection</text>
+<text x="80" y="411" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" fill="#087F8C">List only</text>
+<polyline points="80,433 448,433" fill="none" stroke="#D8E3EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="80" y="468" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">List eligible message IDs.</text>
+<text x="80" y="499" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">No content download or movement.</text>
+<rect x="512" y="213" width="416" height="314" rx="18" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<rect x="536" y="237" width="44" height="44" rx="10" fill="#087F8C"/>
+<text x="547" y="269" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="600" fill="#FFFFFF">B</text>
+<text x="536" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">Open a mail</text>
+<text x="536" y="367" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">and attachment</text>
+<text x="536" y="411" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" fill="#087F8C">INBOUND → MONITOR</text>
+<polyline points="536,433 904,433" fill="none" stroke="#D8E3EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="536" y="468" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">Process one test message.</text>
+<text x="536" y="499" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">Open its body and attachment.</text>
+<rect x="968" y="213" width="416" height="314" rx="18" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<rect x="992" y="237" width="44" height="44" rx="10" fill="#087F8C"/>
+<text x="1003" y="269" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="600" fill="#FFFFFF">C</text>
+<text x="992" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">Schedule</text>
+<text x="992" y="367" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">regular use</text>
+<text x="992" y="411" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" fill="#087F8C">SM36 → SM37</text>
+<polyline points="992,433 1360,433" fill="none" stroke="#D8E3EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="992" y="468" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">Prepare a variant and job.</text>
+<text x="992" y="499" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">Read the job log and results.</text>
+<text x="56" y="603" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#536A7B">Complete setup first. Start with a dedicated test mailbox.</text>
+<text x="1234" y="603" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">ABAP / IMAP</text>
+</svg>

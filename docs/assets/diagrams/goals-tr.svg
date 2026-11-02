@@ -1,1 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="430" viewBox="0 0 720 430" role="img" aria-labelledby="title"><title id="title">Hedefinizden başlayın</title><rect width="720" height="430" rx="18" fill="#122739"/><text x="32" y="49" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#f4f8fa">Hedefinizden başlayın</text><rect x="24" y="76" width="672" height="94" rx="12" fill="#f4f8fa"/><circle cx="65" cy="122" r="23" fill="#d8f2eb"/><text x="65" y="130" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#176b62">A</text><text x="106" y="112" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#183c53">Bağlantıyı ve listeyi görün</text><text x="106" y="142" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#425f70">Yalnız listeleme; içerik indirilmez.</text><rect x="24" y="186" width="672" height="94" rx="12" fill="#f4f8fa"/><circle cx="65" cy="232" r="23" fill="#d8f2eb"/><text x="65" y="240" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#176b62">B</text><text x="106" y="222" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#183c53">İlk maili ve eki açın</text><text x="106" y="252" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#425f70">Normal işleme; başarılı mail taşınır.</text><rect x="24" y="296" width="672" height="94" rx="12" fill="#f4f8fa"/><circle cx="65" cy="342" r="23" fill="#d8f2eb"/><text x="65" y="350" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#176b62">C</text><text x="106" y="332" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" fill="#183c53">Otomatik çalıştırın</text><text x="106" y="362" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#425f70">Varyant ve job; sonuçları izleyin.</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="630" viewBox="0 0 1440 630" role="img" aria-labelledby="title desc">
+<title id="title">İlk kullanım yolları</title><desc id="desc">İlk kullanım yolları. ABAP IMAP Inbound.</desc>
+<rect x="0" y="0" width="1440" height="630" rx="0" fill="#F4F7FA"/>
+<rect x="56" y="44" width="30" height="4" rx="2" fill="#087F8C"/>
+<text x="100" y="53" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">İLK KULLANIM</text>
+<text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="600" fill="#183448">Hedefini seç. Sırayla ilerle.</text>
+<text x="56" y="169" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#536A7B">Bağlantıdan ilk eke, oradan düzenli çalıştırmaya.</text>
+<rect x="56" y="213" width="416" height="314" rx="18" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<rect x="80" y="237" width="44" height="44" rx="10" fill="#087F8C"/>
+<text x="91" y="269" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="600" fill="#FFFFFF">A</text>
+<text x="80" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">Bağlantıyı</text>
+<text x="80" y="367" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">kontrol et</text>
+<text x="80" y="411" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" fill="#087F8C">List only</text>
+<polyline points="80,433 448,433" fill="none" stroke="#D8E3EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="80" y="468" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">İleti numaralarını listeleyin.</text>
+<text x="80" y="499" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">İçerik indirilmez, mail taşınmaz.</text>
+<rect x="512" y="213" width="416" height="314" rx="18" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<rect x="536" y="237" width="44" height="44" rx="10" fill="#087F8C"/>
+<text x="547" y="269" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="600" fill="#FFFFFF">B</text>
+<text x="536" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">Maili ve</text>
+<text x="536" y="367" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">ekini aç</text>
+<text x="536" y="411" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" fill="#087F8C">INBOUND → MONITOR</text>
+<polyline points="536,433 904,433" fill="none" stroke="#D8E3EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="536" y="468" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">Bir test mailini işleyin.</text>
+<text x="536" y="499" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">Gövdeyi ve eki SAP’de açın.</text>
+<rect x="968" y="213" width="416" height="314" rx="18" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
+<rect x="992" y="237" width="44" height="44" rx="10" fill="#087F8C"/>
+<text x="1003" y="269" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="600" fill="#FFFFFF">C</text>
+<text x="992" y="326" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">Düzenli</text>
+<text x="992" y="367" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="600" fill="#183448">çalıştır</text>
+<text x="992" y="411" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" fill="#087F8C">SM36 → SM37</text>
+<polyline points="992,433 1360,433" fill="none" stroke="#D8E3EB" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="992" y="468" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">Varyant ve job tanımlayın.</text>
+<text x="992" y="499" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="400" fill="#536A7B">İş günlüğünü ve sonucu okuyun.</text>
+<text x="56" y="603" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#536A7B">Önce kurulumu tamamlayın. Ayrı bir deneme posta kutusuyla başlayın.</text>
+<text x="1234" y="603" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">ABAP / IMAP</text>
+</svg>
