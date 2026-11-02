@@ -8,7 +8,7 @@ You are assumed to have the skills and permissions to create, activate and run p
 
 Being able to sign in to SAP GUI does not give you Windows/Linux administrator rights. Opening a mailbox in webmail does not give you mail-server administration rights either. If access is missing, involve the machine or email service owner.
 
-**Start with a test system and test mailbox.** Installation and runtime tests for the current 1.1.0 version on an actual SAP system are still pending. [Verification status](TECHNICAL-REFERENCE.md#what-has-been-verified).
+**Start with a test system and test mailbox.** Installation and runtime tests for the current 0.9.0 version on an actual SAP system are still pending. [Verification status](../VALIDATION.md).
 
 ## 1. Which machine should you connect to?
 
@@ -91,7 +91,7 @@ If PowerShell is missing, identify the Linux distribution and version, then foll
 
 Transfer the **entire** archive downloaded using **Code → Download ZIP** from the [repository](https://github.com/Cheditte/abap-imap-inbound). Download it in a browser on the remote machine or use your approved file-transfer method. SSH-based transfer (`scp`/SFTP) can be used for Linux. Do not transfer only a single `.ps1` file.
 
-Extract the ZIP on the SAP machine. The **project root folder** must contain `server`, `script` and `ZIMAP_INSTALL.abap` together. Run server setup commands from that root. This extracted project folder is separate from the protected working folder that will hold mail.
+Extract the ZIP on the SAP machine. The **project root folder** must contain `server`, `script` and `ZCHE_IMAP_INSTALL.abap` together. Run server setup commands from that root. This extracted project folder is separate from the protected working folder that will hold mail.
 
 In administrator PowerShell on Windows, change to the project folder:
 
@@ -100,7 +100,7 @@ In administrator PowerShell on Windows, change to the project folder:
   $ProjectFolder = (Read-Host 'Full path of the extracted project root on the SAP machine').Trim()
   if ($ProjectFolder -eq '') { throw 'Project folder is required.' }
   Set-Location -LiteralPath $ProjectFolder -ErrorAction Stop
-  Get-Item server, script, ZIMAP_INSTALL.abap -ErrorAction Stop
+  Get-Item server, script, ZCHE_IMAP_INSTALL.abap -ErrorAction Stop
 }
 ```
 
@@ -110,7 +110,7 @@ In the Linux SSH session:
 {
   read -r -p 'Full path of the project root on the SAP machine: ' project_folder
   cd -- "${project_folder:?Project folder is required}" &&
-    ls server script ZIMAP_INSTALL.abap
+    ls server script ZCHE_IMAP_INSTALL.abap
 }
 ```
 
@@ -123,7 +123,7 @@ Follow the instructions for your operating system:
 - [Windows server setup block and self-test](TECHNICAL-REFERENCE.md#windows)
 - [Linux server setup block and self-test](TECHNICAL-REFERENCE.md#linux)
 
-The blocks ask for the actual IMAP server, SAP service account and chosen working folder. They prepare protected folders and permissions and deploy both `imap.ps1` and `mime.ps1`. Confirm that the self-test ends in `OK` and reports protocol `2` and version `1.1.0`. Record the full working-folder path; use the same path in the SAP installer.
+The blocks ask for the actual IMAP server, SAP service account and chosen working folder. They prepare protected folders and permissions and deploy both `imap.ps1` and `mime.ps1`. Confirm that the self-test ends in `OK` and reports protocol `2` and version `0.9.0`. Record the full working-folder path; use the same path in the SAP installer.
 
 The mail server must be reachable **from the SAP machine**. For certificate errors, correct the actual hostname and trusted certificates; keep certificate verification enabled.
 

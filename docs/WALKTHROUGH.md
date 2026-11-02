@@ -22,13 +22,13 @@ For authorized RDP/SSH access and file transfer, use the [self-managed setup gui
 
 **Use a test SAP system and test mailbox.** Normal processing may mark mail as read and move it. The example does not create invoices.
 
-This guide covers the 1.1.0 sources; actual SAP acceptance tests for this version are still pending. Images show the earlier 1.0 demonstration and fields may differ. [Test status](TECHNICAL-REFERENCE.md#what-has-been-verified).
+This guide covers the 0.9.0 sources; actual SAP acceptance tests for this version are still pending. [Test status](../VALIDATION.md).
 
 ### Download the files
 
 Open the [GitHub repository](https://github.com/Cheditte/abap-imap-inbound), choose **Code → Download ZIP** and unpack the entire archive. Git is not required.
 
-Keep the folder structure and use files from the same version. You will use the root-level `ZIMAP_INSTALL.abap` file for the SAP steps. If someone else prepares the server, share the same package with them; they need both the `server` and `script` folders.
+Keep the folder structure and use files from the same version. You will use the root-level `ZCHE_IMAP_INSTALL.abap` file for the SAP steps. If someone else prepares the server, share the same package with them; they need both the `server` and `script` folders.
 
 ## 1. Prepare the mail server
 
@@ -77,13 +77,12 @@ The mailbox settings and host preparation are ready. Now use SAP GUI to install 
 
 Create the following program in SE38.
 
-1. Enter **`ZIMAP_INSTALL`** as the program name and choose **Create**.
+1. Enter **`ZCHE_IMAP_INSTALL`** as the program name and choose **Create**.
 2. Enter a description and select **Executable program** as the type.
-3. When saving, use a customer package you have created or one assigned to the project, for example `ZIMAP`. **Local Object** can be used for a temporary trial only.
-4. Open the downloaded [ZIMAP_INSTALL.abap](../ZIMAP_INSTALL.abap) file and paste its **entire contents** into the SAP editor.
+3. When saving, use a customer package you have created or one assigned to the project, for example `ZCHE_IMAP`. **Local Object** can be used for a temporary trial only.
+4. Open the downloaded [ZCHE_IMAP_INSTALL.abap](../ZCHE_IMAP_INSTALL.abap) file and paste its **entire contents** into the SAP editor.
 5. Save, check the syntax and choose **Activate**.
 
-![Creating the installer in SE38 — earlier demonstration](screenshots/01-se38-create.png)
 
 **When can you continue?** Once the program activates without errors. Resolve syntax or activation errors before moving on. Keep the program name as shown.
 
@@ -91,9 +90,8 @@ Create the following program in SE38.
 
 **What are we doing?** The installer will create the SAP screens, tables and definitions needed to connect SAP to the server tools.
 
-Open **`ZIMAP_INSTALL`** in SE38 and choose **Execute (F8)**.
+Open **`ZCHE_IMAP_INSTALL`** in SE38 and choose **Execute (F8)**.
 
-![Installation options — earlier demonstration](screenshots/02-install-screen.png)
 
 - For a first installation, leave **DDIC objects**, **Programs**, **SM69 commands** and **Server check** selected. These cover tables, programs, server commands and the final check.
 - Enter the **full folder path supplied by Basis** in **Server folder**. Do not assume the example path is right for your system.
@@ -104,13 +102,24 @@ Open **`ZIMAP_INSTALL`** in SE38 and choose **Execute (F8)**.
 
 **For maintained use:** The installer currently creates its objects in the local area `$TMP`. Saving the installer itself in a package does not change this. Assign the objects to your customer package and plan transport to test and production systems; coordinate transport settings with their administrators where needed. [Package and transport details](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport).
 
-### 3.3. Set up a mailbox profile
+### 3.3. Create the authorization object and role
+
+**What are we doing?** Allowing your user to run the programs. Every program checks authorization object `ZCHE_IMAP` per profile; without it, they stop with an authorization message, even for a trial.
+
+1. **SU20:** create authorization field `ZCHE_PROF` (type CHAR, length 20).
+2. **SU21:** create authorization object `ZCHE_IMAP` with fields `ZCHE_PROF` and `ACTVT`. Allow activities `02`, `03` and `16`.
+3. **PFCG:** in a role, add `ZCHE_IMAP` with your profile name (for example `INVOICE`) and the activities you need: `03` to view, `02` to maintain profiles and reprocess, `16` to run processing. Add `S_TABU_DIS` for table group `ZCHI`. Assign the role to your user and to the background job user.
+
+Your security team may create these objects for you. Exact activities, file permissions and transactions are in [security setup](../SECURITY.md).
+
+**When can you continue?** Once the role is assigned to your user. Log off and on again if the new authorization is not yet active.
+
+### 3.4. Set up a mailbox profile
 
 **What are we doing?** Telling SAP which email account to connect to and which folder to read. These settings are saved together as a **profile**.
 
-Open **`ZIMAP_CONFIG`** in SE38 and run it with **F8**. Use a SAP session connected to the server Basis prepared; ask Basis to check if you are unsure.
+Open **`ZCHE_IMAP_CONFIG`** in SE38 and run it with **F8**. Use a SAP session connected to the server Basis prepared; ask Basis to check if you are unsure.
 
-![Mailbox settings — earlier demonstration; do not copy the connection details shown](screenshots/04-config-profile.png)
 
 | Field | What should you enter or select? |
 |---|---|
@@ -121,7 +130,7 @@ Open **`ZIMAP_CONFIG`** in SE38 and run it with **F8**. Use a SAP session connec
 | Folder to read | The default `INBOX` reads the inbox. For another folder, enter its actual name/path. |
 | Processed folder | Actual name/path of the folder you select in the same email account for successful messages; choose a different folder from the source. The name `SAP-Processed` is not required. |
 | Move method | Select `MOVE` for the first trial. |
-| Handler program | Leave **`ZIMAP_HANDLER_DEMO`** selected. This is the supplied example program that runs for each message. |
+| Handler program | Leave **`ZCHE_IMAP_HANDLER_DEMO`** selected. This is the supplied example program that runs for each message. |
 
 For the trial, review the remaining message count, size and timeout limits with Basis and keep the starting values where appropriate. Full field descriptions and server password commands are in the [technical reference](TECHNICAL-REFERENCE.md#profile-fields-and-server-managed-passwords).
 
@@ -139,12 +148,11 @@ Check the complete path: a message must be retrieved from the source folder, bec
 
 Send an email with a small PDF or text attachment to the test mailbox. If you selected a source folder other than the inbox, place the message in that folder.
 
-1. Open **`ZIMAP_INBOUND`** in SE38 and run it.
+1. Open **`ZCHE_IMAP_INBOUND`** in SE38 and run it.
 2. Enter the **profile name** saved in the previous step.
 3. Select **List only (no downloads/changes)** and press **F8**. This lists eligible message numbers; it does not yet retrieve content or attachments, or move messages.
 4. If listing succeeds, go back, **clear List only** and run it again. This time the email and attachments are retrieved, the supplied example runs and successful mail is moved to your processed folder.
 
-![Processing screen — earlier demonstration; current list-only mode does not show content](screenshots/06-inbound-screen.png)
 
 **When can you continue?** Once the run finishes. Next, we will check the result in SAP and in the mailbox.
 
@@ -152,12 +160,11 @@ Send an email with a small PDF or text attachment to the test mailbox. If you se
 
 **What are we doing?** Checking the result and confirming that the attachment can be accessed from SAP.
 
-1. Open **`ZIMAP_MONITOR`** in SE38 and run it.
+1. Open **`ZCHE_IMAP_MONITOR`** in SE38 and run it.
 2. Select your profile and a date range covering the test, then press **F8**.
 3. Open your test message's record and inspect its text and attachments.
 4. Open the email account too. Successful mail should be in the processed folder you selected.
 
-![Results screen — earlier demonstration](screenshots/08-monitor-list.png)
 
 | Status | Meaning |
 |---|---|
@@ -182,7 +189,7 @@ Share the error text and the step you reached, without passwords. Authorized use
 
 **What are we doing?** After the trial succeeds, having the mailbox checked automatically at agreed intervals.
 
-If you have SM36 permission, create a **background job** for `ZIMAP_INBOUND`; otherwise ask Basis to schedule it. It must use the correct profile, have list-only cleared and run on the **same SAP machine** prepared for this installation. Test with the user that will run the job, or have the responsible team do so.
+If you have SM36 permission, create a **background job** for `ZCHE_IMAP_INBOUND`; otherwise ask Basis to schedule it. It must use the correct profile, have list-only cleared and run on the **same SAP machine** prepared for this installation. Test with the user that will run the job, or have the responsible team do so.
 
 Agree the business action with the process owner and implement it. For example, linking an attachment to a purchase order is added through the connection point in the [developer guide](TECHNICAL-GUIDE.md). Before production use, validate business rules, permissions and package/transport steps in your test system.
 

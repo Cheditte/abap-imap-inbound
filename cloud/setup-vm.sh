@@ -103,11 +103,11 @@ docker exec a4h bash -c 'command -v curl >/dev/null && curl --version | head -1'
 # The same server setup a Basis administrator runs (server/setup-server.sh),
 # here inside the SAP container. --allow-insecure only because GreenMail
 # uses a self-signed certificate.
-docker exec a4h rm -rf /tmp/zimap-pkg
-docker exec a4h mkdir -p /tmp/zimap-pkg
-docker cp "$REPO_DIR/server" a4h:/tmp/zimap-pkg/server
-docker cp "$REPO_DIR/script" a4h:/tmp/zimap-pkg/script
-docker exec a4h bash /tmp/zimap-pkg/server/setup-server.sh --root "$WORK" \
+docker exec a4h rm -rf /tmp/zche_imap-pkg
+docker exec a4h mkdir -p /tmp/zche_imap-pkg
+docker cp "$REPO_DIR/server" a4h:/tmp/zche_imap-pkg/server
+docker cp "$REPO_DIR/script" a4h:/tmp/zche_imap-pkg/script
+docker exec a4h bash /tmp/zche_imap-pkg/server/setup-server.sh --root "$WORK" \
   --sap-user a4hadm --allowed-hosts greenmail --allow-insecure --force
 
 step "8/8 Sample mails"
@@ -117,7 +117,7 @@ for f in "$REPO_DIR"/test/samples/*.eml; do
     --mail-rcpt 'sap@demo.local' -T "$f" && echo "sent: $(basename "$f")"
 done
 echo
-echo "Self-test as the SAP user (what ZIMAP_INSTALL checks through SM69):"
+echo "Self-test as the SAP user (what ZCHE_IMAP_INSTALL checks through SM69):"
 docker exec -u a4hadm a4h pwsh -NoProfile -NonInteractive -File "$WORK/bin/imap.ps1" test
 
 cat <<'EOF'
@@ -125,8 +125,8 @@ cat <<'EOF'
 === Setup complete.
 Next steps are in cloud/GCP-DEMO.md:
   - SSH tunnel from Windows and SAP GUI connection
-  - SE38: create ZIMAP_INSTALL, paste ZIMAP_INSTALL.abap, F8
-  - ZIMAP_CONFIG: mailbox greenmail:3993, IMAPS, certificate check off,
+  - SE38: create ZCHE_IMAP_INSTALL, paste ZCHE_IMAP_INSTALL.abap, F8
+  - ZCHE_IMAP_CONFIG: mailbox greenmail:3993, IMAPS, certificate check off,
     user sap@demo.local, password sapdemo
 To stop: docker stop -t 7200 a4h
 EOF

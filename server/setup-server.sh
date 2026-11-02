@@ -83,7 +83,7 @@ if [[ -n "$SETPW" ]]; then
   [[ "$SETPW" =~ ^[A-Z0-9]{3}_[0-9]{3}_[A-Z0-9_]{1,20}$ ]] ||
     fail "use SID_CLIENT_PROFILE (example A4H_001_INVOICE)"
   [[ -d "$ROOT/secret" ]] || fail "run server setup first"
-  read -r -p "Mail user name (empty: the one in ZIMAP_CONFIG is used): " U
+  read -r -p "Mail user name (empty: the one in ZCHE_IMAP_CONFIG is used): " U
   read -r -s -p "Password: " P; echo
   [[ -n "$P" && "$P" != *$'\r'* && "$U" != *$'\r'* ]] ||
     fail "password must be nonempty and single-line"
@@ -158,5 +158,5 @@ echo "$OUT" | sed 's/^/  /'
 
 echo
 echo "Server ready. On the SAP side:"
-echo "  SE38 > ZIMAP_INSTALL > Server folder: $ROOT/"
-echo "  Then define the mailbox profile with ZIMAP_CONFIG."
+echo "  SE38 > ZCHE_IMAP_INSTALL > Server folder: $ROOT/"
+echo "  Then define the mailbox profile with ZCHE_IMAP_CONFIG."
