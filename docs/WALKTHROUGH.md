@@ -1,196 +1,206 @@
-# Walkthrough: prepare three parts and see your first email in SAP
+# From setup to your first email and scheduled use
 
-> **English** | [Türkçe](tr/WALKTHROUGH.md) · [Overview](../README.md) · [Technical details](TECHNICAL-REFERENCE.md)
+> **English** | [Türkçe](tr/WALKTHROUGH.md) · [Overview](../README.md) · [Field guide](SCREEN-GUIDE.md)
 
-Use this guide to set up email and attachment retrieval from your mail server into SAP. Start with the three preparation areas, complete each in order, then open a test email in SAP.
+## Choose your goal first
 
-## Start with the whole picture
+**List only** shows message identifiers without downloading mail or attachments. **Normal processing** downloads content, runs the selected ABAP handler, and moves successful mail to the destination folder.
 
-Installation needs **three prepared parts**:
+![Routes for setup, listing, the first email and scheduled use](assets/diagrams/goals-en.svg)
 
-![Three-part setup: mail server, SAP host and SAP ERP](assets/diagrams/setup-en.svg)
+| Goal | Route | How do you recognize completion? |
+|---|---|---|
+| Install for the first time | [Three preparations](#prepare), then [SAP setup](#install) | Programs and authorizations ready; profile connection succeeds. |
+| Check connectivity | [Path A — List only](#list-only) | Message identifiers or an empty-mailbox result; no content download. |
+| Open mail and an attachment | [Path B — First email](#first-mail) | Monitor content and attachment available; successful mail in the destination. |
+| Add my business action | [Developer guide](TECHNICAL-GUIDE.md) | Your validated ABAP action replaces the demonstration. |
+| Run automatically | [Path C — Variant and job](#daily-use) | Job runs on the selected host; log and spool reviewed. |
 
-This does not mean installing three separate machines. **Part 2** is Windows/Linux preparation on the SAP host; **part 3** is the work done through SAP GUI. The mail service may already exist.
+This guide describes the `v0.9.1` release candidate. Current SAP runtime acceptance remains pending. Images are real A4H standard SAP screens; they do not demonstrate a completed IMAP installation or successful processing. [Validation record](../VALIDATION.md) · [Screenshot scope](screenshots/README.md).
 
-First prepare the connection details in part 1, then make the connection available from the SAP machine in part 2. In part 3, install the SAP programs and enter those settings. Finally, check everything with one test email.
+<a id="prepare"></a>
+## Three preparations before you start
 
-## Before you start
+![Mailbox, SAP host and SAP ERP preparation](assets/diagrams/setup-en.svg)
 
-We assume you can create, activate and run programs in SE38 and have permission to do so. You perform the SAP steps yourself. Prepare the mailbox and server yourself if you administer them; otherwise ask their administrators for the items listed in those sections. Here, Basis means whoever takes responsibility for server administration.
+We assume you can create and activate programs in SE38. **Use a test SAP system and a dedicated test mailbox.** Prepare the host and mailbox yourself if you administer them; otherwise pass the listed requirements to their administrators.
 
-For authorized RDP/SSH access and file transfer, use the [self-managed setup guide](SELF-MANAGED-SETUP.md).
+### Download the files once
 
-**Use a test SAP system and test mailbox.** Normal processing may mark mail as read and move it. The example does not create invoices.
-
-This guide covers the 0.9.1 sources; actual SAP acceptance tests for this version are still pending. [Test status](../VALIDATION.md).
-
-### Download the files
-
-Open the [GitHub repository](https://github.com/Cheditte/abap-imap-inbound), choose **Code → Download ZIP** and unpack the entire archive. Git is not required.
-
-Keep the folder structure and use files from the same version. You will use the root-level `ZCHE_IMAP_INSTALL.abap` file for the SAP steps. If someone else prepares the server, share the same package with them; they need both the `server` and `script` folders.
+In the [repository](https://github.com/Cheditte/abap-imap-inbound), choose **Code → Download ZIP** and extract the whole archive. Git and abapGit are optional. Keep `server`, `script` and `ZCHE_IMAP_INSTALL.abap` from the same version. Give the same archive to whoever prepares the host.
 
 ## 1. Prepare the mail server
 
-**Goal:** Choose the account SAP will read, its sign-in method and folders. You do not need to install a new mail server; use a suitable account on an existing service.
+**Goal:** choose the account SAP will read and two mail folders.
 
-Obtain the server name, port, security type and login details from your email administrator. **An email address and correct password may not be enough.** The account must allow another program to read it through **IMAP access**. Have the email team confirm that the account can connect with this project. [Detailed connection requirements](TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
+1. Obtain the **actual IMAP hostname, port and security type** from the provider or administrator. Do not enter your email address as the hostname.
+2. Confirm that the account permits IMAP and password/app-password sign-in. A correct password alone may be insufficient. This version does not support Microsoft 365 / Exchange Online or OAuth-only accounts.
+3. Select the source folder. `INBOX` is the default inbox; use the actual IMAP name for another folder.
+4. Choose **a different existing destination folder in the same account** for successful mail. `SAP-Processed` is only an example; you do not have to create that name.
 
-If you do not have an email team, obtain these settings from your account's provider panel or provider support. Being able to open your mailbox does not mean you can change mail-server settings. [Preparing the account yourself](SELF-MANAGED-SETUP.md).
-
-The default source is the **inbox (`INBOX`)**. You can select a different folder if you only want messages from there. For processed messages, you can use an existing folder in the same email account. The initial `SAP-Processed` value is an example; you do not have to create a new folder with that name. Confirm the actual folder names with the email team.
-
-![Message path from the source folder through SAP processing to a different destination](assets/diagrams/mail-flow-en.svg)
-
-**Output from this part:** Actual IMAP hostname, port, security type, login details, source folder and a different destination folder. Keep passwords out of tickets and screenshots.
+**Continue when:** connection details, an approved sign-in method and both actual folder names are ready. Keep passwords out of support tickets and screenshots. [Detailed requirements](TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
 
 ## 2. Prepare the machine running SAP
 
-**What are we doing?** Preparing the tools and project files that retrieve email on the Windows or Linux machine running SAP. This is usually done once at initial setup.
+**Goal:** prepare mail retrieval tools on the Windows/Linux machine running SAP. This can be different from your SAP GUI computer.
 
-![Prepare the tools, project files and protected working folder on the SAP machine](assets/diagrams/host-prep-en.svg)
+| Preparation | Purpose | Expected output |
+|---|---|---|
+| PowerShell | Runs the project's host commands. | Windows PowerShell 5.1; Linux PowerShell 7.4+. |
+| curl | Connects to the mail server using encrypted IMAP. | Version 8.0.0+ with `imaps` support. |
+| Project files and folder | Holds mail, attachments and connection files. | Matching script versions and protected directories. |
+| Network and certificates | Allows the SAP host to reach the mail service. | Actual mail endpoint/port reachable; certificate trust prepared. |
 
-| Component to prepare | What is it for? |
-|---|---|
-| **PowerShell** | Runs the project's mail retrieval commands. Windows needs 5.1 or later; Linux needs 7. |
-| **curl** | Connects to the mail server. Version **8.0.0 or newer** with encrypted IMAP (`imaps`) support. |
-| **The project's server files** | Prepare messages and attachments as files SAP can read. They are included in the download. |
-| **A protected working folder** | Holds email, attachments and connection settings on the server. Basis chooses its path and access permissions. |
+If you hold administrator access, follow the [RDP/SSH and file transfer guide](SELF-MANAGED-SETUP.md). Otherwise share the table with the responsible team. Run the [Windows](TECHNICAL-REFERENCE.md#windows) or [Linux setup commands](TECHNICAL-REFERENCE.md#linux) on the SAP machine.
 
-Suitable PowerShell and curl installations do not need to be installed again. Basis installs anything missing using your organization's process, then runs the server setup included in the project. The Windows and Linux commands are in [server setup for Basis](TECHNICAL-REFERENCE.md#server-setup-commands-and-checks).
+**Continue when:** the host check reports `PROTOCOL 2`, `VERSION 0.9.1` and the correct folder, ending in `OK`. Record the **SAP application server and full working-folder path**. Use that same host in subsequent steps.
 
-Basis also checks that **the machine running SAP can connect to the mail server**. Accessing the account from your own computer does not replace this check.
-
-Without a Basis team, you can perform this step on your own test server if you have administration permissions. The [separate guide](SELF-MANAGED-SETUP.md) explains how to connect, transfer the files and choose the terminal in which to run the commands.
-
-**When can you continue?** If you prepared the server, check that the test passes; if another team prepared it, obtain their confirmation. Record the SAP server to use and the **full path** of the working folder. We will use that same server and folder in the following steps.
-
+<a id="install"></a>
 ## 3. Install the programs in SAP ERP
 
-The mailbox settings and host preparation are ready. Now use SAP GUI to install the programs and enter the information from those two parts. There are three steps here: create the installer, run it and save a mailbox profile.
-
-![SAP ERP setup: create the program, run installation and configure the mailbox](assets/diagrams/sap-steps-en.svg)
+![SAP setup: create the program, run the installer, prepare roles and save a profile](assets/diagrams/sap-steps-en.svg)
 
 ### 3.1. Create the installer program
 
-**What are we doing?** Preparing a program that creates the SAP programs and tables the project needs. Perform this step with your own SAP development permissions.
+1. In **SE38**, enter `ZCHE_IMAP_INSTALL` and choose **Create**.
+2. Enter a description; choose **Executable program** in **Type**.
+3. Use your customer package, for example a package you created as `ZCHE_IMAP`. `$TMP` is for a temporary local trial only.
+4. Replace the starter code with the **entire source** from [the installer file](../ZCHE_IMAP_INSTALL.abap). Do not upload the GitHub page saved as HTML.
+5. Save, check syntax and activate with **Ctrl+F3**.
 
-Create the following program in SE38.
+![SE38 with the installer name entered before choosing Create](screenshots/sap-se38-installer-entry.png)
 
-1. Enter **`ZCHE_IMAP_INSTALL`** as the program name and choose **Create**.
-2. Enter a description and select **Executable program** as the type.
-3. When saving, use a customer package you have created or one assigned to the project, for example `ZCHE_IMAP`. **Local Object** can be used for a temporary trial only.
-4. Open the downloaded [ZCHE_IMAP_INSTALL.abap](../ZCHE_IMAP_INSTALL.abap) file and paste its **entire contents** into the SAP editor.
-5. Save, check the syntax and choose **Activate**.
+![Initial program attributes; choose Executable program in Type](screenshots/sap-program-attributes.png)
 
-**When can you continue?** Once the program activates without errors. Resolve syntax or activation errors before moving on. Keep the program name as shown.
+The attributes image shows the initial unfilled dialog; select Type yourself. **Continue when:** the program is active without syntax errors.
 
 ### 3.2. Run the installer
 
-**What are we doing?** The installer will create the SAP screens, tables and definitions needed to connect SAP to the server tools.
+Execute `ZCHE_IMAP_INSTALL` with **F8**:
 
-Open **`ZCHE_IMAP_INSTALL`** in SE38 and choose **Execute (F8)**.
+| Option | First installation |
+|---|---|
+| DDIC, Programs, SM69 commands, Server check | Selected. Prepares tables, programs, commands and the final check. |
+| Server folder | The **actual full path** prepared in part 2. |
+| Code page | Automatic unless your developer confirms another [technical setting](TECHNICAL-REFERENCE.md#sap-installation-options-and-checks). |
+| Overwrite existing programs | Cleared for a new installation; use the [upgrade route](#upgrade) for updates. |
+| Uninstall | **Cleared.** |
 
-- For a first installation, leave **DDIC objects**, **Programs**, **SM69 commands** and **Server check** selected. These cover tables, programs, server commands and the final check.
-- Enter the **full folder path supplied by Basis** in **Server folder**. Do not assume the example path is right for your system.
-- Leave **Uninstall** cleared. Review the other options.
-- Press **F8** and read the results.
+Execute with F8 and read the whole result list. **Continue when:** installation and the final host check succeed. Resolve a failed step before continuing.
 
-**When can you continue?** Once the selected installation steps and final server check succeed. Review the failed step; involve the responsible team for server access or permission problems outside your control.
+Generated objects go into `$TMP`; putting the installer itself in a package does not change this. For maintained use, reassign the objects to your customer package and prepare transport. [Package and transport](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport).
 
-**For maintained use:** The installer currently creates its objects in the local area `$TMP`. Saving the installer itself in a package does not change this. Assign the objects to your customer package and plan transport to test and production systems; coordinate transport settings with their administrators where needed. [Package and transport details](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport).
-
+<a id="authorization"></a>
 ### 3.3. Create the authorization object and role
 
-**What are we doing?** Allowing your user to run the programs. Every program checks authorization object `ZCHE_IMAP` per profile; without it, they stop with an authorization message, even for a trial.
+This permits users to work with the intended profile:
 
-1. **SU20:** create authorization field `ZCHE_PROF` with data element `ZCHE_IMAP_PROFID`. The installer created this data element in step 3.2.
-2. **SU21:** create authorization object `ZCHE_IMAP` with fields `ZCHE_PROF` and `ACTVT`. Allow activities `02`, `03` and `16`.
-3. **PFCG:** in a role, add `ZCHE_IMAP` with your profile name (for example `INVOICE`) and the activities you need: `03` to view, `02` to maintain profiles and reprocess, `16` to run processing. Also add:
-   - `S_TABU_DIS` for table group `ZCHI`: `03` to display, `02` to change.
-   - `S_LOG_COM` for the SM69 commands: `ZCHE_IMAP_TEST` for the connection test; `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH` and `ZCHE_IMAP_DONE` for processing.
-   - `S_DATASET` for the working folder from step 2, as listed in [security setup](../SECURITY.md#file-access--dosya-erişimi).
+1. **SU20:** create authorization field `ZCHE_PROF` with installer-created data element `ZCHE_IMAP_PROFID`.
+2. **SU21:** create object `ZCHE_IMAP` containing `ZCHE_PROF` and `ACTVT`.
+3. **PFCG:** grant required profile activities: `03` display, `02` configuration/reprocessing, `16` execution.
+4. Complete table, command and file grants using the [authorization matrix](../SECURITY.md). `S_TABU_DIS`, `S_LOG_COM` and `S_DATASET` are required. Assign the role and complete user comparison.
 
-   Assign the role to your user and to the background job user. Users with broad development roles may already have these; a missing one stops the program with an authorization message.
-
-Your security team may create these objects for you. Exact activities, file permissions and transactions are in [security setup](../SECURITY.md).
-
-**When can you continue?** Once the role is assigned to your user. Log off and on again if the new authorization is not yet active.
+Work with the security administrator if those permissions belong to another team. **Continue when:** your user and the intended job user have the required grants.
 
 ### 3.4. Set up a mailbox profile
 
-**What are we doing?** Telling SAP which email account to connect to and which folder to read. These settings are saved together as a **profile**.
+A **profile** is the saved name for connection and processing settings. Open **SE38 → `ZCHE_IMAP_CONFIG` → F8**. F8 **inside the configuration screen saves settings and checks connectivity**.
 
-Open **`ZCHE_IMAP_CONFIG`** in SE38 and run it with **F8**. Use a SAP session connected to the server Basis prepared; ask Basis to check if you are unsure.
-
-| Field | What should you enter or select? |
+| Field | First use |
 |---|---|
-| Profile | A name for your settings, for example `INVOICE`. You may choose another name; use the same name in later steps. |
-| Active | Selected, to allow this profile to be processed. |
-| Server, port and security | Actual values from your email team. Do not enter your email address in the server field. Keep certificate verification enabled. |
-| Username and password | Login details confirmed by the email team. Password source `S` means entering the password in SAP; `O` means Basis saves it on the server. Agree the method with Basis. |
-| Folder to read | The default `INBOX` reads the inbox. For another folder, enter its actual name/path. |
-| Processed folder | Actual name/path of the folder you select in the same email account for successful messages; choose a different folder from the source. The name `SAP-Processed` is not required. |
-| Move method | Select `MOVE` for the first trial. |
-| Handler program | Leave **`ZCHE_IMAP_HANDLER_DEMO`** selected. This is the supplied example program that runs for each message. |
+| Profile / Active | Your chosen name, for example `MAIL_DEMO`; Active selected. Use this name in later steps. |
+| Server, Port, Security | Actual values from the mail administrator; certificate verification selected. |
+| User / Password source | Actual login; default `O` means the administrator prepares the password on the host. |
+| Folder to read | `INBOX` or the actual alternative source folder. |
+| Processed folder | A different existing folder in the same account; `SAP-Processed` is optional. |
+| Move method | `MOVE`; the mail server must support it. |
+| Handler program / FORM | `ZCHE_IMAP_HANDLER_DEMO` / `HANDLE_MAIL`, the supplied example. |
 
-For the trial, review the remaining message count, size and timeout limits with Basis and keep the starting values where appropriate. Full field descriptions and server password commands are in the [technical reference](TECHNICAL-REFERENCE.md#profile-fields-and-server-managed-passwords).
+For source `O`, the administrator [prepares the host credential](TECHNICAL-REFERENCE.md#profile-fields-and-server-managed-passwords) with the actual `SID_CLIENT_PROFILE` key. Source `S` is SAP-screen password entry with different protection/grant requirements. Saved passwords are not displayed again.
 
-Press **F8** to save and test the connection. Keep passwords out of screenshots and support tickets.
+[Remaining fields explained](SCREEN-GUIDE.md#profile). **Continue when:** settings are saved and the connection check succeeds for the intended account.
 
-**When can you continue?** Once the connection test succeeds for the intended mailbox. Saved settings alone do not prove the connection works.
+<a id="list-only"></a>
+<a id="4-test-the-three-parts-together"></a>
+## Path A — Check connectivity and list messages
 
-## 4. Test the three parts together
+1. Open **SE38 → `ZCHE_IMAP_INBOUND` → F8** to reach the selection screen.
+2. Enter **only your dedicated test profile**. An empty profile selection includes all active profiles.
+3. **Select List only (no downloads/changes) yourself.** Do not assume it is selected on entry.
+4. Execute with F8. A `UID` is the mail server's message identifier, not a business document number.
 
-Check the complete path: a message must be retrieved from the source folder, become visible in SAP and move to your destination folder.
+**Success:** eligible message identifiers or an empty-mailbox result. This path **does not download bodies/attachments, call the handler or move mail**. [Selection fields](SCREEN-GUIDE.md#processing).
 
-### 4.1. Process mail
+<a id="first-mail"></a>
+## Path B — Open the first email and attachment in SAP
 
-**What are we doing?** First checking that the mailbox can be read, then retrieving a test message.
+### B1. Process a dedicated test message
 
-Send an email with a small PDF or text attachment to the test mailbox. If you selected a source folder other than the inbox, place the message in that folder.
+1. Send a small PDF/text attachment to the test account. If using another source folder, put the message there.
+2. Keep the supplied demo handler in the same test profile.
+3. Return to INBOUND, **clear List only** and execute with F8.
 
-1. Open **`ZCHE_IMAP_INBOUND`** in SE38 and run it.
-2. Enter the **profile name** saved in the previous step.
-3. Select **List only (no downloads/changes)** and press **F8**. This lists eligible message numbers; it does not yet retrieve content or attachments, or move messages.
-4. If listing succeeds, go back, **clear List only** and run it again. This time the email and attachments are retrieved, the supplied example runs and successful mail is moved to your processed folder.
+**Normal mail processing starts now.** Mail and attachments are retrieved; the example attempts to read attachments. Successful mail moves to the destination and may be marked as read. The example does not create an invoice or purchase order.
 
-**When can you continue?** Once the run finishes. Next, we will check the result in SAP and in the mailbox.
+### B2. Verify in the monitor
 
-### 4.2. Monitor mails and attachments
+1. Open **SE38 → `ZCHE_IMAP_MONITOR` → F8** to reach its selection screen.
+2. Choose your profile and a date range covering the run; execute with F8.
+3. Double-click the mail row to read headers, body and attachment details.
+4. Open/download an attachment. PDF, text and supported images can open in an appropriate viewer; other file types download only.
+5. Check the mailbox: successful mail should be in your chosen destination.
 
-**What are we doing?** Checking the result and confirming that the attachment can be accessed from SAP.
-
-1. Open **`ZCHE_IMAP_MONITOR`** in SE38 and run it.
-2. Select your profile and a date range covering the test, then press **F8**.
-3. Open your test message's record and inspect its text and attachments.
-4. Open the email account too. Successful mail should be in the processed folder you selected.
-
-| Status | Meaning |
+| Status | Meaning and next step |
 |---|---|
-| `S` | Processing and moving the mail are complete. |
-| `E` | An error occurred; read the explanation in the record. |
-| `R` | A failed message has been marked for another attempt. |
-| `H` | The SAP business step is complete, but moving the mail is pending. |
+| `S` — Done | Processing and movement complete; verify attachment and destination. |
+| `E` — Error | Read the explanation and correct the cause. Ordinary runs skip earlier failures. |
+| `H` — To move | Business result committed; movement pending. A normal run attempts movement recovery only. |
+| `R` — Retry | An authorized user requested reprocessing; a normal run may try again. |
 
-PDFs and common images can open in a suitable application. Download other attachments, such as Excel files, and inspect them with an application on your computer.
+**Success:** an `S` record, an accessible attachment and the message in the destination verified together. Do not delete logs/files to force replay. [Errors and retry](SCREEN-GUIDE.md#errors).
 
-**A successful first trial means:** you see status `S`, can access the attachment and can find the message in the processed folder. The supplied example does not also create an invoice or purchase order.
+### B3. Add your ABAP action
 
-#### If a step fails
+Follow the [developer guide](TECHNICAL-GUIDE.md) to copy the handler to your customer program. Preserve the allowed name prefix and transaction contract. Use your business key to prevent a document being created twice. The processor owns the commit.
 
-- **Sign-in or folder error:** Ask the email team to check connection details, IMAP access and the selected folder names.
-- **Connection, certificate or SAP permission error:** Ask Basis for help. Keep certificate verification enabled.
-- **The example or your business program fails:** Review the error and the relevant program. The supplied example deliberately fails for subjects containing `TEST-ERROR`.
+<a id="daily-use"></a>
+<a id="5-schedule-regular-processing"></a>
+## Path C — Run automatically at agreed intervals
 
-Share the error text and the step you reached, without passwords. Authorized users can mark failed messages for another attempt. Do not delete log records or server files to force reprocessing. [Retry details](TECHNICAL-REFERENCE.md#retention-and-retry-details).
+**Flow:** selections → variant → SM36 → SM37 log/spool. A variant stores settings; the job runs the program with those settings.
 
-## 5. Schedule regular processing
+### C1. Prepare a list-only variant first
 
-**What are we doing?** After the trial succeeds, having the mailbox checked automatically at agreed intervals.
+In INBOUND, enter your profile, **select List only**, and leave retry cleared. Save a variant under an unused name such as `IMAP_LIST_DEMO`; the name is only an example. Reload it to check the stored selections.
 
-If you have SM36 permission, create a **background job** for `ZCHE_IMAP_INBOUND`; otherwise ask Basis to schedule it. It must use the correct profile, have list-only cleared and run on the **same SAP machine** prepared for this installation. Test with the user that will run the job, or have the responsible team do so.
+### C2. Define the job in SM36
 
-Agree the business action with the process owner and implement it. For example, linking an attachment to a purchase order is added through the connection point in the [developer guide](TECHNICAL-GUIDE.md). Before production use, validate business rules, permissions and package/transport steps in your test system.
+1. Open **SM36** and enter an unused job name. `ZCHE_IMAP_LIST_DEMO` in the image is only an example.
+2. Use **Job Class C** unless your organization specifies another class.
+3. Set **Target** to the installation's application server. In a multi-server system, do not leave host selection to chance.
+4. Choose **Step → ABAP program**; enter `ZCHE_IMAP_INBOUND` and your list-only variant. Check the execution user and save the step.
 
-**If you are updating an existing installation,** follow the [upgrade procedure](TECHNICAL-REFERENCE.md#8-update-an-existing-installation) rather than directly repeating the first-install steps. Server commands and detailed checks are in the [technical reference](TECHNICAL-REFERENCE.md).
+![SM36 job definition with Job Name, Target, Step and Start condition](screenshots/sap-sm36-job-definition.png)
+
+This is an unsaved preparation screen. Target, step and start condition have not been selected; it does not show a completed job.
+
+### C3. Set the start condition and inspect the result
+
+1. For the first check, choose **Start condition → Immediate** with **Periodic Job cleared**. Save the condition and the main job.
+2. In **SM37**, search by your job name, user and execution time. Widen status filters and refresh if needed.
+3. Read **Job log** and **Spool**. **Finished does not mean mail was moved:** list-only jobs do not download content. Review counts and error details.
+
+After checking the real job user and selected host, prepare **a separate variant and job** for Path B's normal processing. Clear List only only in that variant. Agree the interval with operations; use **Date/Time + Periodic Job + Period values** in SM36. Confirm the SAP/job timezone. Monitor initial runs through the monitor, log/spool and mailbox together.
+
+<a id="upgrade"></a>
+## If you already have an installation
+
+Do not repeat first-install instructions without review. Stop scheduled work and follow the [upgrade procedure](TECHNICAL-REFERENCE.md#8-update-an-existing-installation).
+
+For `0.9.0 → 0.9.1`, replace and activate the SAP installer source with the current file and deploy both matching host modules. After backup/review, select **Programs + Overwrite existing programs (update) + Server check**; assess required SM69/DDIC steps for your installation. Overwrite can replace local source changes. Do not resume jobs before host and profile checks succeed.
+
+Old `ZIMAP_` and new `ZCHE_IMAP_` jobs must not process the same mailbox together. Old history is not migrated automatically.
+
+## When you need help
+
+[Field guide](SCREEN-GUIDE.md) explains screen choices. [Technical reference](TECHNICAL-REFERENCE.md) covers connectivity, host setup and transport. [SECURITY](../SECURITY.md) covers roles and credentials. Share the failed step and error text, without passwords or real mail content.

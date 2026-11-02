@@ -6,7 +6,7 @@
 - Server setup checks for curl 8.0.0 or newer at the start; Linux setup accepts `--curl-path`.
 - Guides: authorization step with `S_LOG_COM` and `S_DATASET`, curl 8 requirement, handler template without the duplicate include, retry limit, setup commands for elevated sessions.
 
-Upgrade from 0.9.0: copy the new `script` files to the server (the script version must match), then rerun `ZCHE_IMAP_INSTALL` with Programs and Server check selected.
+Upgrade from 0.9.0: stop processing and follow the [upgrade route](docs/WALKTHROUGH.md#upgrade). Replace and activate the SAP installer source, deploy both matching server modules, then rerun `ZCHE_IMAP_INSTALL` with **Programs, Overwrite existing programs (update), and Server check** selected after backup/review. Overwrite can replace local source changes.
 
 ## 0.9.0 — release candidate
 
