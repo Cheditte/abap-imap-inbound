@@ -49,7 +49,7 @@ Normal işleme maili okundu işaretleyebilir ve taşıyabilir. İlk kullanım i�
 
 ## Durum ve ayrıntılar
 
-**Güncel sürüm: [v0.9.2 — sürüm adayı](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.2).** Önceki `ZIMAP_` sürümü A4H'de mail ve ekleri açtı; güncel `ZCHE_IMAP_` sürümünün SAP çalışma kabulü henüz tamamlanmadı. Klasik ABAP 7.00 uyumluluğu bir hedeftir; ECC çalışma sertifikasyonu değildir. [Doğrulama kaydı](VALIDATION.md).
+**Güncel sürüm: [v0.9.2 — sürüm adayı](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.2).** Proje sahibi, 3 Kasım 2026'da v0.9.2'yi SAP'de çalıştırıp sonuç aldığını doğruladı. Bu manuel doğrulama, bütün kabul senaryolarının tamamlandığı anlamına gelmez. Klasik ABAP 7.00 uyumluluğu bir hedeftir; ECC çalışma sertifikasyonu değildir. [Doğrulama kaydı](VALIDATION.md).
 
 - [Kurulum ve kullanım](docs/tr/WALKTHROUGH.md) · [Alan rehberi](docs/tr/SCREEN-GUIDE.md)
 - [Sunucuya kendiniz bağlanacaksanız](docs/tr/SELF-MANAGED-SETUP.md)
