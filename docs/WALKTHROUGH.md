@@ -16,7 +16,7 @@
 | Add my business action | [Developer guide](TECHNICAL-GUIDE.md) | Your validated ABAP action replaces the demonstration. |
 | Run automatically | [Path C — Variant and job](#daily-use) | Job runs on the selected host; log and spool reviewed. |
 
-This guide describes the `v0.9.1` release candidate. Current SAP runtime acceptance remains pending. Images are real A4H standard SAP screens; they do not demonstrate a completed IMAP installation or successful processing. [Validation record](../VALIDATION.md) · [Screenshot scope](screenshots/README.md).
+This guide describes the `v0.9.2` release candidate. Current SAP runtime acceptance remains pending. Images are real A4H standard SAP screens; they do not demonstrate a completed IMAP installation or successful processing. [Validation record](../VALIDATION.md) · [Screenshot scope](screenshots/README.md).
 
 <a id="prepare"></a>
 ## Three preparations before you start
@@ -53,7 +53,7 @@ In the [repository](https://github.com/Cheditte/abap-imap-inbound), choose **Cod
 
 If you hold administrator access, follow the [RDP/SSH and file transfer guide](SELF-MANAGED-SETUP.md). Otherwise share the table with the responsible team. Run the [Windows](TECHNICAL-REFERENCE.md#windows) or [Linux setup commands](TECHNICAL-REFERENCE.md#linux) on the SAP machine.
 
-**Continue when:** the host check reports `PROTOCOL 2`, `VERSION 0.9.1` and the correct folder, ending in `OK`. Record the **SAP application server and full working-folder path**. Use that same host in subsequent steps.
+**Continue when:** the host check reports `PROTOCOL 2`, `VERSION 0.9.2` and the correct folder, ending in `OK`. Record the **SAP application server and full working-folder path**. Use that same host in subsequent steps.
 
 <a id="install"></a>
 ## 3. Install the programs in SAP ERP
@@ -197,7 +197,7 @@ After checking the real job user and selected host, prepare **a separate variant
 
 Do not repeat first-install instructions without review. Stop scheduled work and follow the [upgrade procedure](TECHNICAL-REFERENCE.md#8-update-an-existing-installation).
 
-For `0.9.0 → 0.9.1`, replace and activate the SAP installer source with the current file and deploy both matching host modules. After backup/review, select **Programs + Overwrite existing programs (update) + Server check**; assess required SM69/DDIC steps for your installation. Overwrite can replace local source changes. Do not resume jobs before host and profile checks succeed.
+For `0.9.0 / 0.9.1 → 0.9.2`, replace and activate the SAP installer source with the current file and deploy both matching host modules. After backup/review, select **Programs + Overwrite existing programs (update) + Server check**; assess required SM69/DDIC steps for your installation. Overwrite can replace local source changes. Do not resume jobs before host and profile checks succeed.
 
 Old `ZIMAP_` and new `ZCHE_IMAP_` jobs must not process the same mailbox together. Old history is not migrated automatically.
 

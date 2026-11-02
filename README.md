@@ -45,7 +45,7 @@ Normal processing may mark mail as read and move it. Start with **a test SAP sys
 
 ## Status and details
 
-**Current version: [v0.9.1 — release candidate](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.1).** The earlier `ZIMAP_` edition opened mail and attachments on A4H. SAP runtime acceptance of the current `ZCHE_IMAP_` edition is still pending. Classic ABAP 7.00 compatibility is a target, not an ECC runtime certification. [Validation record](VALIDATION.md).
+**Current version: [v0.9.2 — release candidate](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.2).** The earlier `ZIMAP_` edition opened mail and attachments on A4H. SAP runtime acceptance of the current `ZCHE_IMAP_` edition is still pending. Classic ABAP 7.00 compatibility is a target, not an ECC runtime certification. [Validation record](VALIDATION.md).
 
 - [Setup and usage](docs/WALKTHROUGH.md) · [Field guide](docs/SCREEN-GUIDE.md)
 - [Preparing the host yourself](docs/SELF-MANAGED-SETUP.md)
