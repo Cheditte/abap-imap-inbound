@@ -150,7 +150,7 @@ This example only lists eligible UIDs. Clear `p_test` for an intentional normal 
 - Install SAP objects and both server modules as a matching protocol-2 set. For upgrades and pending old archives, follow the [upgrade procedure](TECHNICAL-REFERENCE.md#8-update-an-existing-installation).
 - Processing, configuration and monitoring are pinned to one application-server host. Include the new handler program in the appropriate `S_DATASET` and business authorization design. See the [role outline](TECHNICAL-REFERENCE.md#access-and-operating-boundaries).
 
-The source avoids modern ABAP syntax, uses ASCII and limits ABAP source to 72 columns. Compatibility with older SAP is a target, not a verified release certification. Keep additions compatible and compile on the actual target system.
+The source avoids modern ABAP syntax, uses ASCII and limits ABAP source to 255 columns. Compatibility with older SAP is a target, not a verified release certification. Keep additions compatible and compile on the actual target system.
 
 ## 8. Acceptance checks for your handler
 

@@ -10,7 +10,7 @@ This record applies to the 0.9.0 release candidate. SAP tests and renewed SAP sc
 | Restricted-user background job | Target SAP | 2026-11-02 | Not executed, operator request. |
 | ABAP syntax and installer build | abaplint 2.120.92 v700; limited DDIC stand-ins | 2026-11-02 | Local check passed; does not validate SAP API signatures/runtime. |
 | Windows parser and IMAP helper | Local PowerShell 7 + disposable GreenMail 2.1.14 | 2026-11-02 | Passed locally. |
-| Windows PowerShell 5.1 | Local Windows parser, codepage and retention regressions | 2026-11-02 | Passed locally; CI also configured. |
+| Windows PowerShell 5.1 | Local Windows parser, codepage and retention regressions | 2026-11-02 | Passed locally and on Windows CI. |
 | Linux helper | Linux CI + disposable GreenMail 2.1.14 | 2026-11-02 | Passed on Linux CI with GreenMail 2.1.14. |
 | Old curl 7.55.1 | Unsupported | 2026-11-02 | Rejected by version guard; no compatibility claim. |
 

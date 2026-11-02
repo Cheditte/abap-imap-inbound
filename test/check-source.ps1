@@ -1,5 +1,5 @@
 # Offline source/build checks plus pinned abaplint grammar parsing.
-# abaplint v702 is a parser check; it does not certify SAP 4.6C runtime.
+# abaplint v700 uses limited stand-ins; SAP runtime is not exercised.
 param([switch]$SkipAbaplint)
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent

@@ -6,7 +6,7 @@
 *
 * Classic ABAP 7.00: no inline
 * declarations, constructor expressions or string templates;
-* lines at most 72 characters; ASCII only.
+* source lines fit ABAPSOURCE; ASCII only.
 *---------------------------------------------------------------
 TYPES: ty_t_line TYPE STANDARD TABLE OF zche_imap_s_line
                  WITH DEFAULT KEY.

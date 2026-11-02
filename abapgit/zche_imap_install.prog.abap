@@ -2294,7 +2294,7 @@ FORM fill_common.
   src '*'.
   src '* Classic ABAP 7.00: no inline'.
   src '* declarations, constructor expressions or string templates;'.
-  src '* lines at most 72 characters; ASCII only.'.
+  src '* source lines fit ABAPSOURCE; ASCII only.'.
   src '*--------------------------------------------------------------'.
   cnt '-'.
   src 'TYPES: ty_t_line TYPE STANDARD TABLE OF zche_imap_s_line'.

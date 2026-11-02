@@ -2,7 +2,7 @@
 # abap\ embedded into the program. Run it again whenever a source
 # changes:
 #   powershell -NoProfile -ExecutionPolicy Bypass -File installer\build.ps1
-# Every line of the output is at most 72 characters (4.6C editor).
+# Source lines fit ABAPSOURCE (255); embedded literal chunks fit 72.
 
 param([switch]$Check)
 
@@ -61,7 +61,7 @@ foreach ($p in @(
     $all.AddRange((Get-Form $p[0] $p[1]))
 }
 
-# Checks: 72 columns and ASCII only
+# Checks: ABAPSOURCE width and ASCII only
 $bad = @()
 for ($i = 0; $i -lt $all.Count; $i++) {
     if ($all[$i].Length -gt 255) { $bad += "line $($i + 1): $($all[$i].Length) characters" }
