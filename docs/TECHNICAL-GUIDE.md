@@ -149,10 +149,10 @@ This example only lists eligible UIDs. Clear `p_test` for an intentional normal 
 - Install SAP objects and both server modules as a matching protocol-2 set. For upgrades and pending old archives, follow the [upgrade procedure](TECHNICAL-REFERENCE.md#8-update-an-existing-installation).
 - Processing, configuration and monitoring are pinned to one application-server host. Include the new handler program in the appropriate `S_DATASET` and business authorization design. See the [role outline](TECHNICAL-REFERENCE.md#access-and-operating-boundaries).
 
-The source avoids modern ABAP syntax, uses ASCII and limits source lines to 255 columns. Embedded installer literal chunks are separately generated to fit within 72 columns. Compatibility with older SAP is a target, not a verified release certification. Keep additions compatible and compile on the actual target system.
+The source avoids modern ABAP syntax, uses ASCII and limits ABAP source lines to 255 columns (the `ABAPSOURCE` width). The generated installer embeds the sources as literal pieces of at most 72 columns; `installer/build.ps1` handles that split. Compatibility with older SAP is a target, not a verified release certification. Keep additions compatible and compile on the actual target system.
 
 ## 8. Acceptance checks for your handler
 
 Use a disposable mailbox and your target SAP system. Confirm normal success, missing/invalid attachments, a returned business error with rollback, a failing local V1 update, an authorized retry, and a movement failure after committed handler success. Confirm recovery does not duplicate the business action. Run the scheduled variant with the intended restricted job user on the selected host.
 
-Source/parser/IMAP checks run in GitHub Actions; [CONTRIBUTING.md](../CONTRIBUTING.md) also gives the commands for local execution. They do not execute your business API or replace SAP compiler/runtime acceptance tests. Current project verification limits are in the [validation record](../VALIDATION.md).
+Source, parser and IMAP tests run in GitHub Actions on every push and pull request, and can be run locally; see [CONTRIBUTING.md](../CONTRIBUTING.md). They do not execute your business API or replace SAP compiler/runtime acceptance tests. Current project verification limits are in the [validation record](../VALIDATION.md).
