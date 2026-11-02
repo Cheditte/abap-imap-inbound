@@ -513,9 +513,28 @@ FORM handler_allowed USING iv_prog TYPE c iv_form TYPE c
   cv_ok = 'X'.
 ENDFORM.
 
+* Optional per-profile check. It applies only when the customer has
+* defined authorization object ZCHE_IMAP (SU21); otherwise the
+* standard table, command and file authorizations decide.
 FORM profile_auth USING iv_prof TYPE c iv_activity TYPE c
                   CHANGING cv_ok TYPE c.
+  STATICS: sv_known(1) TYPE c,
+           sv_defined(1) TYPE c.
+  DATA lv_object(10) TYPE c.
+
   CLEAR cv_ok.
+  IF sv_known IS INITIAL.
+    SELECT SINGLE objct FROM tobj INTO lv_object
+      WHERE objct = 'ZCHE_IMAP'.
+    IF sy-subrc = 0.
+      sv_defined = 'X'.
+    ENDIF.
+    sv_known = 'X'.
+  ENDIF.
+  IF sv_defined IS INITIAL.
+    cv_ok = 'X'.
+    EXIT.
+  ENDIF.
   AUTHORITY-CHECK OBJECT 'ZCHE_IMAP'
     ID 'ZCHE_PROF' FIELD iv_prof
     ID 'ACTVT' FIELD iv_activity.

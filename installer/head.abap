@@ -464,7 +464,7 @@ FORM next_steps.
   SKIP.
   WRITE: / 'Next steps:',
          / '  1. ZCHE_IMAP_CONFIG: mailbox profile, password, F8 test',
-         / '  2. ZCHE_IMAP_INBOUND: first with "Test mode", then SM36 job',
+         / '  2. ZCHE_IMAP_INBOUND: first with "List only", then SM36',
          / '  3. ZCHE_IMAP_MONITOR: processed mails, attachments, errors'.
   SKIP.
   WRITE: / 'Required authorizations (PFCG):',
@@ -472,7 +472,10 @@ FORM next_steps.
            'S_DATASET ZCHE_IMAP_INBOUND read',
          / '  Administrator   : S_LOG_COM ZCHE_IMAP_TEST; S_DATASET',
            'ZCHE_IMAP_CONFIG write (conf, secret)',
-         / '  Monitoring      : S_DATASET ZCHE_IMAP_MONITOR read'.
+         / '  Monitoring      : S_DATASET ZCHE_IMAP_MONITOR read',
+         / '  Tables          : S_TABU_DIS group ZCHI',
+         / '  Optional        : define object ZCHE_IMAP in SU21 for',
+           'per-profile access (see SECURITY.md)'.
 ENDFORM.
 
 *---------------------------------------------------------------

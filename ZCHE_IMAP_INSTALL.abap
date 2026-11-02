@@ -464,7 +464,7 @@ FORM next_steps.
   SKIP.
   WRITE: / 'Next steps:',
          / '  1. ZCHE_IMAP_CONFIG: mailbox profile, password, F8 test',
-         / '  2. ZCHE_IMAP_INBOUND: first with "Test mode", then SM36 job',
+         / '  2. ZCHE_IMAP_INBOUND: first with "List only", then SM36',
          / '  3. ZCHE_IMAP_MONITOR: processed mails, attachments, errors'.
   SKIP.
   WRITE: / 'Required authorizations (PFCG):',
@@ -472,7 +472,10 @@ FORM next_steps.
            'S_DATASET ZCHE_IMAP_INBOUND read',
          / '  Administrator   : S_LOG_COM ZCHE_IMAP_TEST; S_DATASET',
            'ZCHE_IMAP_CONFIG write (conf, secret)',
-         / '  Monitoring      : S_DATASET ZCHE_IMAP_MONITOR read'.
+         / '  Monitoring      : S_DATASET ZCHE_IMAP_MONITOR read',
+         / '  Tables          : S_TABU_DIS group ZCHI',
+         / '  Optional        : define object ZCHE_IMAP in SU21 for',
+           'per-profile access (see SECURITY.md)'.
 ENDFORM.
 
 *---------------------------------------------------------------
@@ -2907,9 +2910,29 @@ FORM fill_common.
   src '  cv_ok = ''X''.'.
   src 'ENDFORM.'.
   src ''.
+  src '* Optional per-profile check. It applies only when the customer'.
+  cnt ' has'.
+  src '* defined authorization object ZCHE_IMAP (SU21); otherwise the'.
+  src '* standard table, command and file authorizations decide.'.
   src 'FORM profile_auth USING iv_prof TYPE c iv_activity TYPE c'.
   src '                  CHANGING cv_ok TYPE c.'.
+  src '  STATICS: sv_known(1) TYPE c,'.
+  src '           sv_defined(1) TYPE c.'.
+  src '  DATA lv_object(10) TYPE c.'.
+  src ''.
   src '  CLEAR cv_ok.'.
+  src '  IF sv_known IS INITIAL.'.
+  src '    SELECT SINGLE objct FROM tobj INTO lv_object'.
+  src '      WHERE objct = ''ZCHE_IMAP''.'.
+  src '    IF sy-subrc = 0.'.
+  src '      sv_defined = ''X''.'.
+  src '    ENDIF.'.
+  src '    sv_known = ''X''.'.
+  src '  ENDIF.'.
+  src '  IF sv_defined IS INITIAL.'.
+  src '    cv_ok = ''X''.'.
+  src '    EXIT.'.
+  src '  ENDIF.'.
   src '  AUTHORITY-CHECK OBJECT ''ZCHE_IMAP'''.
   src '    ID ''ZCHE_PROF'' FIELD iv_prof'.
   src '    ID ''ACTVT'' FIELD iv_activity.'.

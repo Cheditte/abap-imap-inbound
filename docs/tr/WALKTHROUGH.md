@@ -106,16 +106,13 @@ Installer, oluşturduğu nesneleri `$TMP`'ye koyar; installer'ı kendi paketiniz
 
 <a id="yetkiler"></a>
 <a id="33-yetki-nesnesini-ve-rolü-oluşturun"></a>
-### 3.3. Yetki nesnesini ve rolü hazırlayın
+### 3.3. Yetkileri kontrol edin
 
-Programların profil bazında çalışmasına izin verirsiniz:
+Programlar standart SAP yetkilerini kullanır: `ZCHI` tablo grubu için `S_TABU_DIS`, `ZCHE_IMAP_*` SM69 komutları için `S_LOG_COM` ve çalışma klasörü için `S_DATASET`. Geliştirici kullanıcısında genellikle bulunurlar; diğer kullanıcılar ve job kullanıcısı için [yetki tablosuna](../../SECURITY.md) bakın.
 
-1. **SU20:** `ZCHE_PROF` yetki alanını, installer'ın oluşturduğu `ZCHE_IMAP_PROFID` veri elemanıyla oluşturun.
-2. **SU21:** `ZCHE_IMAP` yetki nesnesine `ZCHE_PROF` ve `ACTVT` alanlarını ekleyin.
-3. **PFCG:** seçtiğiniz profil adı için `03` görüntüleme, `02` profil bakımı/yeniden işleme, `16` çalıştırma aktivitelerini gereken kullanıcılara verin.
-4. Rolün tablo, komut ve dosya yetkilerini [yetki tablosuna](../../SECURITY.md) göre tamamlayın. Özellikle `S_TABU_DIS`, `S_LOG_COM` ve `S_DATASET` gerekir. Rolü kullanıcıya atayıp kullanıcı karşılaştırmasını tamamlayın.
+**İsteğe bağlı — profil bazında ayrım:** Farklı ekiplerin yalnızca kendi posta kutusunu görmesi gerekiyorsa SU21'de `ZCHE_IMAP` yetki nesnesini tanımlayın. Programlar bunu kendiliğinden denetler. [Kurulum adımları](../../SECURITY.md#optional-per-profile-authorization).
 
-Yetki yönetimi başka ekipteyse bu adımı onlarla yapın. **Devam koşulu:** kendi kullanıcınızın ve ileride job kullanıcısının gerekli yetkileri var.
+**Devam koşulu:** kendi kullanıcınızın ve job kullanıcısının standart yetkileri var.
 
 <a id="34-posta-kutusu-profilini-tanımlayın"></a>
 ### 3.4. Posta profilini kaydedin

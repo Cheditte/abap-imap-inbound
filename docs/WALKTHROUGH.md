@@ -105,16 +105,13 @@ Execute with F8 and read the whole result list. **Continue when:** installation 
 Generated objects go into `$TMP`; putting the installer itself in a package does not change this. For maintained use, reassign the objects to your customer package and prepare transport. [Package and transport](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport).
 
 <a id="authorization"></a>
-### 3.3. Create the authorization object and role
+### 3.3. Check the authorizations
 
-This permits users to work with the intended profile:
+The programs use standard SAP authorizations: `S_TABU_DIS` for table group `ZCHI`, `S_LOG_COM` for the `ZCHE_IMAP_*` SM69 commands and `S_DATASET` for the working folder. A developer user usually has them; for other users and the job user, see the [authorization matrix](../SECURITY.md).
 
-1. **SU20:** create authorization field `ZCHE_PROF` with installer-created data element `ZCHE_IMAP_PROFID`.
-2. **SU21:** create object `ZCHE_IMAP` containing `ZCHE_PROF` and `ACTVT`.
-3. **PFCG:** grant required profile activities: `03` display, `02` configuration/reprocessing, `16` execution.
-4. Complete table, command and file grants using the [authorization matrix](../SECURITY.md). `S_TABU_DIS`, `S_LOG_COM` and `S_DATASET` are required. Assign the role and complete user comparison.
+**Optional — separate access per profile:** if different teams must see only their own mailbox, define authorization object `ZCHE_IMAP` in SU21. The programs then check it automatically. [How to set it up](../SECURITY.md#optional-per-profile-authorization).
 
-Work with the security administrator if those permissions belong to another team. **Continue when:** your user and the intended job user have the required grants.
+**Continue when:** your user and the intended job user have the standard grants.
 
 ### 3.4. Set up a mailbox profile
 
