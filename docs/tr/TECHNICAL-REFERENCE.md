@@ -2,7 +2,7 @@
 
 > [English](../TECHNICAL-REFERENCE.md) | **Türkçe** · [Projeyi tanıyın](../../README.tr.md) · [Kurulum](WALKTHROUGH.md) · [Kod örnekleri](TECHNICAL-GUIDE.md)
 
-Bu dosya, kurulumu hazırlayan Basis ve e-posta ekipleri ile ayrıntıları incelemek isteyen geliştiriciler içindir. **0.9.0 kaynaklarını ve betik protokolü 2'yi** anlatır. Sırayla kurulum yapmak için [adım adım rehberi](WALKTHROUGH.md), kendi iş mantığınızı eklemek için [geliştirici rehberini](TECHNICAL-GUIDE.md) kullanın.
+Bu dosya, kurulumu hazırlayan Basis ve e-posta ekipleri ile ayrıntıları incelemek isteyen geliştiriciler içindir. **0.9.1 kaynaklarını ve betik protokolü 2'yi** anlatır. Sırayla kurulum yapmak için [adım adım rehberi](WALKTHROUGH.md), kendi iş mantığınızı eklemek için [geliştirici rehberini](TECHNICAL-GUIDE.md) kullanın.
 
 SAP adımlarında okuyucunun SE38 ile program oluşturup etkinleştirebildiği ve çalıştırabildiği varsayılır. Bu rehberde **Basis / sunucu yöneticisi**, sunucunun yönetim sorumluluğunu üstlenen kişi veya ekibi ifade eder; gerekli yetkilere sahipseniz bu kişi siz olabilirsiniz. Posta yönetimi için de aynı ayrım geçerlidir. [Yetkiler sizdeyse hazırlık adımları](SELF-MANAGED-SETUP.md).
 
@@ -107,13 +107,13 @@ Kaynaklar klasik ABAP sistemleri için **7.00 and later** uyumluluğunu hedefler
 
 ## Yetkiler ve işletim sınırları
 
-Basis, yetkileri ilgili kullanıcılara ve tablo yetki gruplarına göre tanımlar. Uygulama tablo erişimini `VIEW_AUTHORITY_CHECK` ile denetler; dosya ve komut yetkileri ayrıca kontrol edilir.
+Basis, yetkileri ilgili kullanıcılara ve tablo yetki gruplarına göre tanımlar. Uygulama tablo erişimini `VIEW_AUTHORITY_CHECK` ile denetler; dosya ve komut yetkileri ayrıca kontrol edilir. Üç tablo `ZCHI` tablo yetki grubundadır: aşağıdaki tabloya göre `ZCHI` için `S_TABU_DIS` yetkisini `03` (görüntüleme) veya `02` (değiştirme) aktivitesiyle verin. Önce `ZCHE_IMAP` yetki nesnesini oluşturun ([kurulum rehberi adım 3.3](WALKTHROUGH.md#33-yetki-nesnesini-ve-rolü-oluşturun)).
 
 | Rol | Gerekli erişim |
 |---|---|
-| Job kullanıcısı | `ZCHE_IMAP_PROFILE` görüntüleme; `ZCHE_IMAP_LOG` değiştirme; `S_LOG_COM` üzerinden `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE`; `S_DATASET` üzerinden gelen mail dosyalarını okuma; handler'ın ihtiyaç duyduğu yetkiler. |
-| Profil yöneticisi | `ZCHE_IMAP_PROFILE` görüntüleme/değiştirme; `ZCHE_IMAP_TEST` çalıştırma; `ZCHE_IMAP_CONFIG` için profil ve kimlik bilgisi dosyalarına `S_DATASET` yazma erişimi. |
-| İzleme kullanıcısı | `ZCHE_IMAP_LOG` görüntüleme; `ZCHE_IMAP_MONITOR` için gelen/arşiv dosyalarını okuma. Yeniden işleme ayrıca `ZCHE_IMAP_LOG` değiştirme yetkisi gerektirir. |
+| Job kullanıcısı | Profil adı için `ZCHE_IMAP` aktivite `16`; `ZCHE_IMAP_PROFILE` görüntüleme; `ZCHE_IMAP_LOG` değiştirme; `S_LOG_COM` üzerinden `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH`, `ZCHE_IMAP_DONE`; `S_DATASET` üzerinden gelen mail dosyalarını okuma; handler'ın ihtiyaç duyduğu yetkiler. |
+| Profil yöneticisi | Profil adı için `ZCHE_IMAP` aktivite `03` ve `02`; `ZCHE_IMAP_PROFILE` görüntüleme/değiştirme; `ZCHE_IMAP_TEST` çalıştırma; `ZCHE_IMAP_CONFIG` için profil ve kimlik bilgisi dosyalarına `S_DATASET` yazma erişimi. |
+| İzleme kullanıcısı | Profil adı için `ZCHE_IMAP` aktivite `03` (yeniden deneme için ayrıca `02`); `ZCHE_IMAP_LOG` görüntüleme; `ZCHE_IMAP_MONITOR` için gelen/arşiv dosyalarını okuma. Yeniden işleme ayrıca `ZCHE_IMAP_LOG` değiştirme yetkisi gerektirir. |
 | Kurulumu yapan | Proje nesneleri için geliştirme yetkileri ve SM69 komutlarını yönetip test etme yetkileri. Kaldırmada ek client kontrolleri vardır. |
 
 - Proje şifreleri **kendi SAP tablolarına yazmaz**. Kimlik bilgileri işletim sistemi izinleriyle korunan düz metin dosyalardır; SAP servis hesabı ve ayrıcalıklı yöneticiler erişebilir. Uygulama kaydedilmiş şifreyi göstermez.
@@ -189,7 +189,7 @@ Bağlantıyı o sunucudan kontrol edin. Windows örneği:
 
 ### Windows
 
-PowerShell 5.1 veya üzeri ve `curl.exe --version` çıktısında `imaps` bulunan bir curl gerekir. Windows PowerShell'de `curl.exe` yazın; `curl` başka bir komutu ifade edebilir.
+Windows PowerShell 5.1 ve `curl.exe --version` çıktısında `imaps` bulunan **curl 8.0.0 veya üzeri** gerekir. Eski Windows sürümlerindeki `curl.exe` daha eskidir; güncel bir curl kurup yolunu `-CurlPath` ile verin. curl 8'den eskiyse kurulum anlaşılır bir mesajla durur. Windows PowerShell'de `curl.exe` yazın; `curl` başka bir komutu ifade edebilir.
 
 Depo klasöründen, yönetici PowerShell oturumunda aşağıdaki bloğu çalıştırın. Sorulduğunda posta ekibinin IMAP sunucusunu, Basis'in doğruladığı Windows SAP hesabını ve tam çalışma klasörünü girin. Boş yanıtla kurulum başlamaz.
 
@@ -218,15 +218,15 @@ Varsayılan kök klasör `C:\sapimap`. Yukarıdaki blok klasör yolunu ayrıca s
   if (@($ImapRoot) -contains '') {
     throw 'Bilgiler bos birakilamaz. Ilgili ekipten alip tekrar calistirin.'
   }
-  powershell.exe -NoProfile -File (Join-Path $ImapRoot 'bin\imap.ps1') test
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $ImapRoot 'bin\imap.ps1') test
 }
 ```
 
-Başarılı çıktı `PROTOCOL 2`, `VERSION 0.9.0` ve seçilen kökü belirtir; `OK` ile biter. Yönetici hesabıyla bu test yararlıdır; ileride SAP kurulum programının testi gerçek SAP çalışma hesabıyla da geçmelidir.
+Başarılı çıktı `PROTOCOL 2`, `VERSION 0.9.1` ve seçilen kökü belirtir; `OK` ile biter. Yönetici hesabıyla bu test yararlıdır; ileride SAP kurulum programının testi gerçek SAP çalışma hesabıyla da geçmelidir.
 
 ### Linux
 
-PowerShell (`pwsh`) ve IMAPS destekli curl kurun. Oluşturulan SM69 komutu `/usr/bin/pwsh` bekler. SAP'nin gerçek çalışma kullanıcısını doğrulayın; `a4hadm` örnektir.
+PowerShell (`pwsh`) ve IMAPS destekli **curl 8.0.0 veya üzeri** kurun. Birçok SAP Linux sürümünde `/usr/bin` altındaki curl 7.x'tir; daha yeni bir curl kurup kuruluma `--curl-path /tam/yol/curl` verin, kurulum bunu `bin/policy.psd1` dosyasına yazar. curl 8'den eskiyse kurulum anlaşılır bir mesajla durur. Oluşturulan SM69 komutu `/usr/bin/pwsh` bekler. SAP'nin gerçek çalışma kullanıcısını doğrulayın; `a4hadm` örnektir.
 
 Depo klasöründen Bash içinde aşağıdaki bloğu çalıştırın. Sunucu adı posta ekibinden, Linux SAP kullanıcısı ve tam çalışma klasörü Basis'ten alınır; her soruya kendi değerinizle yanıt verin.
 
@@ -242,7 +242,7 @@ Depo klasöründen Bash içinde aşağıdaki bloğu çalıştırın. Sunucu adı
 }
 ```
 
-Varsayılan kök `/usr/sap/sapimap`. Üst klasörlerden biri root dışındaki kullanıcı/gruplar tarafından yazılabiliyorsa kurulum yolu reddeder. Basis, uygun olduğunda `--root /opt/sapimap` gibi üst klasörleri korumalı, onaylı bir yer seçip her adımda aynı yolu kullanmalıdır. Kontrolü geçmek için mevcut SAP klasörlerinin sahipliğini değiştirmeyin.
+Varsayılan kök `/usr/sap/sapimap`. Mevcut üst klasörlerden biri root'a ait değilse veya root dışındaki kullanıcı/gruplar tarafından yazılabiliyorsa kurulum yolu reddeder. Basis, uygun olduğunda `--root /opt/sapimap` gibi üst klasörleri korumalı, onaylı bir yer seçip her adımda aynı yolu kullanmalıdır. Kontrolü geçmek için mevcut SAP klasörlerinin sahipliğini değiştirmeyin.
 
 Seçilen kökü SAP'nin çalışma kullanıcısıyla test edin. İki soruya önceki kurulumdaki Linux kullanıcı adı ve tam klasör yoluyla yanıt verin:
 
@@ -255,7 +255,7 @@ Seçilen kökü SAP'nin çalışma kullanıcısıyla test edin. İki soruya önc
 }
 ```
 
-Çıktı protokol `2`, sürüm `0.9.0` ve seçilen kökü belirtip `OK` ile bitmelidir. Bu yerel ön koşulları kontrol eder; SAP kurulumu ve posta bağlantısı sonraki adımlardadır.
+Çıktı protokol `2`, sürüm `0.9.1` ve seçilen kökü belirtip `OK` ile bitmelidir. Bu yerel ön koşulları kontrol eder; SAP kurulumu ve posta bağlantısı sonraki adımlardadır.
 
 ### Sertifika ve danışmana teslim
 
@@ -278,7 +278,7 @@ Geliştirme sistemindeki ilk kurulum için:
 | Server check | Seçili ve zorunlu. SAP'nin beklenen script sürümünü ve kökü çalıştırabildiğini kontrol eder. |
 | Overwrite programs | Yedekleme/inceleme sonrası planlı güncellemede kullanın; yerel değişiklikleri değiştirebilir. |
 | Server folder | Basis'in verdiği kök; örneğin `C:\sapimap\` veya `/usr/sap/sapimap/`. |
-| I/O mode / code page | Geliştirici başka seçim önermedikçe otomatik bırakın. Eski sistemlerin dosya okuma biçimini etkiler. |
+| Code page / kod sayfası | Geliştirici başka seçim önermedikçe otomatik bırakın. Eski sistemlerin dosya okuma biçimini etkiler. |
 | Uninstall | Seçmeyin. Mandantlar arası ortak nesneleri kaldırır; profil sıfırlama değildir. |
 
 Çalıştırın ve sonuç listesinin tamamını okuyun. Seçili adımlar ve son sunucu kontrolü başarılıysa devam edin. Hata varsa çıktıyı Basis/geliştirme ekibine verin.
@@ -314,10 +314,10 @@ SAP kaynakları: [Nesne dizini ve paket değiştirme](https://help.sap.com/docs/
 | Parola kaynağı | `S` veya `O` | `S`: SAP'de girilir. `O`: Basis sunucuda saklar. |
 | Okunacak klasör | Varsayılan `INBOX` | Gelen Kutusu okunur. Başka bir klasörü okumak istiyorsanız aynı posta kutusundaki o klasörün gerçek IMAP adını/yolunu girin; yalnız seçilen klasör okunur. |
 | İşlenmiş klasörü | Seçtiğiniz posta klasörünün adı | Mevcut bir klasörü kullanabilirsiniz. Başlangıçtaki `SAP-Processed` değerini seçtiğiniz klasörün gerçek IMAP adı/yoluyla değiştirin. |
-| Taşıma modu | `MOVE` | UID MOVE desteği gerekir. |
+| Taşıma yöntemi (Move method) | `MOVE` | UID MOVE desteği gerekir. |
 | Handler programı | `ZCHE_IMAP_HANDLER_DEMO` | Hazır örnek; iş belgesi oluşturmaz. |
-| En çok ileti | `50` | Bir çalıştırmadaki örnek üst sınır. |
-| En çok boyut | `20` | İleti başına örnek MiB sınırı; sunucu politikası daha düşük olabilir. |
+| Çalıştırma başına ileti (Mails per run) | `50` | Bir çalıştırmadaki örnek üst sınır. |
+| Azami ileti boyutu, MB (Max mail size) | `20` | İleti başına örnek MiB sınırı; sunucu politikası daha düşük olabilir. |
 | Zaman aşımı | `120` | Örnek ağ zaman aşımı, saniye. |
 | Saklama süresi | `30` | Tamamlanmış yerel arşivler için gün; SAP logunu veya uzaktaki postayı silmez. |
 
@@ -327,7 +327,7 @@ SAP kaynakları: [Nesne dizini ve paket değiştirme](https://help.sap.com/docs/
 
 **`O` kaynağında** Basis'e tam **`SID_MANDANT_PROFIL`** anahtarını verin. Sistem `A4H`, mandant `001`, profil `INVOICE` ise anahtar **`A4H_001_INVOICE`** olur. SID ve mandantı **Sistem → Durum / System → Status** altında görebilirsiniz.
 
-Basis sunucuda depo klasöründen işletim sistemine uygun bloğu çalıştırır. Önce gerçek tam profil anahtarı, SAP işletim sistemi hesabı ve kurulumdaki tam klasör yolu sorulur. `A4H_001_INVOICE` değerini aynen kopyalamayın; kendi SID/mandant/profilinizden oluşturun. Parolayı kurulum aracı daha sonra ayrıca sorar; komuta yazmayın.
+Basis sunucuda depo klasöründen işletim sistemine uygun bloğu çalıştırır: Windows'ta yönetici olarak açılmış PowerShell oturumunda, Linux'ta root olarak. Önce gerçek tam profil anahtarı, SAP işletim sistemi hesabı ve kurulumdaki tam klasör yolu sorulur. `A4H_001_INVOICE` değerini aynen kopyalamayın; kendi SID/mandant/profilinizden oluşturun. Parolayı kurulum aracı daha sonra ayrıca sorar; komuta yazmayın.
 
 ```powershell
 & {
@@ -337,7 +337,7 @@ Basis sunucuda depo klasöründen işletim sistemine uygun bloğu çalıştırı
   if (@($ProfileKey, $SapOsAccount, $ImapRoot) -contains '') {
     throw 'Bilgiler bos birakilamaz. Ilgili ekipten alip tekrar calistirin.'
   }
-  powershell.exe -NoProfile -File server\setup-server.ps1 `
+  powershell.exe -NoProfile -ExecutionPolicy Bypass -File server\setup-server.ps1 `
     -SetPassword $ProfileKey -SapAccount $SapOsAccount -Root $ImapRoot
 }
 ```
@@ -367,7 +367,7 @@ Log kayıtları dosyalardan daha uzun süre kalabilir. Saklama süresi tamamlanm
 3. İlgili programdaki nedeni düzeltin veya bu iletiyi kabul eden onaylı deneme handler'ını seçin. Yeniden deneme işareti demonun kuralını değiştirmez.
 4. Yetkili monitör kullanıcısı yeniden deneme işlemini seçer. Kayıt `R` olur; normal işleme çalıştırın.
 
-Yeniden deneme log değiştirme yetkisi gerektirir. İşleme ekranındaki **retry errors** seçeneği de seçilen `E` iletilerini bilerek tekrar denemek içindir. `H`, taşıma kurtarmasıyla ele alınır. Tekrar çalıştırmak için log satırlarını veya sunucu dosyalarını silmeyin.
+Yeniden deneme log değiştirme yetkisi gerektirir. İşleme ekranındaki **retry errors** seçeneği de `E` iletilerini bilerek tekrar denemek içindir, ancak yalnızca `MAX_ATTEMPTS` (varsayılan 3) başarısız denemenin altında çalışır; sonrasında monitördeki yeniden denemeyi kullanın. `H`, taşıma kurtarmasıyla ele alınır. Tekrar çalıştırmak için log satırlarını veya sunucu dosyalarını silmeyin.
 
 ## 7. Teknik başvuru: SAP hangi komutları çalıştırır?
 

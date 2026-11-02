@@ -22,7 +22,7 @@ For authorized RDP/SSH access and file transfer, use the [self-managed setup gui
 
 **Use a test SAP system and test mailbox.** Normal processing may mark mail as read and move it. The example does not create invoices.
 
-This guide covers the 0.9.0 sources; actual SAP acceptance tests for this version are still pending. [Test status](../VALIDATION.md).
+This guide covers the 0.9.1 sources; actual SAP acceptance tests for this version are still pending. [Test status](../VALIDATION.md).
 
 ### Download the files
 
@@ -53,7 +53,7 @@ The default source is the **inbox (`INBOX`)**. You can select a different folder
 | Component to prepare | What is it for? |
 |---|---|
 | **PowerShell** | Runs the project's mail retrieval commands. Windows needs 5.1 or later; Linux needs 7. |
-| **curl** | Connects to the mail server. It must support encrypted IMAP connections. |
+| **curl** | Connects to the mail server. Version **8.0.0 or newer** with encrypted IMAP (`imaps`) support. |
 | **The project's server files** | Prepare messages and attachments as files SAP can read. They are included in the download. |
 | **A protected working folder** | Holds email, attachments and connection settings on the server. Basis chooses its path and access permissions. |
 
@@ -83,7 +83,6 @@ Create the following program in SE38.
 4. Open the downloaded [ZCHE_IMAP_INSTALL.abap](../ZCHE_IMAP_INSTALL.abap) file and paste its **entire contents** into the SAP editor.
 5. Save, check the syntax and choose **Activate**.
 
-
 **When can you continue?** Once the program activates without errors. Resolve syntax or activation errors before moving on. Keep the program name as shown.
 
 ### 3.2. Run the installer
@@ -91,7 +90,6 @@ Create the following program in SE38.
 **What are we doing?** The installer will create the SAP screens, tables and definitions needed to connect SAP to the server tools.
 
 Open **`ZCHE_IMAP_INSTALL`** in SE38 and choose **Execute (F8)**.
-
 
 - For a first installation, leave **DDIC objects**, **Programs**, **SM69 commands** and **Server check** selected. These cover tables, programs, server commands and the final check.
 - Enter the **full folder path supplied by Basis** in **Server folder**. Do not assume the example path is right for your system.
@@ -106,9 +104,14 @@ Open **`ZCHE_IMAP_INSTALL`** in SE38 and choose **Execute (F8)**.
 
 **What are we doing?** Allowing your user to run the programs. Every program checks authorization object `ZCHE_IMAP` per profile; without it, they stop with an authorization message, even for a trial.
 
-1. **SU20:** create authorization field `ZCHE_PROF` (type CHAR, length 20).
+1. **SU20:** create authorization field `ZCHE_PROF` with data element `ZCHE_IMAP_PROFID`. The installer created this data element in step 3.2.
 2. **SU21:** create authorization object `ZCHE_IMAP` with fields `ZCHE_PROF` and `ACTVT`. Allow activities `02`, `03` and `16`.
-3. **PFCG:** in a role, add `ZCHE_IMAP` with your profile name (for example `INVOICE`) and the activities you need: `03` to view, `02` to maintain profiles and reprocess, `16` to run processing. Add `S_TABU_DIS` for table group `ZCHI`. Assign the role to your user and to the background job user.
+3. **PFCG:** in a role, add `ZCHE_IMAP` with your profile name (for example `INVOICE`) and the activities you need: `03` to view, `02` to maintain profiles and reprocess, `16` to run processing. Also add:
+   - `S_TABU_DIS` for table group `ZCHI`: `03` to display, `02` to change.
+   - `S_LOG_COM` for the SM69 commands: `ZCHE_IMAP_TEST` for the connection test; `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH` and `ZCHE_IMAP_DONE` for processing.
+   - `S_DATASET` for the working folder from step 2, as listed in [security setup](../SECURITY.md#file-access--dosya-erişimi).
+
+   Assign the role to your user and to the background job user. Users with broad development roles may already have these; a missing one stops the program with an authorization message.
 
 Your security team may create these objects for you. Exact activities, file permissions and transactions are in [security setup](../SECURITY.md).
 
@@ -119,7 +122,6 @@ Your security team may create these objects for you. Exact activities, file perm
 **What are we doing?** Telling SAP which email account to connect to and which folder to read. These settings are saved together as a **profile**.
 
 Open **`ZCHE_IMAP_CONFIG`** in SE38 and run it with **F8**. Use a SAP session connected to the server Basis prepared; ask Basis to check if you are unsure.
-
 
 | Field | What should you enter or select? |
 |---|---|
@@ -153,7 +155,6 @@ Send an email with a small PDF or text attachment to the test mailbox. If you se
 3. Select **List only (no downloads/changes)** and press **F8**. This lists eligible message numbers; it does not yet retrieve content or attachments, or move messages.
 4. If listing succeeds, go back, **clear List only** and run it again. This time the email and attachments are retrieved, the supplied example runs and successful mail is moved to your processed folder.
 
-
 **When can you continue?** Once the run finishes. Next, we will check the result in SAP and in the mailbox.
 
 ### 4.2. Monitor mails and attachments
@@ -164,7 +165,6 @@ Send an email with a small PDF or text attachment to the test mailbox. If you se
 2. Select your profile and a date range covering the test, then press **F8**.
 3. Open your test message's record and inspect its text and attachments.
 4. Open the email account too. Successful mail should be in the processed folder you selected.
-
 
 | Status | Meaning |
 |---|---|

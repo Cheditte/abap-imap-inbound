@@ -10,7 +10,7 @@ The current integration point is a **handler program with a `FORM`**, rather tha
 
 1. Complete a demonstration run using `ZCHE_IMAP_HANDLER_DEMO` in a test mailbox.
 2. In **SE38**, copy that installed program to a customer name such as `ZCHE_IMAP_HANDLER_CUSTOM`. Keep its program type **subroutine pool** and assign your transportable customer package.
-3. Keep `INCLUDE zche_imap_common`, `INCLUDE zche_imap_io` and the `HANDLE_MAIL` interface. The installer selects the appropriate implementation of `ZCHE_IMAP_IO` for the SAP system.
+3. Keep `INCLUDE zche_imap_common` and the `HANDLE_MAIL` interface. `ZCHE_IMAP_COMMON` already includes the file helpers (`ZCHE_IMAP_IO`); do not include them a second time.
 4. In `ZCHE_IMAP_CONFIG`, enter your program in **Handler program** and `HANDLE_MAIL` in **Handler FORM**. Save and check the connection result.
 5. Test with an authorized job user and inspect the monitor before scheduling business processing.
 
@@ -18,7 +18,7 @@ The installer contains the demonstration handler, not your custom copy. Keep cus
 
 ## 2. Understand the inputs and result
 
-`ZCHE_IMAP_HANDLER_CUSTOM` is an example name for the program you create. If you choose another, use it consistently in SE38, the example's `PROGRAM` statement and the profile's handler field. Keep the installed include names and the `HANDLE_MAIL` interface as shown.
+`ZCHE_IMAP_HANDLER_CUSTOM` is an example name for the program you create. If you choose another, it must start with `ZCHE_IMAP_HANDLER_`: the processor runs only programs with this installer-owned prefix and rejects other names. Use the name consistently in SE38, the example's `PROGRAM` statement and the profile's handler field. Keep the installed include names and the `HANDLE_MAIL` interface as shown.
 
 The processor dynamically calls this exact interface once for each eligible mail needing business processing:
 
@@ -48,7 +48,6 @@ This complete subroutine pool checks that at least one non-inline PDF can be rea
 PROGRAM zche_imap_handler_custom.
 
 INCLUDE zche_imap_common.
-INCLUDE zche_imap_io.
 
 FORM handle_mail USING    is_mail TYPE zche_imap_s_mail
                           it_body TYPE STANDARD TABLE
@@ -112,8 +111,8 @@ This is not an unconditional exactly-once guarantee. The transaction protection 
 | State / trigger | What the processor does |
 |---|---|
 | New eligible message | Fetches/parses it and calls the configured handler. |
-| Handler returns failure | Rolls back the business LUW and records `E`. Normal runs skip it until retry is requested. |
-| Monitor retry | Marks `E` as `R`; a normal run can call the handler again. The processor's explicit retry option can also include `E`. |
+| Handler returns failure | Rolls back the business LUW and records `E`. Normal runs skip it until retry is requested. After `MAX_ATTEMPTS` failed attempts (default 3), the retry option skips it as well. |
+| Monitor retry | Marks `E` as `R`; a normal run can call the handler again, even after the attempt limit. The processor's retry option includes `E` only below `MAX_ATTEMPTS`. |
 | Handler success committed | Records `H` before attempting remote movement. |
 | Move fails / process stops after `H` | Keeps movement pending and resumes through the normal processor, including when the original UID is no longer in the inbox. It does not intentionally rerun the completed handler. |
 | Move/archive completion | Records `S`. |

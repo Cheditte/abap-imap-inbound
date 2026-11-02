@@ -229,6 +229,7 @@ Step 'curl check'
 if (-not (Test-Path $CurlPath)) { Fail "curl not found: $CurlPath (install curl and pass -CurlPath)" }
 $v = (& $CurlPath --version) -join ' '
 if ($v -cnotmatch '\bimaps\b') { Fail 'This curl does not support IMAPS.' }
+if ($v -notmatch '^curl ([0-9]+)\.' -or [int]$Matches[1] -lt 8) { Fail "curl 8.0.0 or newer is required: $((($v -split ' ')[0..1]) -join ' ') (install a newer curl and pass -CurlPath)" }
 Write-Host ((($v -split ' ')[0..1]) -join ' ')
 
 Step "Folders: $Root"

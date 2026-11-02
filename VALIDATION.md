@@ -1,6 +1,6 @@
 # Validation / Doğrulama
 
-This record applies to the 0.9.0 release candidate. SAP tests and renewed SAP screenshots are excluded by the operator's instruction on 2 November 2026. Historical screenshots do not validate this candidate; they were removed from the current tree.
+This record applies to the 0.9.1 release candidate. 0.9.1 fixes an installer defect found by code review after the 0.9.0 release: the handler prefix was never written, so no profile could be saved. SAP tests and renewed SAP screenshots are excluded by the operator's instruction on 2 November 2026. Historical screenshots do not validate this candidate; they were removed from the current tree.
 
 | Check / Kontrol | System and version | Date | Result |
 |---|---|---|---|
