@@ -1,56 +1,55 @@
-# SAP’de IMAP posta kutusundan mail ve ek okuma
+# SAP'de e-posta ve ek okuma
 
 > [English](README.md) | **Türkçe**
 
-ABAP, PowerShell ve curl ile IMAP posta kutusundaki mail ve ekleri SAP’ye alın. PI/PO veya ayrı bir entegrasyon sunucusu gerekmez; betikler SAP uygulama sunucusunda çalışır.
+**SAP tarafını tek kurulum programıyla hazırlayın; e-postaları ve eklerini SAP'den yönetin.**
 
-**IMAP, parola/uygulama şifresi ve UID MOVE destekleyen sunucular içindir. Microsoft 365 / Exchange Online desteklenmez:** bu proje OAuth kullanmaz. Bu durum için ayrı bir Microsoft Graph projesi (abap-graph) hazırlanıyor. [Microsoft’un kimlik doğrulama açıklaması](https://learn.microsoft.com/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online).
+Bir posta sunucusundaki e-postaları SAP'de okumak, eklerini almak ve kendi ABAP sürecinizde işlemek için bu projeyi kullanabilirsiniz. Hazır örnek, maili ve eki alma akışını gösterir. Fatura oluşturma veya belgeye ek bağlama gibi iş adımlarını siz eklersiniz.
 
-## Üç hazırlıkla başlayın
+![Posta kutusundan SAP'ye: okuyun, ekleri açın ve kendi işleminizi ekleyin](docs/assets/diagrams/usage-tr.svg)
 
-1. **Posta kutusu:** ayrı bir test hesabı, IMAP sunucusu/TLS portu ve birbirinden farklı kaynak/işlenen klasörleri.
-2. **SAP sunucusu:** PowerShell, curl ve korumalı çalışma klasörleri. [Sunucu hazırlığını](docs/tr/SELF-MANAGED-SETUP.md) izleyin. Kendi bilgisayarınızın internete çıkması yeterli değildir.
-3. **SAP:** [ZCHE_IMAP_INSTALL.abap](ZCHE_IMAP_INSTALL.abap) dosyasını SE38’e yapıştırın. Oluşturulan programlardan önce [yetki nesnesini ve rolleri](SECURITY.md) hazırlayın.
+## Ne yapmak istiyorsunuz?
 
-`ZCHE_IMAP_CONFIG` ile profil oluşturun; sertifika doğrulaması açık kalsın. Üretim için varsayılan, Basis’in yönettiği parola kaynağıdır (`O`). Önce `ZCHE_IMAP_INBOUND` ile yalnız listeleyin; ardından yapay bir maili demo handler ile işleyin. Gövde ve ekleri `ZCHE_IMAP_MONITOR` üzerinden inceleyin. Handler sonucu commit edildikten sonra mail taşınır; EXPUNGE kullanılmaz.
-
-Ana kurulum yolu **tek installer’ı kopyala/yapıştır** yöntemidir. [abapGit](ABAPGIT.md) alternatif olarak installer kaynağını taşır; DDIC ve programları oluşturmak için installer çalıştırılır. Eski `ZIMAP_` kurulumları için kontrollü geçiş gerekir; eski nesne/veriler otomatik taşınmaz veya silinmez.
-
-![Posta kutusundan SAP sunucusuna ve monitöre akış](docs/assets/diagrams/usage-tr.svg)
-
-## Neden SAPconnect / SO50 değil?
-
-| Yaklaşım | Kullanım alanı |
+| Hedefiniz | Başlayacağınız yer |
 |---|---|
-| SAPconnect / SO50 | SAP’ye SMTP ile yönlendirilen posta; relay/yönlendirme ve SAP SMTP uç noktası gerekir. |
-| PI/PO veya Integration Suite mail adaptörü | Kurumda mevcut bir entegrasyon katmanı varsa yönetilen yol. |
-| Google ABAP SDK | Google posta kutuları için Gmail API entegrasyonu. |
-| Bu proje | SAP sunucusundaki küçük betiklerle, parola destekleyen IMAP kutusundan çekme. |
+| İlk kez kurmak | [Üç hazırlık ve SAP kurulumu](docs/tr/WALKTHROUGH.md#hazirlik) |
+| Bağlantıyı ve gelen ileti listesini kontrol etmek | [Yol A — Yalnız listeleme](docs/tr/WALKTHROUGH.md#listeleme) |
+| İlk maili ve ekini SAP'de açmak | [Yol B — İlk mail](docs/tr/WALKTHROUGH.md#ilk-mail) |
+| Ekleri kendi ABAP kodumla işlemek | [Geliştirici rehberi](docs/tr/TECHNICAL-GUIDE.md) |
+| Belirli aralıklarla otomatik çalıştırmak | [Yol C — Varyant ve job](docs/tr/WALKTHROUGH.md#otomatik) |
+| Ekrandaki bir alanın ne olduğunu öğrenmek | [Alan rehberi](docs/tr/SCREEN-GUIDE.md) |
 
-## Uyumluluk
+## Kurulumun üç parçası
 
-| Bileşen | Hedef / kanıt |
-|---|---|
-| ABAP | Klasik 7.00 söz dizimi; Unicode ve sistem kod sayfasıyla metin okuma/yazma. |
-| Windows | Windows PowerShell 5.1 veya PowerShell 7; curl 8.0.0+. |
-| Linux | PowerShell 7.4+; curl 8.0.0+. |
-| Posta sunucusu | TLS, UID MOVE ve parola/uygulama şifresi. |
-| Doğrulama | Önceki `ZIMAP_` sürümü SAP A4H'de mailleri okudu ve ekleri açtı. 0.9.2 henüz SAP'de çalıştırılmadı; geri bildirime açık. [Doğrulama kaydı](VALIDATION.md). |
+![Posta hesabı, SAP sunucusu ve SAP programları için hazırlık haritası](docs/assets/diagrams/setup-tr.svg)
 
-curl 7.55.1 kabul edilmez. İndirilen dosyanın boyutu UID için bildirilen RFC822.SIZE ile aynı olmalıdır; aynı boyut tek başına kimliği kanıtlamaz. GreenMail testlerinde ardışık olmayan UID’ler ve içerik kontrol edilir.
+1. **Posta hesabı:** SAP'nin okuyacağı hesap, giriş yöntemi ve posta klasörleri hazırlanır.
+2. **SAP'nin çalıştığı makine:** Maili getiren PowerShell ve curl araçları, proje dosyaları ve korumalı çalışma klasörü hazırlanır. SAP GUI'yi açtığınız bilgisayar farklı olabilir.
+3. **SAP ERP:** `ZCHE_IMAP_INSTALL` SE38'de oluşturulur ve çalıştırılır. Ardından gerekli yetkiler ve posta bağlantı ayarları hazırlanır.
 
-## Sık sorulan sorular
+Bu, üç yeni sunucu kuracağınız anlamına gelmez. Mevcut posta hizmetinizi ve SAP sunucunuzu kullanabilirsiniz. SAP nesneleri **tek installer dosyasıyla** oluşturulur; posta ve sunucu hazırlığı ayrıca yapılır. Ayrı PI/PO veya entegrasyon sunucusu gerekmez.
 
-### SAP’de gelen maildeki ek nasıl okunur?
-Demo handler başlık, gövde satırları ve ek bilgilerini alır. İkili dosya okuma yardımcısını kullanarak iş mantığınızı izinli `ZCHE_IMAP_HANDLER_*` programına ekleyin. [Handler sözleşmesini](docs/tr/TECHNICAL-GUIDE.md) izleyin; commit’i yalnız işlemci yapar.
+SE38'de program oluşturup etkinleştirebildiğiniz varsayılır. Sunucu ve posta yönetimi sizdeyse hazırlıkları da yapabilirsiniz; başka ekipteyse rehberde hangi bilgileri istemeniz gerektiği açıklanır. [Adım adım başlayın](docs/tr/WALKTHROUGH.md#hazirlik).
 
-### Microsoft 365 veya Gmail ile çalışır mı?
-Microsoft 365 desteklenmez. Gmail, hesapta IMAP ve uygulama şifresine izin veriliyorsa kullanılabilir; yalnız OAuth kabul eden hesaplar desteklenmez.
+## Posta hesabınız uygun mu?
 
-### Hangi yetkiler gerekiyor?
-Profil bazlı `ZCHE_IMAP`, `ZCHI` tablo grubu, sınırlı `S_LOG_COM` ve dosya yetkileri gerekir. [Rol ve parola kurulumu](SECURITY.md).
+**Doğru e-posta adresi ve parola tek başına yeterli olmayabilir.** Hesap IMAP erişimine ve bu projenin kullandığı parola/uygulama şifresiyle girişe izin vermelidir. Microsoft 365 / Exchange Online ve yalnız OAuth kabul eden hesaplar bu sürümde desteklenmez. [Posta hesabı koşulları](docs/tr/TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu).
 
-### Desteklenmeyen karakterler ve hatalı mailler ne olur?
-SAP kod sayfasına sığmayan gösterim karakterleri `?` olur; özgün baytlar `mail.eml` içinde korunur. Başlıklar ve gösterim ek adları sınırlandırılır. Hatalı işlemler görünür kalır; varsayılan üç hata sınırı ve monitörden açıkça yeniden işleme vardır. Hatalı yerel önbellekler 30 gün sonra temizlenir; commit edilmiş bekleyen taşımalar korunur. [Kurtarma ayrıntıları](SECURITY.md).
+Varsayılan okuma klasörü **Gelen Kutusu (`INBOX`)**. İsterseniz başka bir klasör seçebilirsiniz. Başarıyla işlenen mailler aynı hesapta farklı bir klasöre taşınır. **`SAP-Processed` örnek addır; bu isimle klasör oluşturmak zorunlu değildir.** Seçtiğiniz hedef klasörün posta hesabında bulunması gerekir.
 
-[Adım adım rehber](docs/tr/WALKTHROUGH.md) · [Teknik başvuru](docs/tr/TECHNICAL-REFERENCE.md) · [Katkı](CONTRIBUTING.md) · [MIT lisansı](LICENSE)
+## İlk kullanımda ne olacak?
+
+Önce **List only / Yalnız listeleme** ile ileti numaralarını görürsünüz; içerik ve ekler indirilmez. Sonra ayrı bir deneme mailini hazır örnekle normal işlersiniz. Başarılı mail hedef klasöre taşınır; gövde ve eklerine `ZCHE_IMAP_MONITOR` üzerinden ulaşırsınız.
+
+Normal işleme maili okundu işaretleyebilir ve taşıyabilir. İlk kullanım için **deneme sistemi ve ayrı bir deneme posta kutusu** seçin.
+
+## Durum ve ayrıntılar
+
+**Güncel sürüm: [v0.9.2 — sürüm adayı](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.2).** Önceki `ZIMAP_` sürümü A4H'de mail ve ekleri açtı; güncel `ZCHE_IMAP_` sürümünün SAP çalışma kabulü henüz tamamlanmadı. Klasik ABAP 7.00 uyumluluğu bir hedeftir; ECC çalışma sertifikasyonu değildir. [Doğrulama kaydı](VALIDATION.md).
+
+- [Kurulum ve kullanım](docs/tr/WALKTHROUGH.md) · [Alan rehberi](docs/tr/SCREEN-GUIDE.md)
+- [Sunucuya kendiniz bağlanacaksanız](docs/tr/SELF-MANAGED-SETUP.md)
+- [Teknik başvuru](docs/tr/TECHNICAL-REFERENCE.md) · [Yetkiler ve parola yönetimi](SECURITY.md)
+- [Mevcut kurulumdan güncelleme](docs/tr/WALKTHROUGH.md#guncelleme) · [İsteğe bağlı abapGit](ABAPGIT.md)
+
+[MIT lisansı](LICENSE) · [Değişiklikler](CHANGELOG.md) · [Katkı](CONTRIBUTING.md) · [Sorun bildir](https://github.com/Cheditte/abap-imap-inbound/issues)

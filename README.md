@@ -1,56 +1,55 @@
-# abap-imap-inbound
+# Read emails and attachments in SAP
 
 > **English** | [Türkçe](README.tr.md)
 
-Read e-mails and attachments from an IMAP mailbox into SAP with ABAP, PowerShell and curl. No PI/PO or separate integration server is required; the scripts run on the SAP application host.
+**Set up the SAP objects with one installer, then manage emails and attachments from SAP.**
 
-**For IMAP servers supporting a password or app password and UID MOVE. Microsoft 365 / Exchange Online is not supported:** this project does not implement OAuth. A separate Microsoft Graph project, abap-graph, is being prepared for that case. [Microsoft authentication guidance](https://learn.microsoft.com/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online).
+Use this project to read messages from a mail server in SAP, retrieve attachments, and connect them to your own ABAP process. The supplied example demonstrates mail and attachment retrieval. You add business actions such as creating a document or linking an attachment to an existing record.
 
-## Start with three preparations
+![From the mailbox to SAP: read mail, open attachments and add your business action](docs/assets/diagrams/usage-en.svg)
 
-1. **Mailbox:** a dedicated test account, IMAP hostname, TLS port and separate source/processed folders.
-2. **SAP host:** PowerShell, curl and protected working folders. Follow [host setup](docs/SELF-MANAGED-SETUP.md). A browser connection from your PC is not sufficient.
-3. **SAP:** paste [ZCHE_IMAP_INSTALL.abap](ZCHE_IMAP_INSTALL.abap) into SE38. Create the authorization object and roles in [security setup](SECURITY.md) before using the generated programs.
+## What would you like to do?
 
-Use `ZCHE_IMAP_CONFIG` to define a profile with certificate verification enabled. Basis-managed credentials (source `O`) are the production default. Run `ZCHE_IMAP_INBOUND` in list-only mode, then process a synthetic mail with the demo handler. Inspect its body and attachments in `ZCHE_IMAP_MONITOR`. The processor commits the handler result before moving mail; it never issues EXPUNGE.
-
-Installation is **copy/paste from one installer**. [abapGit](ABAPGIT.md) is an optional way to transport the installer source; execute the installer to create DDIC/program objects. Existing `ZIMAP_` installations require a reviewed migration; old data is not renamed or deleted automatically.
-
-![Flow from the mailbox through the SAP host to the monitor](docs/assets/diagrams/usage-en.svg)
-
-## Why not SAPconnect / SO50?
-
-| Approach | Where it fits |
+| Your goal | Start here |
 |---|---|
-| SAPconnect / SO50 | Inbound SMTP routed to SAP; requires mail routing/relay and the SAP SMTP endpoint. |
-| PI/PO or Integration Suite mail adapter | A managed integration layer when that infrastructure already exists. |
-| Google ABAP SDK | Gmail API integration for Google mailboxes. |
-| This project | Pull from a password-enabled IMAP mailbox using scripts on the SAP host. |
+| Install for the first time | [Three preparations and SAP setup](docs/WALKTHROUGH.md#prepare) |
+| Check connectivity and the message list | [Path A — List only](docs/WALKTHROUGH.md#list-only) |
+| Open the first email and attachment in SAP | [Path B — First email](docs/WALKTHROUGH.md#first-mail) |
+| Process attachments with my own ABAP code | [Developer guide](docs/TECHNICAL-GUIDE.md) |
+| Run automatically at agreed intervals | [Path C — Variant and job](docs/WALKTHROUGH.md#daily-use) |
+| Understand a field on the screen | [Field guide](docs/SCREEN-GUIDE.md) |
 
-## Compatibility
+## Three parts to prepare
 
-| Component | Baseline / evidence |
-|---|---|
-| ABAP | Classic 7.00 syntax target; Unicode and system-codepage text I/O. |
-| Windows host | Windows PowerShell 5.1 or PowerShell 7; curl 8.0.0+. |
-| Linux host | PowerShell 7.4+; curl 8.0.0+. |
-| Mail server | IMAP with TLS and UID MOVE; password/app-password authentication. |
-| Verification | The earlier `ZIMAP_` edition read mail and opened attachments on SAP A4H. 0.9.2 has not yet run in SAP; feedback welcome. [Validation record](VALIDATION.md). |
+![Preparation map: mailbox, SAP application host and SAP programs](docs/assets/diagrams/setup-en.svg)
 
-curl 7.55.1 is deliberately rejected, not certified. Downloads must match the UID's declared RFC822.SIZE; size equality alone cannot prove identity. GreenMail tests exercise nonconsecutive UIDs and message contents.
+1. **Mailbox:** prepare the account SAP will read, its sign-in method, and the mail folders.
+2. **Machine running SAP:** prepare PowerShell, curl, the project files, and a protected working folder. Your SAP GUI computer may be a different machine.
+3. **SAP ERP:** create and execute `ZCHE_IMAP_INSTALL` in SE38, then prepare authorizations and mailbox settings.
 
-## FAQ
+You do not need three new servers. You can use an existing mail service and SAP host. **One installer file creates the SAP objects**; mailbox and host preparation are separate steps. No PI/PO or separate integration server is required.
 
-### How do I read e-mail attachments in SAP ABAP?
-The demo handler receives headers, body lines and attachment metadata. Use the helper to read binary content; add business logic in an allowlisted `ZCHE_IMAP_HANDLER_*` program. Follow the [handler contract](docs/TECHNICAL-GUIDE.md); only the processor commits.
+We assume you can create and activate programs in SE38. Prepare the host and mailbox yourself if you administer them; otherwise the guide explains what to request from their administrators. [Start step by step](docs/WALKTHROUGH.md#prepare).
 
-### Does it work with Microsoft 365 / Gmail?
-Microsoft 365 is unsupported. Gmail is usable only where the account permits IMAP and app-password authentication; OAuth-only accounts are unsupported.
+## Is your mailbox suitable?
 
-### Which authorizations are needed?
-Per-profile `ZCHE_IMAP`, table group `ZCHI`, scoped `S_LOG_COM` and file permissions. [Exact role and credential setup](SECURITY.md).
+**A correct email address and password may not be enough.** The account must allow IMAP and the password/app-password sign-in implemented here. Microsoft 365 / Exchange Online and OAuth-only accounts are unsupported in this version. [Mailbox requirements](docs/TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
 
-### What happens to unsupported characters or failed mail?
-Display text substitutes `?` for characters outside the SAP codepage; `mail.eml` preserves the original bytes. Display headers and attachment names are bounded. Failed business processing remains visible, with a default three-failure cap and explicit monitor reprocessing. Failed local caches expire after 30 days; pending committed moves are protected. [Recovery details](SECURITY.md).
+The default source is **the inbox (`INBOX`)**; you can select another folder. Successful messages move to a different folder in the same account. **`SAP-Processed` is an example name, not a required new folder.** The destination you select must exist in the mailbox.
 
-[Walkthrough](docs/WALKTHROUGH.md) · [Technical reference](docs/TECHNICAL-REFERENCE.md) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)
+## What happens on the first run?
+
+Start with **List only** to see message identifiers; it does not download message content or attachments. Then process a separate test message normally with the supplied example. Successful mail moves to the destination folder; open its body and attachments in `ZCHE_IMAP_MONITOR`.
+
+Normal processing may mark mail as read and move it. Start with **a test SAP system and a dedicated test mailbox**.
+
+## Status and details
+
+**Current version: [v0.9.2 — release candidate](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.2).** The earlier `ZIMAP_` edition opened mail and attachments on A4H. SAP runtime acceptance of the current `ZCHE_IMAP_` edition is still pending. Classic ABAP 7.00 compatibility is a target, not an ECC runtime certification. [Validation record](VALIDATION.md).
+
+- [Setup and usage](docs/WALKTHROUGH.md) · [Field guide](docs/SCREEN-GUIDE.md)
+- [Preparing the host yourself](docs/SELF-MANAGED-SETUP.md)
+- [Technical reference](docs/TECHNICAL-REFERENCE.md) · [Authorization and credentials](SECURITY.md)
+- [Updating an existing installation](docs/WALKTHROUGH.md#upgrade) · [Optional abapGit](ABAPGIT.md)
+
+[MIT license](LICENSE) · [Changes](CHANGELOG.md) · [Contributing](CONTRIBUTING.md) · [Report an issue](https://github.com/Cheditte/abap-imap-inbound/issues)

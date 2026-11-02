@@ -1,196 +1,200 @@
-# Kurulum rehberi: üç bölümü hazırlayın, ilk e-postayı SAP'de görün
+# Kurulumdan ilk maile ve otomatik kullanıma
 
-> [English](../WALKTHROUGH.md) | **Türkçe** · [Genel bakış](../../README.tr.md) · [Teknik ayrıntılar](TECHNICAL-REFERENCE.md)
+> [English](../WALKTHROUGH.md) | **Türkçe** · [Proje özeti](../../README.tr.md) · [Alan rehberi](SCREEN-GUIDE.md)
 
-Bu rehberle, posta sunucusundaki e-postaları ve eklerini SAP'ye alacak kurulumu yapacaksınız. Önce üç hazırlık alanını göreceğiz; sonra her birini sırayla tamamlayıp bir deneme e-postasını SAP'de açacağız.
+## Önce hedefinizi seçin
 
-## Önce bütün resmi görün
+**Yalnız listeleme**, ileti numaralarını gösterir; maili veya eki indirmez. **Normal işleme**, içeriği indirir, seçtiğiniz ABAP örneğini çalıştırır ve başarılı maili hedef klasöre taşır.
 
-Kurulumun tamamlanması için **üç bölüm** hazır olmalı:
+![Kurulum, listeleme, ilk mail ve otomatik kullanım yolları](../assets/diagrams/goals-tr.svg)
 
-![Üç parçalı kurulum: posta sunucusu, SAP makinesi ve SAP ERP](../assets/diagrams/setup-tr.svg)
+| Hedef | İzlenecek yol | Bittiğini nasıl anlarsınız? |
+|---|---|---|
+| İlk kez kurmak | [Üç hazırlık](#hazirlik), ardından [SAP kurulumu](#kurulum) | Programlar ve yetkiler hazır; profil bağlantısı başarılı. |
+| Bağlantıyı kontrol etmek | [Yol A — Listeleme](#listeleme) | İleti numaraları veya boş kutu sonucu görülür; içerik indirilmez. |
+| Mail ve ekini açmak | [Yol B — İlk mail](#ilk-mail) | Monitörde mail/ek açılır; başarılı mail hedef klasördedir. |
+| Kendi iş adımımı eklemek | [Geliştirici rehberi](TECHNICAL-GUIDE.md) | Hazır örnek yerine kendi doğrulanmış ABAP işleminiz kullanılır. |
+| Otomatik çalıştırmak | [Yol C — Varyant ve job](#otomatik) | Doğru sunucuda çalışan işin log ve spool'u incelenir. |
 
-Bu üç ayrı makine kurmak anlamına gelmez. **2. bölüm**, SAP sunucusundaki Windows/Linux hazırlığı; **3. bölüm**, SAP GUI içinden yaptığınız program ve ayar işlemleridir. Posta hizmetiniz zaten mevcut olabilir.
+Rehber `v0.9.2` sürüm adayını anlatır. [Doğrulama kaydı](../../VALIDATION.md).
 
-Önce 1. bölümde bağlantı bilgilerini hazırlayacağız, sonra 2. bölümde bu bağlantıyı SAP makinesinden kuracağız. 3. bölümde SAP programlarını kurup bu bilgileri kullanacağız. Son olarak hepsini tek bir deneme e-postasıyla kontrol edeceğiz.
+<a id="hazirlik"></a>
+## Başlamadan önce üç hazırlık
 
-## Başlamadan önce
+![Posta hesabı, SAP sunucusu ve SAP ERP hazırlıkları](../assets/diagrams/setup-tr.svg)
 
-SE38'de program oluşturma, etkinleştirme ve çalıştırma bilgi ve yetkinizin bulunduğunu varsayıyoruz. SAP adımlarını siz yapacaksınız. Posta ve sunucu yönetim yetkisi sizdeyse o hazırlıkları da yapabilirsiniz; başka ekipteyse ilgili bölümdeki bilgileri onlardan isteyin. Bu rehberde Basis, sunucu yönetim sorumluluğunu üstlenen kişi veya ekibi ifade eder.
+SE38'de program oluşturup etkinleştirebilen bir SAP geliştiricisi olduğunuz varsayılır. **Deneme SAP sistemi ve ayrı bir deneme posta kutusuyla başlayın.** Sunucu ve posta yönetimi sizdeyse aşağıdaki hazırlıkları da yapabilirsiniz; değilse ilgili yöneticiye belirtilen bilgileri iletin.
 
-RDP/SSH ile kendiniz bağlanacaksanız [kendi sistemini yönetenler için rehber](SELF-MANAGED-SETUP.md) bağlantı ve dosya aktarımını anlatır.
+### Dosyaları bir kez indirin
 
-**Deneme SAP sistemi ve deneme posta kutusu kullanın.** Normal işlem iletileri okundu işaretleyebilir ve başka klasöre taşıyabilir. Hazır örnek fatura oluşturmaz.
-
-Bu rehber 0.9.2 kaynakları içindir; güncel sürümün gerçek SAP kabul testleri henüz tamamlanmadı. [Test durumu](../../VALIDATION.md).
-
-### Dosyaları indirin
-
-[GitHub deposunu](https://github.com/Cheditte/abap-imap-inbound) açın, **Code → Download ZIP** seçin ve arşivin tamamını bir klasöre çıkartın. Git kurmanız gerekmez.
-
-Klasör yapısını koruyun; farklı sürümlerden dosyaları karıştırmayın. SAP adımlarında ana klasördeki `ZCHE_IMAP_INSTALL.abap` dosyasını kullanacaksınız. Sunucu hazırlığını başka biri yapacaksa aynı paketi onunla paylaşın; `server` ve `script` klasörleri birlikte gerekir.
+[Depoda](https://github.com/Cheditte/abap-imap-inbound) **Code → Download ZIP** seçip arşivin tamamını açın. Git veya abapGit zorunlu değildir. `server`, `script` ve `ZCHE_IMAP_INSTALL.abap` aynı sürümden olmalı. Sunucuyu başka biri hazırlayacaksa aynı arşivi ona verin.
 
 ## 1. Posta sunucusunu hazırlayın
 
-**Hedef:** SAP'nin okuyacağı posta hesabını, erişim yöntemini ve klasörleri belirlemek. Yeni bir posta sunucusu kurmanız gerekmez; mevcut bir hizmette uygun bir hesap kullanabilirsiniz.
+**Amaç:** SAP'nin okuyacağı hesabı ve iki posta klasörünü belirlemek.
 
-E-posta yöneticinizden sunucu adını, bağlantı portunu, güvenlik türünü ve giriş bilgilerini alın. **Doğru e-posta adresi ve parola tek başına yeterli olmayabilir.** Başka bir programın kutuyu okumasına, yani **IMAP erişimine**, izin verilmelidir. Posta ekibi hesabın bu projeyle bağlantı kurmaya uygun olduğunu doğrulasın. [Ayrıntılı bağlantı koşulları](TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu).
+1. Posta sağlayıcısından veya yöneticiden **gerçek IMAP sunucu adı, port ve bağlantı türünü** alın. Sunucu alanına kendi e-posta adresinizi yazmayın.
+2. Hesabın IMAP erişimine ve parola/uygulama şifresiyle girişe izin verdiğini doğrulatın. Doğru parola tek başına yeterli olmayabilir. Bu sürüm Microsoft 365 / Exchange Online veya yalnız OAuth kabul eden hesaplarla çalışmaz.
+3. Okuma klasörünü seçin. Varsayılan `INBOX`, Gelen Kutusu'dur; başka klasör istiyorsanız onun gerçek IMAP adını kullanın.
+4. Başarılı mailler için **aynı hesapta farklı, mevcut bir hedef klasör** seçin. `SAP-Processed` yalnız örnek addır; bu adla yeni klasör oluşturmanız gerekmez.
 
-E-posta ekibiniz yoksa bu bilgileri, yönettiğiniz hesabın sağlayıcı panelinden veya sağlayıcının desteğinden alın. Yalnız kendi posta kutunuzu açabiliyor olmanız, posta sunucusunun ayarlarını değiştirebildiğiniz anlamına gelmez. [Posta hesabını kendiniz hazırlama](SELF-MANAGED-SETUP.md).
-
-Varsayılan olarak **Gelen Kutusu (`INBOX`)** okunur. Yalnız belirli bir klasördeki iletileri almak isterseniz o klasörü seçebilirsiniz. İşlenen iletiler için de aynı posta hesabındaki mevcut bir klasörü kullanabilirsiniz. `SAP-Processed` başlangıç adıdır; bu adla yeni klasör açmak zorunda değilsiniz. Seçtiğiniz klasörlerin gerçek adlarını posta ekibinden doğrulayın.
-
-![Okunacak klasörden SAP işlemeye ve farklı hedef klasöre giden ileti yolu](../assets/diagrams/mail-flow-tr.svg)
-
-**Bu bölümün çıktısı:** Posta sunucusu adı, port, güvenlik türü, giriş bilgileri, okunacak klasör ve ondan farklı hedef klasörün gerçek adları. Parolayı destek kaydına veya ekran görüntüsüne koymayın.
+**Devam koşulu:** Bağlantı bilgileri, onaylı giriş yöntemi ve iki gerçek klasör adı elinizde. Parolayı destek kaydına veya ekran görüntüsüne koymayın. [Ayrıntılı posta koşulları](TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu).
 
 ## 2. SAP'nin kurulu olduğu makineyi hazırlayın
 
-**Ne yapıyoruz?** SAP'nin kurulu olduğu Windows veya Linux makinede e-postaları alacak araçları ve proje dosyalarını hazırlıyoruz. Bu, genellikle ilk kurulumda bir kez yapılır.
+**Amaç:** Maili getiren araçları SAP'nin çalıştığı Windows/Linux makinesine hazırlamak. SAP GUI'yi açtığınız bilgisayar aynı makine olmayabilir.
 
-![SAP makinesinde hazırlanacaklar: araçlar, proje dosyaları ve korumalı klasör](../assets/diagrams/host-prep-tr.svg)
+| Hazırlık | Ne işe yarar? | Beklenen çıktı |
+|---|---|---|
+| PowerShell | Projenin sunucu komutlarını çalıştırır. | Windows'ta 5.1; Linux'ta 7.4+ hazır. |
+| curl | Posta sunucusuna şifreli IMAP bağlantısı kurar. | Sürüm 8.0.0+ ve `imaps` desteği. |
+| Proje dosyaları ve klasör | Mail, ek ve bağlantı dosyalarını tutar. | İki betik aynı sürümde; klasör ve dosya izinleri hazırlanmış. |
+| Ağ ve sertifika | SAP sunucusunun posta hizmetine erişmesini sağlar. | Gerçek posta adresine/portuna erişim; sertifika güveni hazır. |
 
-| Hazırlanacak parça | Ne işe yarar? |
-|---|---|
-| **PowerShell** | Projenin e-posta alma komutlarını çalıştırır. Windows'ta 5.1 veya üzeri, Linux'ta 7 gerekir. |
-| **curl** | Posta sunucusuyla bağlantıyı kurar. **8.0.0 veya üzeri** olmalı ve şifreli IMAP (`imaps`) desteklemelidir. |
-| **Projenin sunucu dosyaları** | İletileri ve ekleri SAP'nin okuyabileceği dosyalara hazırlar. İndirdiğiniz paketin içindedir. |
-| **Korumalı çalışma klasörü** | E-postaların, eklerin ve bağlantı ayarlarının sunucuda tutulacağı yerdir. Basis yolunu ve erişim izinlerini belirler. |
+Yönetim yetkiniz varsa [RDP/SSH ve dosya aktarımı rehberini](SELF-MANAGED-SETUP.md) izleyin. Başka ekip hazırlayacaksa tabloyu onlara iletin. [Windows](TECHNICAL-REFERENCE.md#windows) veya [Linux kurulum komutlarını](TECHNICAL-REFERENCE.md#linux) SAP makinesinde çalıştırın.
 
-PowerShell veya curl zaten uygunsa tekrar kurulmaz. Basis eksikleri kurumunuzun kurulum yöntemiyle tamamlar; ardından paketteki sunucu kurulumunu çalıştırır. Kullanılacak Windows/Linux komutları [Basis için sunucu kurulum bölümündedir](TECHNICAL-REFERENCE.md#sunucu-kurulumu-komutlar-ve-kontroller).
+**Devam koşulu:** Sunucu kontrolü `PROTOCOL 2`, `VERSION 0.9.2` ve doğru klasörü gösterip `OK` ile bitmeli. Kullanılacak **SAP uygulama sunucusunu ve tam çalışma klasörü yolunu** not edin. Sonraki adımlarda aynı sunucuyu kullanın.
 
-Basis ayrıca **SAP'nin çalıştığı makineden posta sunucusuna bağlantı kurulabildiğini** kontrol eder. Kendi bilgisayarınızdan posta hesabına erişmeniz bu kontrolün yerini tutmaz.
-
-Basis ekibiniz yoksa bu adımı, yönetim yetkiniz bulunan kendi deneme sunucunuzda siz uygulayabilirsiniz. Sunucuya nasıl bağlanacağınız, dosyaları nereye aktaracağınız ve komutları nerede çalıştıracağınız [ayrı rehberde](SELF-MANAGED-SETUP.md) açıklanıyor.
-
-**Ne zaman devam edebilirsiniz?** Sunucuyu siz hazırladıysanız testin başarılı olduğunu kontrol edin; başka ekip hazırladıysa bu sonucu onlardan alın. Kullanılacak SAP sunucusunu ve çalışma klasörünün **tam yolunu** not edin. Sonraki adımlarda aynı sunucuyu ve klasörü kullanacağız.
-
+<a id="kurulum"></a>
 ## 3. SAP ERP içindeki kurulumu yapın
 
-Posta bilgileri ve sunucu hazırlığı tamamlandı. Şimdi SAP GUI içinde programları kuracak ve bu iki bölümden gelen bilgileri SAP'ye tanıtacağız. Bu bölümde üç işlem var: kurulum programını oluşturma, çalıştırma ve posta profilini kaydetme.
-
-![SAP ERP kurulum sırası: programı oluşturun, kurulumu çalıştırın ve postayı tanımlayın](../assets/diagrams/sap-steps-tr.svg)
+![SAP kurulumu: programı oluşturma, installer, yetkiler ve posta profili](../assets/diagrams/sap-steps-tr.svg)
 
 ### 3.1. Kurulum programını oluşturun
 
-**Ne yapıyoruz?** SAP'nin gerekli programlarını ve tablolarını oluşturacak kurulum programını hazırlıyoruz. Bu adımı kendi SAP geliştirme yetkinizle uygulayın.
+1. **SE38**'de program adına `ZCHE_IMAP_INSTALL` yazıp **Create / Oluştur** seçin.
+2. Açıklama girin; **Type / Tür** alanında **Executable program / Çalıştırılabilir program** seçin.
+3. Kendi müşteri paketinizi kullanın; örneğin önceden oluşturduğunuz `ZCHE_IMAP`. `$TMP` yalnız geçici yerel deneme içindir.
+4. [Installer dosyasının](../../ZCHE_IMAP_INSTALL.abap) **tam kaynak kodunu** başlangıç kodunun yerine koyun. GitHub sayfasını HTML olarak kaydedip yüklemeyin.
+5. Kaydedin, sözdizimini kontrol edin ve **Ctrl+F3** ile etkinleştirin.
 
-SE38 üzerinden aşağıdaki programı oluşturun.
+**Devam koşulu:** program etkin ve sözdizimi hatası yok.
 
-1. Program adı olarak **`ZCHE_IMAP_INSTALL`** yazıp **Create / Oluştur** seçin.
-2. Açıklama girin; tür olarak **Executable program / Çalıştırılabilir program** seçin.
-3. Kaydederken kendi oluşturduğunuz veya projeye ayrılmış müşteri paketini kullanın; örneğin `ZCHE_IMAP`. Yalnız geçici denemede **Local Object / Yerel Nesne** seçilebilir.
-4. İndirdiğiniz [ZCHE_IMAP_INSTALL.abap](../../ZCHE_IMAP_INSTALL.abap) dosyasının **tamamını** açıp SAP editörüne yapıştırın.
-5. Kaydedin, sözdizimi kontrolünü yapın ve **Activate / Etkinleştir** seçin.
+### 3.2. Kurulumu çalıştırın
 
-**Ne zaman devam edebilirsiniz?** Program hata vermeden etkinleştiğinde. Sözdizimi veya etkinleştirme hatası varsa çözmeden sonraki adıma geçmeyin. Program adını aynen kullanın.
+`ZCHE_IMAP_INSTALL` içinde **F8**:
 
-### 3.2. Kurulum programını çalıştırın
-
-**Ne yapıyoruz?** Kurulum programı gerekli SAP ekranlarını, tablolarını ve sunucuyla bağlantı için gereken tanımları oluşturacak.
-
-SE38'de **`ZCHE_IMAP_INSTALL`** açıp **Execute / Çalıştır (F8)** seçin.
-
-- İlk kurulumda **DDIC objects**, **Programs**, **SM69 commands** ve **Server check** seçili kalsın. Bunlar tabloları, programları, sunucu komutlarını ve son kontrolü kapsar.
-- **Server folder** alanına Basis'in verdiği **tam klasör yolunu** girin. Ekrandaki örnek yolun size uygun olduğunu varsaymayın.
-- **Uninstall / Kaldır** seçilmesin. Diğer seçenekleri kontrol edin.
-- **F8** ile çalıştırın ve sonuç listesini okuyun.
-
-**Ne zaman devam edebilirsiniz?** Seçilen kurulum adımları ve son sunucu kontrolü başarılı olduğunda. Hata veren adımın çıktısını inceleyin; sunucu erişimi veya yetki sorunu başka bir ekibin sorumluluğundaysa onlara iletin.
-
-**Kalıcı kullanım için:** Kurulum programı ürettiği nesneleri şu anda `$TMP` adlı yerel alana koyar. Programın kendisini pakete kaydetmek bunu değiştirmez. Nesneleri müşteri paketinize alıp test/canlı sisteme taşıma sürecini planlayın; transport ayarları başka ekipteyse onlarla koordine edin. [Paket ve taşıma ayrıntıları](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport).
-
-### 3.3. Yetki nesnesini ve rolü oluşturun
-
-**Ne yapıyoruz?** Kullanıcınızın programları çalıştırabilmesini sağlıyoruz. Her program, profil bazında `ZCHE_IMAP` yetki nesnesini kontrol eder; bu yetki yoksa deneme için bile yetki mesajıyla durur.
-
-1. **SU20:** `ZCHE_IMAP_PROFID` veri elemanıyla `ZCHE_PROF` yetki alanını oluşturun. Bu veri elemanını kurulum programı 3.2. adımda oluşturdu.
-2. **SU21:** `ZCHE_PROF` ve `ACTVT` alanlarıyla `ZCHE_IMAP` yetki nesnesini oluşturun. `02`, `03` ve `16` aktivitelerine izin verin.
-3. **PFCG:** Bir role `ZCHE_IMAP` nesnesini profil adınızla (örneğin `INVOICE`) ve gereken aktivitelerle ekleyin: görüntüleme için `03`, profil bakımı ve yeniden işleme için `02`, işlemeyi çalıştırmak için `16`. Ayrıca şunları ekleyin:
-   - `ZCHI` tablo grubu için `S_TABU_DIS`: görüntüleme için `03`, değiştirme için `02`.
-   - SM69 komutları için `S_LOG_COM`: bağlantı testi için `ZCHE_IMAP_TEST`; işleme için `ZCHE_IMAP_LIST`, `ZCHE_IMAP_FETCH` ve `ZCHE_IMAP_DONE`.
-   - 2. adımdaki çalışma klasörü için `S_DATASET`; ayrıntısı [yetki rehberinde](../../SECURITY.md#file-access--dosya-erişimi).
-
-   Rolü kendi kullanıcınıza ve arka plan işini çalıştıran kullanıcıya atayın. Geniş geliştirici rolleri bunları zaten içerebilir; eksik olan yetki programı yetki mesajıyla durdurur.
-
-Bu nesneleri yetki ekibiniz de oluşturabilir. Aktivitelerin, dosya izinlerinin ve işlem kodlarının ayrıntısı [yetki rehberinde](../../SECURITY.md).
-
-**Ne zaman devam edebilirsiniz?** Rol kullanıcınıza atandığında. Yeni yetki görünmüyorsa oturumu kapatıp yeniden açın.
-
-### 3.4. Posta kutusu profilini tanımlayın
-
-**Ne yapıyoruz?** Hangi posta hesabına bağlanacağımızı ve hangi klasördeki iletileri okuyacağımızı SAP'ye söylüyoruz. Bu ayarların birlikte kaydedilmiş haline **profil** denir.
-
-SE38'de **`ZCHE_IMAP_CONFIG`** açıp **F8** ile çalıştırın. Basis'in hazırladığı sunucuya bağlı SAP oturumunu kullanın; emin değilseniz Basis kontrol etsin.
-
-| Alan | Ne yazacaksınız / seçeceksiniz? |
+| Seçim | İlk kurulumda |
 |---|---|
-| Profil | Ayarlarınıza vereceğiniz bir ad. Örneğin `INVOICE`; kendi adınızı seçebilirsiniz. Sonraki adımlarda aynı adı kullanın. |
-| Aktif | Seçili olsun; bu profilin işlenmesine izin verir. |
-| Sunucu, port ve güvenlik | E-posta ekibinizin verdiği gerçek bilgiler. Sunucu alanına e-posta adresinizi yazmayın. Sertifika doğrulaması açık kalsın. |
-| Kullanıcı ve parola | E-posta ekibinizin doğruladığı bilgiler. Parola kaynağı `S` ise parolayı SAP ekranından girersiniz; `O` ise Basis sunucuda kaydeder. Yöntemi Basis ile belirleyin. |
-| Okunacak klasör | Varsayılan `INBOX`, Gelen Kutusu'nu okur. Başka klasör için onun gerçek adını/yolunu girin. |
-| İşlenmiş klasörü | Başarılı iletilerin taşınacağı, aynı posta hesabındaki, okunacak klasörden farklı seçtiğiniz klasörün gerçek adı/yolu. `SAP-Processed` adı zorunlu değildir. |
-| Taşıma yöntemi | İlk denemede `MOVE` seçin. |
-| Handler programı | **`ZCHE_IMAP_HANDLER_DEMO`** kalsın. Bu, her e-posta için çalışacak hazır örnek programdır. |
+| DDIC, Programs, SM69 commands, Server check | İşaretli. Tablolar, programlar, sunucu komutları ve son kontrol hazırlanır. |
+| Server folder | 2. bölümde hazırlanan **gerçek tam klasör yolu**. |
+| Code page | Otomatik; farklı seçim için [teknik açıklamayı](TECHNICAL-REFERENCE.md#sap-kurulum-seçenekleri-ve-kontrolleri) izleyin. |
+| Overwrite existing programs | İlk kurulumda işaretsiz; güncelleme için [ayrı yol](#guncelleme). |
+| Uninstall | **İşaretsiz.** |
 
-İlk denemede ileti sayısı, boyut ve zaman aşımı gibi diğer sınırları Basis ile kontrol edip başlangıç değerlerinde bırakabilirsiniz. Ayrıntılı alanlar ve sunucuda parola kaydetme işlemi [teknik rehberde](TECHNICAL-REFERENCE.md#profil-alanları-ve-sunucuda-parola-yönetimi).
+F8 ile çalıştırıp sonuç listesinin tamamını okuyun. **Devam koşulu:** kurulum ve son sunucu kontrolü başarılı. Hatalı adımdan sonra devam etmeyin.
 
-**F8** ile kaydedip bağlantıyı test edin. Parolayı ekran görüntüsüne veya destek kaydına eklemeyin.
+Installer, oluşturduğu nesneleri `$TMP`'ye koyar; installer'ı kendi paketinize kaydetmek bunu değiştirmez. Kalıcı kullanımda nesneleri müşteri paketinize atayıp transport edin. [Paket ve transport](TECHNICAL-REFERENCE.md#2b-canlıya-çıkmadan-önce-paket-ve-transport).
 
-**Ne zaman devam edebilirsiniz?** Doğru posta hesabına bağlantı testi başarılı olduğunda. Ayarların kaydedilmesi tek başına bağlantının kurulduğu anlamına gelmez.
+<a id="yetkiler"></a>
+<a id="33-yetki-nesnesini-ve-rolü-oluşturun"></a>
+### 3.3. Yetki nesnesini ve rolü hazırlayın
 
-## 4. Üç bölümü birlikte deneyin
+Programların profil bazında çalışmasına izin verirsiniz:
 
-Üç bölümün de ayrı ayrı hazır görünmesi yeterli değildir. Bir e-postanın seçtiğiniz posta klasöründen alınıp SAP'de görünmesini ve hedef klasöre taşınmasını kontrol edeceğiz.
+1. **SU20:** `ZCHE_PROF` yetki alanını, installer'ın oluşturduğu `ZCHE_IMAP_PROFID` veri elemanıyla oluşturun.
+2. **SU21:** `ZCHE_IMAP` yetki nesnesine `ZCHE_PROF` ve `ACTVT` alanlarını ekleyin.
+3. **PFCG:** seçtiğiniz profil adı için `03` görüntüleme, `02` profil bakımı/yeniden işleme, `16` çalıştırma aktivitelerini gereken kullanıcılara verin.
+4. Rolün tablo, komut ve dosya yetkilerini [yetki tablosuna](../../SECURITY.md) göre tamamlayın. Özellikle `S_TABU_DIS`, `S_LOG_COM` ve `S_DATASET` gerekir. Rolü kullanıcıya atayıp kullanıcı karşılaştırmasını tamamlayın.
 
-### 4.1. E-postayı işleyin
+Yetki yönetimi başka ekipteyse bu adımı onlarla yapın. **Devam koşulu:** kendi kullanıcınızın ve ileride job kullanıcısının gerekli yetkileri var.
 
-**Ne yapıyoruz?** Önce posta kutusunun okunabildiğini kontrol ediyor, sonra deneme iletisini gerçekten alıyoruz.
+<a id="34-posta-kutusu-profilini-tanımlayın"></a>
+### 3.4. Posta profilini kaydedin
 
-Deneme posta kutusuna küçük bir PDF veya metin eki bulunan e-posta gönderin. Gelen Kutusu yerine başka klasör seçtiyseniz iletiyi o klasöre koyun.
+**Profil**, bağlantı ve işleme ayarlarının birlikte saklanan adıdır. **SE38 → `ZCHE_IMAP_CONFIG` → F8** ile ayar ekranını açın. Ekranın içindeki F8, **ayarları kaydeder ve bağlantıyı kontrol eder**.
 
-1. SE38'de **`ZCHE_IMAP_INBOUND`** açıp çalıştırın.
-2. Önceki adımda kaydettiğiniz **profil adını** girin.
-3. **List only (no downloads/changes)**, yani **yalnız listele** seçeneğini işaretleyip **F8** basın. Uygun iletilerin numaraları listelenir; içerik ve ekler henüz alınmaz, iletiler taşınmaz.
-4. Listeleme başarılıysa geri dönün, **yalnız listele işaretini kaldırın** ve tekrar çalıştırın. Bu kez e-posta ve ekleri alınır, hazır örnek çalışır ve başarılı ileti seçtiğiniz işlenmiş klasörüne taşınır.
-
-**Ne zaman devam edebilirsiniz?** Çalıştırma tamamlandığında. Şimdi sonucu SAP'de ve posta kutusunda kontrol edeceğiz.
-
-### 4.2. E-postaları ve ekleri izleyin
-
-**Ne yapıyoruz?** İşlemin sonucunu görüyor ve ekin SAP'den erişilebilir olduğunu kontrol ediyoruz.
-
-1. SE38'de **`ZCHE_IMAP_MONITOR`** açıp çalıştırın.
-2. Profilinizi ve deneme gününü kapsayan tarih aralığını seçip **F8** basın.
-3. Deneme iletinizin kaydını açın; metnini ve eklerini inceleyin.
-4. Posta hesabınızı da açın. Başarılı ileti seçtiğiniz işlenmiş klasöründe bulunmalı.
-
-| Durum | Kısaca anlamı |
+| Alan | İlk kullanımda |
 |---|---|
-| `S` | İşlem ve posta taşıması tamamlandı. |
-| `E` | Hata oluştu; kayıttaki açıklamayı inceleyin. |
-| `R` | Hatalı ileti yeniden denenmek üzere işaretlendi. |
-| `H` | SAP'deki iş adımı tamamlandı, postanın taşınması bekliyor. |
+| Profile / Active | Seçtiğiniz ad; örneğin `MAIL_DEMO`. Active işaretli. Bu adı sonraki adımlarda da kullanın. |
+| Server, Port, Security | Posta yöneticisinin verdiği gerçek bilgiler. Sertifika doğrulaması açık. |
+| User / Password source | Gerçek giriş adı; varsayılan `O`, parolayı sunucuda yöneticinin hazırlamasıdır. |
+| Folder to read | `INBOX` veya seçtiğiniz gerçek kaynak klasör. |
+| Processed folder | Aynı hesapta farklı, mevcut hedef klasör. `SAP-Processed` adı zorunlu değil. |
+| Move method | `MOVE`. Posta sunucusu bu işlemi desteklemeli. |
+| Handler program / FORM | `ZCHE_IMAP_HANDLER_DEMO` / `HANDLE_MAIL`. Hazır örnek iş programı. |
 
-PDF ve yaygın görseller uygun uygulamayla açılabilir. Excel gibi diğer ekleri indirip bilgisayarınızdaki uygulamayla inceleyebilirsiniz.
+`O` kaynağı için sunucu yöneticisi, gerçek `SID_CLIENT_PROFILE` anahtarıyla parolayı [sunucuda hazırlar](TECHNICAL-REFERENCE.md#profil-alanları-ve-sunucuda-parola-yönetimi). `S` kaynağı SAP ekranından parola girişidir; izin ve koruma koşulları farklıdır. Kaydedilen parola ekranda geri gösterilmez.
 
-**İlk deneme başarılıysa:** SAP'de `S` durumunu, erişilebilir eki ve posta hesabında taşınan iletiyi görmüş olmalısınız. Hazır örnekte ayrıca fatura veya sipariş oluşması beklenmez.
+[Diğer alanların açıklaması](SCREEN-GUIDE.md#profil). **Devam koşulu:** ayarlar kaydedilmiş ve doğru hesap için bağlantı kontrolü başarılı.
 
-#### Bir adımda hata alırsanız
+<a id="listeleme"></a>
+<a id="4-üç-bölümü-birlikte-deneyin"></a>
+## Yol A — Bağlantıyı ve ileti listesini kontrol edin
 
-- **Giriş veya klasör hatası:** E-posta ekibine bağlantı bilgilerini, IMAP iznini ve seçilen klasör adlarını kontrol ettirin.
-- **Bağlantı, sertifika veya SAP yetki hatası:** Basis'ten destek alın; sertifika doğrulamasını kapatarak geçmeyin.
-- **Örnek veya kendi iş programınız hata veriyorsa:** Hata açıklamasını ve ilgili programı inceleyin. Hazır örnek, konusu `TEST-ERROR` içeren iletilerde bilerek hata verir.
+1. **SE38 → `ZCHE_IMAP_INBOUND` → F8** ile seçim ekranını açın.
+2. Profil alanına **yalnız kendi deneme profilinizi** girin. Boş bırakmak bütün aktif profilleri kapsar.
+3. **List only (no downloads/changes)** kutusunu **kendiniz işaretleyin**; başlangıçta işaretli olduğunu varsaymayın.
+4. F8 ile çalıştırın. `UID`, posta sunucusunun ileti numarasıdır; belge numarası değildir.
 
-Hata metnini ve kaldığınız adımı paylaşın; parola paylaşmayın. Yetkili kullanıcı hatalı iletileri yeniden denemeye alabilir. Log veya sunucu dosyalarını silerek tekrar işlemeyi denemeyin. [Yeniden deneme ayrıntıları](TECHNICAL-REFERENCE.md#saklama-ve-yeniden-deneme-ayrıntıları).
+**Başarı ölçütü:** uygun ileti numaraları veya boş kutu sonucu görülür. Bu yol **mail gövdesini/ekleri indirmez, handler'ı çalıştırmaz ve maili taşımaz**. [Seçim alanları](SCREEN-GUIDE.md#isleme).
 
-## 5. Düzenli çalışmayı zamanlayın
+<a id="ilk-mail"></a>
+## Yol B — İlk maili ve eki SAP'de açın
 
-**Ne yapıyoruz?** Başarılı denemeden sonra posta kontrolünün elle başlatılmadan, belirlenen aralıklarla çalışmasını sağlıyoruz.
+### B1. Ayrı bir deneme mailini işleyin
 
-SM36 yetkiniz varsa `ZCHE_IMAP_INBOUND` için bir **arka plan işi** oluşturun; bu yetki başka ekipteyse Basis'ten planlamasını isteyin. Doğru profil kullanılmalı, yalnız listeleme kapalı olmalı ve iş hazırladığımız **aynı SAP makinesinde** çalışmalıdır. İşi çalıştıracak kullanıcıyla da deneme yapın veya ilgili ekibe yaptırın.
+1. Deneme kutusuna küçük bir PDF veya metin eki içeren mail gönderin. Farklı kaynak klasör seçtiyseniz maili oraya koyun.
+2. Aynı deneme profilinde hazır demo handler seçili olsun.
+3. INBOUND ekranına dönün; **List only işaretini kaldırın** ve F8'e basın.
 
-Gerçek iş adımını süreç sorumlusuyla belirleyip uygulayın. Örneğin eki bir siparişe bağlama işlemi [geliştirici rehberindeki](TECHNICAL-GUIDE.md) bağlantı noktasıyla eklenir. Canlı kullanımdan önce iş kurallarını, yetkileri ve paketle taşıma sürecini test sisteminizde doğrulayın.
+**Bu kez gerçek mail işlemesi başlar.** Mail ve ekler sunucuya alınır; hazır örnek ekleri okumayı dener. Başarılı mail hedef klasöre taşınır, okundu işaretlenebilir. Fatura veya sipariş oluşturulmaz.
 
-**Mevcut kurulumu güncelliyorsanız** ilk kurulum adımlarını doğrudan tekrarlamak yerine [güncelleme yolunu](TECHNICAL-REFERENCE.md#8-mevcut-kurulumu-güncelleyin) izleyin. Sunucu komutları ve ayrıntılı kontroller [teknik başvuru rehberindedir](TECHNICAL-REFERENCE.md).
+### B2. Monitörde kontrol edin
+
+1. **SE38 → `ZCHE_IMAP_MONITOR` → F8** ile seçim ekranını açın.
+2. Kendi profilinizi ve çalıştırmayı kapsayan tarih aralığını seçip F8'e basın.
+3. Mail satırına çift tıklayın; başlık, gövde ve ekleri inceleyin.
+4. Eki açın veya indirin. PDF, metin ve desteklenen görseller uygun görüntüleyicide açılabilir; diğer türler yalnız indirilir.
+5. Posta hesabında başarılı mailin seçtiğiniz hedef klasöre geçtiğini kontrol edin.
+
+| Durum | Anlamı ve sonraki adım |
+|---|---|
+| `S` — Done | İşleme ve taşıma tamamlandı; eki ve hedef klasörü kontrol edin. |
+| `E` — Error | Açıklamayı okuyup nedeni giderin. Normal çalıştırma hatalı maili tekrar tekrar işlemez. |
+| `H` — To move | İş adımı kaydedildi, taşıma bekliyor. Normal çalıştırma yalnız taşımayı kurtarmayı dener. |
+| `R` — Retry | Yetkili kullanıcı yeniden işleme istedi; sonraki normal çalıştırma yeniden deneyebilir. |
+
+**Başarı ölçütü:** `S` kaydı, açılabilen ek ve hedef klasördeki mail birlikte doğrulanmış. Mail kutusu veya dosyaları silerek yeniden denemeyi zorlamayın. [Hata ve yeniden deneme](SCREEN-GUIDE.md#hatalar).
+
+### B3. Kendi ABAP işleminizi ekleyin
+
+Hazır akıştan sonra [geliştirici rehberindeki](TECHNICAL-GUIDE.md) handler'ı ayrı müşteri programına kopyalayın. İzinli ad önekini ve işlem sözleşmesini koruyun; mailin aynı iş belgesini ikinci kez oluşturmaması için kendi iş anahtarınızla tekrar kontrolü ekleyin. İşlem sonunda commit'i ana program yapar.
+
+<a id="otomatik"></a>
+<a id="5-düzenli-çalışmayı-planlayın"></a>
+## Yol C — Belirli aralıklarla otomatik çalıştırın
+
+**Akış:** seçimler → varyant → SM36 → SM37 log/spool. Varyant ayarları saklar; job bu ayarlarla programı çalıştırır.
+
+### C1. Önce yalnız listeleyen bir varyant hazırlayın
+
+INBOUND seçim ekranında kendi profilinizi girin, **List only işaretli** ve retry işaretsiz olsun. Varyant olarak örneğin `IMAP_LIST_DEMO` adıyla kaydedin; bu örnek adı kendi adınızla değiştirebilirsiniz. Varyantı tekrar çağırıp seçimleri kontrol edin.
+
+### C2. SM36'da işi tanımlayın
+
+1. **SM36** açın; kullanılmayan bir job adı girin. Görseldeki `ZCHE_IMAP_LIST_DEMO` yalnız örnektir.
+2. Normal iş için **Job Class C** kullanın; kurumunuzun kuralı varsa onu izleyin.
+3. **Target / Hedef** alanında kurulum yapılan uygulama sunucusunu seçin. Çok sunuculu sistemde boş hedefi rastgele sunucu seçimine bırakmayın.
+4. **Step / Adım → ABAP program:** `ZCHE_IMAP_INBOUND` ve kaydettiğiniz listeleme varyantını girin. Doğru çalışma kullanıcısını kontrol edip adımı kaydedin.
+
+### C3. Başlangıcı belirleyin ve sonucu okuyun
+
+1. İlk kontrol için **Start condition → Immediate** seçin; **Periodic Job işaretsiz** olsun. Başlangıcı ve ana işi kaydedin.
+2. **SM37**'de kendi iş adı, kullanıcı ve çalışma zamanıyla arayın; gerekirse durum filtrelerini genişletip yenileyin.
+3. **Job log** ve **Spool** içindeki sonucu okuyun. **Finished, mail taşındığını göstermez:** listeleme işi içerik indirmez. Hata sayısı ve açıklamalar kontrol edilmeli.
+
+Bu kontrolü gerçek job kullanıcısı ve seçilen sunucuda tamamladıktan sonra, B yolundaki normal işleme için **ayrı bir varyant ve job** hazırlayın. Yalnız o varyantta List only işaretini kaldırın. Çalışma aralığını operasyonla belirleyin; SM36'daki **Date/Time + Periodic Job + Period values** ile planlayın. SAP/job saat dilimini kontrol edin. İlk çalışmaları monitör, log/spool ve posta kutusuyla birlikte izleyin.
+
+<a id="guncelleme"></a>
+## Mevcut kurulumunuz varsa
+
+İlk kurulum adımlarını doğrudan tekrar etmeyin. İşleri durdurup [güncelleme prosedürünü](TECHNICAL-REFERENCE.md#8-mevcut-kurulumu-güncelleyin) izleyin.
+
+`0.9.0 / 0.9.1 → 0.9.2` için SAP'deki installer kaynağını güncel dosyayla değiştirip etkinleştirin; sunucudaki iki betiği aynı sürüme güncelleyin. Yedekleme ve inceleme sonrasında **Programs + Overwrite existing programs (update) + Server check** seçin; gereken SM69/DDIC adımlarını mevcut kurulumunuza göre değerlendirin. Overwrite yerel kaynak değişikliklerini değiştirebilir. Sunucu kontrolü ve profil kontrolü başarılı olmadan işleri yeniden açmayın.
+
+Eski `ZIMAP_` ve yeni `ZCHE_IMAP_` işleri aynı kutuyu birlikte işlememeli; eski geçmişin otomatik taşındığını varsaymayın.
+
+## Takıldığınızda
+
+[Alan rehberi](SCREEN-GUIDE.md) → ekranın anlamı ve doldurma kararı. [Teknik başvuru](TECHNICAL-REFERENCE.md) → bağlantı, sunucu, paket/transport. [SECURITY](../../SECURITY.md) → yetki ve parola dosyaları. Destek isterken adımı ve hata metnini paylaşın; parola veya gerçek mail içeriğini paylaşmayın.
