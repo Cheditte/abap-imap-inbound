@@ -156,4 +156,4 @@ Kaynak modern ABAP sözdiziminden kaçınır, ASCII kullanır ve ABAP satırlar�
 
 Ayrılmış deneme kutusu ve hedef SAP sisteminde normal başarıyı, eksik/geçersiz eki, rollback gerektiren iş hatasını, başarısız yerel V1 update'i, yetkili tekrar denemeyi ve handler başarısından sonraki taşıma hatasını deneyin. Kurtarmanın iş belgesini çoğaltmadığını doğrulayın. Zamanlanacak varyantı gerçek kısıtlı job kullanıcısıyla seçili sunucuda çalıştırın.
 
-Kaynak/ayrıştırıcı/IMAP testleri elle çalıştırılır; [CONTRIBUTING.md](../../CONTRIBUTING.md) komutları içerir. Bunlar iş API'nizi çalıştırmaz, SAP derleyicisi ve çalışma zamanı kabul testinin yerini almaz. Güncel doğrulama sınırları [teknik başvuru rehberindedir](TECHNICAL-REFERENCE.md#neler-doğrulandı).
+Kaynak/ayrıştırıcı/IMAP testleri elle çalıştırılır; [CONTRIBUTING.md](../../CONTRIBUTING.md) komutları içerir. Bunlar iş API'nizi çalıştırmaz, SAP derleyicisi ve çalışma zamanı kabul testinin yerini almaz. Güncel doğrulama sınırları [doğrulama kaydındadır](../../VALIDATION.md).

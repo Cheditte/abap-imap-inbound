@@ -156,4 +156,4 @@ The source avoids modern ABAP syntax, uses ASCII and limits ABAP source to 255 c
 
 Use a disposable mailbox and your target SAP system. Confirm normal success, missing/invalid attachments, a returned business error with rollback, a failing local V1 update, an authorized retry, and a movement failure after committed handler success. Confirm recovery does not duplicate the business action. Run the scheduled variant with the intended restricted job user on the selected host.
 
-Source/parser/IMAP tests are run manually; see [CONTRIBUTING.md](../CONTRIBUTING.md). They do not execute your business API or replace SAP compiler/runtime acceptance tests. Current project verification limits are in the [technical reference](TECHNICAL-REFERENCE.md#what-has-been-verified).
+Source/parser/IMAP tests are run manually; see [CONTRIBUTING.md](../CONTRIBUTING.md). They do not execute your business API or replace SAP compiler/runtime acceptance tests. Current project verification limits are in the [validation record](../VALIDATION.md).

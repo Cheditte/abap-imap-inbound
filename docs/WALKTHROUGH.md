@@ -22,7 +22,7 @@ For authorized RDP/SSH access and file transfer, use the [self-managed setup gui
 
 **Use a test SAP system and test mailbox.** Normal processing may mark mail as read and move it. The example does not create invoices.
 
-This guide covers the 0.9.0 sources; actual SAP acceptance tests for this version are still pending. Images show the earlier 1.0 demonstration and fields may differ. [Test status](TECHNICAL-REFERENCE.md#what-has-been-verified).
+This guide covers the 0.9.0 sources; actual SAP acceptance tests for this version are still pending. [Test status](../VALIDATION.md).
 
 ### Download the files
 
@@ -102,7 +102,19 @@ Open **`ZCHE_IMAP_INSTALL`** in SE38 and choose **Execute (F8)**.
 
 **For maintained use:** The installer currently creates its objects in the local area `$TMP`. Saving the installer itself in a package does not change this. Assign the objects to your customer package and plan transport to test and production systems; coordinate transport settings with their administrators where needed. [Package and transport details](TECHNICAL-REFERENCE.md#2b-before-production-package-and-transport).
 
-### 3.3. Set up a mailbox profile
+### 3.3. Create the authorization object and role
+
+**What are we doing?** Allowing your user to run the programs. Every program checks authorization object `ZCHE_IMAP` per profile; without it, they stop with an authorization message, even for a trial.
+
+1. **SU20:** create authorization field `ZCHE_PROF` (type CHAR, length 20).
+2. **SU21:** create authorization object `ZCHE_IMAP` with fields `ZCHE_PROF` and `ACTVT`. Allow activities `02`, `03` and `16`.
+3. **PFCG:** in a role, add `ZCHE_IMAP` with your profile name (for example `INVOICE`) and the activities you need: `03` to view, `02` to maintain profiles and reprocess, `16` to run processing. Add `S_TABU_DIS` for table group `ZCHI`. Assign the role to your user and to the background job user.
+
+Your security team may create these objects for you. Exact activities, file permissions and transactions are in [security setup](../SECURITY.md).
+
+**When can you continue?** Once the role is assigned to your user. Log off and on again if the new authorization is not yet active.
+
+### 3.4. Set up a mailbox profile
 
 **What are we doing?** Telling SAP which email account to connect to and which folder to read. These settings are saved together as a **profile**.
 

@@ -4,7 +4,7 @@
 
 ABAP, PowerShell ve curl ile IMAP posta kutusundaki mail ve ekleri SAP’ye alın. PI/PO veya ayrı bir entegrasyon sunucusu gerekmez; betikler SAP uygulama sunucusunda çalışır.
 
-**IMAP, parola/uygulama şifresi ve UID MOVE destekleyen sunucular içindir. Microsoft 365 / Exchange Online desteklenmez:** bu proje OAuth kullanmaz. Microsoft Graph yaklaşımı için kardeş [abap-graph projesine](https://github.com/Cheditte/abap-graph) bakın; erişilebilirliği yayın durumuna bağlıdır. [Microsoft’un kimlik doğrulama açıklaması](https://learn.microsoft.com/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online).
+**IMAP, parola/uygulama şifresi ve UID MOVE destekleyen sunucular içindir. Microsoft 365 / Exchange Online desteklenmez:** bu proje OAuth kullanmaz. Bu durum için ayrı bir Microsoft Graph projesi (abap-graph) hazırlanıyor. [Microsoft’un kimlik doğrulama açıklaması](https://learn.microsoft.com/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online).
 
 ## Üç hazırlıkla başlayın
 
@@ -35,7 +35,7 @@ Ana kurulum yolu **tek installer’ı kopyala/yapıştır** yöntemidir. [abapGi
 | Windows | Windows PowerShell 5.1 veya PowerShell 7; curl 8.0.0+. |
 | Linux | PowerShell 7.4+; curl 8.0.0+. |
 | Posta sunucusu | TLS, UID MOVE ve parola/uygulama şifresi. |
-| Doğrulama | Yapılmayan SAP kontrolleri dahil [tek doğrulama kaydı](VALIDATION.md). |
+| Doğrulama | Önceki `ZIMAP_` sürümü SAP A4H'de mailleri okudu ve ekleri açtı. 0.9.0 henüz SAP'de çalıştırılmadı; geri bildirime açık. [Doğrulama kaydı](VALIDATION.md). |
 
 curl 7.55.1 kabul edilmez. İndirilen dosyanın boyutu UID için bildirilen RFC822.SIZE ile aynı olmalıdır; aynı boyut tek başına kimliği kanıtlamaz. GreenMail testlerinde ardışık olmayan UID’ler ve içerik kontrol edilir.
 
