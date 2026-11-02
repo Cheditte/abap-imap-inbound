@@ -2,6 +2,8 @@
 # (bin); read-only for the SAP service account. Profiles in SAP cannot
 # go beyond these limits. The setup-server scripts generate this file.
 @{
+    # Failed local caches marked by the operator; inbox mail is untouched.
+    InCacheRetentionDays = 30
     # Work folder: contains conf, secret, in, done, tmp, log
     WorkDir          = 'C:\sapimap'
 

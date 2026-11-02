@@ -2,74 +2,55 @@
 
 > **English** | [Türkçe](README.tr.md)
 
-Use this project to **view and read emails from a mail server in SAP, retrieve their attachments and process them**. Define the business action for those attachments in your own ABAP code.
+Read e-mails and attachments from an IMAP mailbox into SAP with ABAP, PowerShell and curl. No PI/PO or separate integration server is required; the scripts run on the SAP application host.
 
-![Read emails in SAP and process attachments with ABAP](docs/assets/diagrams/usage-en.svg)
+**For IMAP servers supporting a password or app password and UID MOVE. Microsoft 365 / Exchange Online is not supported:** this project does not implement OAuth. A separate Microsoft Graph project, abap-graph, is being prepared for that case. [Microsoft authentication guidance](https://learn.microsoft.com/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online).
 
+## Start with three preparations
 
-Installation assumes **you can create, activate and run programs in SE38**. Start with a test SAP system and a dedicated test mailbox.
+1. **Mailbox:** a dedicated test account, IMAP hostname, TLS port and separate source/processed folders.
+2. **SAP host:** PowerShell, curl and protected working folders. Follow [host setup](docs/SELF-MANAGED-SETUP.md). A browser connection from your PC is not sufficient.
+3. **SAP:** paste [ZCHE_IMAP_INSTALL.abap](ZCHE_IMAP_INSTALL.abap) into SE38. Create the authorization object and roles in [security setup](SECURITY.md) before using the generated programs.
 
-## The big picture: three parts to prepare
+Use `ZCHE_IMAP_CONFIG` to define a profile with certificate verification enabled. Basis-managed credentials (source `O`) are the production default. Run `ZCHE_IMAP_INBOUND` in list-only mode, then process a synthetic mail with the demo handler. Inspect its body and attachments in `ZCHE_IMAP_MONITOR`. The processor commits the handler result before moving mail; it never issues EXPUNGE.
 
-**Completing this project's installation requires preparation in three areas:**
+Installation is **copy/paste from one installer**. [abapGit](ABAPGIT.md) is an optional way to transport the installer source; execute the installer to create DDIC/program objects. Existing `ZIMAP_` installations require a reviewed migration; old data is not renamed or deleted automatically.
 
-1. **Mail server:** Prepare the account SAP will read and its connection permissions.
-2. **Machine running SAP:** Prepare the helper tools and project files that retrieve mail.
-3. **SAP ERP:** Install the ABAP programs, enter mailbox settings and run processing from SAP.
+![Flow from the mailbox through the SAP host to the monitor](docs/assets/diagrams/usage-en.svg)
 
-These are not three separate machines you need to install. The second area is the Windows/Linux side of the SAP server; the third is the work you do through SAP screens on that system. The mail service may be one you already use.
+## Why not SAPconnect / SO50?
 
-### Installation map
+| Approach | Where it fits |
+|---|---|
+| SAPconnect / SO50 | Inbound SMTP routed to SAP; requires mail routing/relay and the SAP SMTP endpoint. |
+| PI/PO or Integration Suite mail adapter | A managed integration layer when that infrastructure already exists. |
+| Google ABAP SDK | Gmail API integration for Google mailboxes. |
+| This project | Pull from a password-enabled IMAP mailbox using scripts on the SAP host. |
 
-This map shows the preparation order. Each part is explained below.
+## Compatibility
 
-![Installation order: mail server, machine running SAP, SAP ERP](docs/assets/diagrams/setup-en.svg)
+| Component | Baseline / evidence |
+|---|---|
+| ABAP | Classic 7.00 syntax target; Unicode and system-codepage text I/O. |
+| Windows host | Windows PowerShell 5.1 or PowerShell 7; curl 8.0.0+. |
+| Linux host | PowerShell 7.4+; curl 8.0.0+. |
+| Mail server | IMAP with TLS and UID MOVE; password/app-password authentication. |
+| Verification | The earlier `ZIMAP_` edition read mail and opened attachments on SAP A4H. 0.9.0 has not yet run in SAP; feedback welcome. [Validation record](VALIDATION.md). |
 
-## 1. What do you prepare on the mail server?
+curl 7.55.1 is deliberately rejected, not certified. Downloads must match the UID's declared RFC822.SIZE; size equality alone cannot prove identity. GreenMail tests exercise nonconsecutive UIDs and message contents.
 
-Choose the email account SAP will connect to and the folder it will read. Even for your own account, **a correct email address and password may not be enough**. It must allow IMAP access, so another program can read its messages, and support the sign-in method implemented by this project.
+## FAQ
 
-The source defaults to the **inbox (`INBOX`)**. You can select another folder. For successful messages, select a different destination in the same account. `SAP-Processed` is an initial example name; you do not have to create a new folder with that name.
+### How do I read e-mail attachments in SAP ABAP?
+The demo handler receives headers, body lines and attachment metadata. Use the helper to read binary content; add business logic in an allowlisted `ZCHE_IMAP_HANDLER_*` program. Follow the [handler contract](docs/TECHNICAL-GUIDE.md); only the processor commits.
 
-**This part is ready when:** You have the actual IMAP hostname, port, security type, login details and both folder names. Check these yourself if you administer the account; otherwise obtain them from the email administrator or provider support.
+### Does it work with Microsoft 365 / Gmail?
+Microsoft 365 is unsupported. Gmail is usable only where the account permits IMAP and app-password authentication; OAuth-only accounts are unsupported.
 
-[Mail account preparation steps →](docs/WALKTHROUGH.md#1-prepare-the-mail-server)
+### Which authorizations are needed?
+Per-profile `ZCHE_IMAP`, table group `ZCHI`, scoped `S_LOG_COM` and file permissions. [Exact role and credential setup](SECURITY.md).
 
-## 2. What do you prepare on the machine running SAP?
+### What happens to unsupported characters or failed mail?
+Display text substitutes `?` for characters outside the SAP codepage; `mail.eml` preserves the original bytes. Display headers and attachment names are bounded. Failed business processing remains visible, with a default three-failure cap and explicit monitor reprocessing. Failed local caches expire after 30 days; pending committed moves are protected. [Recovery details](SECURITY.md).
 
-The project uses **PowerShell** and **curl** to retrieve mail. PowerShell runs the project commands; curl connects to the mail server. Prepare these tools and the server files **on the Windows/Linux machine running SAP**. The computer where you open SAP GUI may be different.
-
-Suitable tools do not need reinstalling. The project's server setup also prepares a protected working folder for messages and attachments.
-
-**This part is ready when:** The server test passes and you know the SAP host and full working-folder path. With administration permissions, you can connect through RDP/SSH and prepare it yourself; otherwise ask Basis or the server administrator.
-
-[Host preparation steps →](docs/WALKTHROUGH.md#2-prepare-the-machine-running-sap)
-
-## 3. What do you do inside SAP ERP?
-
-Create, activate and run `ZIMAP_INSTALL` in SE38. It creates the SAP programs and tables the project needs.
-
-Then enter the mailbox details prepared in the first part into `ZIMAP_CONFIG`. We call this saved set of settings a **profile**. The SAP installation also uses the host and folder prepared in the second part.
-
-**This part is ready when:** The SAP installation checks and mailbox connection test pass. You perform these SAP steps with your own development permissions.
-
-[SAP ERP installation steps →](docs/WALKTHROUGH.md#3-install-the-programs-in-sap-erp)
-
-## Once all three parts are ready, try them together
-
-Send a test email with a small attachment. Run `ZIMAP_INBOUND` with **List only** first, then process it normally with the supplied example. Check the result and attachment in `ZIMAP_MONITOR`, and confirm the message moved to the destination folder in the mailbox.
-
-The example checks this basic flow. Add business actions such as invoice creation, reading PDF amounts or attaching documents to purchase orders separately.
-
-[Follow the first trial step by step →](docs/WALKTHROUGH.md#4-test-the-three-parts-together)
-
-## Which guide should you open?
-
-- [Walkthrough](docs/WALKTHROUGH.md): Prepare the three parts in order and process the first email.
-- [Self-managed host and mailbox preparation](docs/SELF-MANAGED-SETUP.md): RDP/SSH, file transfer and administration panels.
-- [Developer guide](docs/TECHNICAL-GUIDE.md): Add your ABAP business logic.
-- [Technical reference](docs/TECHNICAL-REFERENCE.md): Detailed requirements, permissions, limits and verification status.
-
-**Current sources: 1.1.0.** Actual SAP installation/runtime acceptance tests for this version are still pending. [Verification status](docs/TECHNICAL-REFERENCE.md#what-has-been-verified).
-
-You may use, modify and share the project under the [MIT license](LICENSE).
+[Walkthrough](docs/WALKTHROUGH.md) · [Technical reference](docs/TECHNICAL-REFERENCE.md) · [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE)

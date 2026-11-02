@@ -1,7 +1,7 @@
 # Google Cloud üzerinde demo ortamı
 > [English](../../cloud/GCP-DEMO.md) | **Türkçe**
 
-Öğrenme ve ekran görüntüleri için geçici demo ortamı. Kaynak oluşturmadan hesabınızın maliyet ve deneme kredisi koşullarını kontrol edin. Güncel SAP 1.1.0 çalışma zamanı hedef sistemde doğrulanmayı bekliyor.
+Öğrenme ve ekran görüntüleri için geçici demo ortamı. Kaynak oluşturmadan hesabınızın maliyet ve deneme kredisi koşullarını kontrol edin. Güncel SAP 0.9.0 çalışma zamanı hedef sistemde doğrulanmayı bekliyor.
 
 ```
 Windows (SAP GUI) ──SSH tüneli──► Google Cloud VM (Ubuntu 24.04)
@@ -62,7 +62,7 @@ Bağlantı koparsa yeniden bağlanın ve `tmux attach -t setup` ile devam edin.
 
 Betik şunları yapar: Docker'ı kurar, çekirdek parametrelerini ayarlar, SAP lisansını kabul etmenizi ister, Docker Hub'a giriş yapar (ücretsiz bir Docker Hub hesabı gerekir), GreenMail'i başlatır, SAP imajını çeker ve başlatır, PowerShell 7'yi kurar, sunucu kurulumunu çalıştırır ve örnek mailleri gönderir. En uzun adım, imajın çekilmesi ve SAP'nin ilk açılışıdır.
 
-Betik, Basis'in çalıştıracağı sunucu kurulumunun aynısını çalıştırarak ([SERVER-SETUP.md](SERVER-SETUP.md)) biter, altı örnek mail gönderir ve kendi kendini SAP kullanıcısıyla (`a4hadm`) sınar. Son satırlarda `STEP POLICY OK`, `STEP CURL OK`, `STEP FOLDERS OK` ve `OK` görünmelidir.
+Betik, Basis'in çalıştıracağı sunucu kurulumunun aynısını çalıştırarak ([WALKTHROUGH.md](WALKTHROUGH.md)) biter, altı örnek mail gönderir ve kendi kendini SAP kullanıcısıyla (`a4hadm`) sınar. Son satırlarda `STEP POLICY OK`, `STEP CURL OK`, `STEP FOLDERS OK` ve `OK` görünmelidir.
 
 ## 4. SAP GUI bağlantısı (Windows)
 
@@ -75,19 +75,19 @@ SAP Logon → yeni bağlantı: application server `127.0.0.1`, instance number `
 
 ## 5. SAP'de kurulum
 
-[SAP kurulum adımları](WALKTHROUGH.md#31-kurulum-programını-oluşturun) içindeki geliştirici adımlarını izleyin. Bu demoda sunucu ana klasörü `/usr/sap/sapimap`'tir; `ZIMAP_INSTALL`, Linux ve Unicode olduğunu kendisi anlar.
+[SAP kurulum adımları](WALKTHROUGH.md#31-kurulum-programını-oluşturun) içindeki geliştirici adımlarını izleyin. Bu demoda sunucu ana klasörü `/usr/sap/sapimap`'tir; `ZCHE_IMAP_INSTALL`, Linux ve Unicode olduğunu kendisi anlar.
 
-`ZIMAP_CONFIG`'te demo posta kutusu şöyledir: server `greenmail`, port `3993`, IMAPS, sertifika kontrolü kapalı, kullanıcı `sap@demo.local`, şifre `sapdemo` (yalnızca GreenMail test değerleri).
+`ZCHE_IMAP_CONFIG`'te demo posta kutusu şöyledir: server `greenmail`, port `3993`, IMAPS, sertifika kontrolü kapalı, kullanıcı `sap@demo.local`, şifre `sapdemo` (yalnızca GreenMail test değerleri).
 
 ## 6. Ekran görüntüleri
 
 | # | Ekran | Ne göstermeli |
 |---|---|---|
-| 1 | `ZIMAP_INSTALL` çıktısı | DDIC, programlar, sözdizimi kontrolleri, SM69 komutları, sunucu testi OK |
-| 2 | `ZIMAP_CONFIG` | Profil ve adım adım bağlantı testi |
-| 3 | `ZIMAP_INBOUND`, yalnız listeleme | Yalnız uygun ileti numaraları; içerik veya ek önizlemesi yok |
+| 1 | `ZCHE_IMAP_INSTALL` çıktısı | DDIC, programlar, sözdizimi kontrolleri, SM69 komutları, sunucu testi OK |
+| 2 | `ZCHE_IMAP_CONFIG` | Profil ve adım adım bağlantı testi |
+| 3 | `ZCHE_IMAP_INBOUND`, yalnız listeleme | Yalnız uygun ileti numaraları; içerik veya ek önizlemesi yok |
 | 4 | Aynı rapor, test modu kapalı | İşlenen mailler |
-| 5 | `ZIMAP_MONITOR` | Liste, mail ayrıntıları, bilgisayarda açılmış bir PDF ve bir görsel |
+| 5 | `ZCHE_IMAP_MONITOR` | Liste, mail ayrıntıları, bilgisayarda açılmış bir PDF ve bir görsel |
 | 6 | Hata senaryosu | Konusunda `TEST-ERROR` geçen bir mail: durum `E`, sonra yeniden işleme |
 | 7 | SM37 | Periyodik job ve spool çıktısı |
 | 8 | Windows PowerShell | `test\run-tests.ps1` ve `test\run-imap-tests.ps1` çıktısı |

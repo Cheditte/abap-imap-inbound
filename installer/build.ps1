@@ -1,15 +1,15 @@
-# Builds ZIMAP_INSTALL.abap: installer\head.abap plus the sources in
+# Builds ZCHE_IMAP_INSTALL.abap: installer\head.abap plus the sources in
 # abap\ embedded into the program. Run it again whenever a source
 # changes:
 #   powershell -NoProfile -ExecutionPolicy Bypass -File installer\build.ps1
-# Every line of the output is at most 72 characters (4.6C editor).
+# Source lines fit ABAPSOURCE (255); embedded literal chunks fit 72.
 
 param([switch]$Check)
 
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $abap = Join-Path $root 'abap'
-$out = Join-Path $root 'ZIMAP_INSTALL.abap'
+$out = Join-Path $root 'ZCHE_IMAP_INSTALL.abap'
 $Max = 63   # "  src '" + 63 + "'." = 72
 
 # Splits escaped text into pieces that fit in 72 columns. A piece never
@@ -52,24 +52,23 @@ function Get-Form([string]$form, [string]$file) {
 $all = New-Object System.Collections.Generic.List[string]
 $all.AddRange([IO.File]::ReadAllLines((Join-Path $PSScriptRoot 'head.abap')))
 foreach ($p in @(
-        @('fill_common', 'ZIMAP_COMMON.abap'),
-        @('fill_io_legacy', 'ZIMAP_IO_LEGACY.abap'),
-        @('fill_io_unicode', 'ZIMAP_IO_UNICODE.abap'),
-        @('fill_handler', 'ZIMAP_HANDLER_DEMO.abap'),
-        @('fill_inbound', 'ZIMAP_INBOUND.abap'),
-        @('fill_config', 'ZIMAP_CONFIG.abap'),
-        @('fill_monitor', 'ZIMAP_MONITOR.abap'))) {
+        @('fill_common', 'ZCHE_IMAP_COMMON.abap'),
+        @('fill_io', 'ZCHE_IMAP_IO.abap'),
+        @('fill_handler', 'ZCHE_IMAP_HANDLER_DEMO.abap'),
+        @('fill_inbound', 'ZCHE_IMAP_INBOUND.abap'),
+        @('fill_config', 'ZCHE_IMAP_CONFIG.abap'),
+        @('fill_monitor', 'ZCHE_IMAP_MONITOR.abap'))) {
     $all.AddRange((Get-Form $p[0] $p[1]))
 }
 
-# Checks: 72 columns and ASCII only
+# Checks: ABAPSOURCE width and ASCII only
 $bad = @()
 for ($i = 0; $i -lt $all.Count; $i++) {
-    if ($all[$i].Length -gt 72) { $bad += "line $($i + 1): $($all[$i].Length) characters" }
+    if ($all[$i].Length -gt 255) { $bad += "line $($i + 1): $($all[$i].Length) characters" }
     # -cmatch: case-insensitive matching misreads I/i on a Turkish locale
     if ($all[$i] -cmatch '[^\x09\x20-\x7E]') { $bad += "line $($i + 1): non-ASCII character" }
 }
-if ($bad.Count -gt 0) { $bad | ForEach-Object { Write-Host $_ }; throw 'ZIMAP_INSTALL.abap was not built' }
+if ($bad.Count -gt 0) { $bad | ForEach-Object { Write-Host $_ }; throw 'ZCHE_IMAP_INSTALL.abap was not built' }
 
 if ($Check) {
     if (-not [IO.File]::Exists($out)) { throw 'Generated installer is missing.' }
@@ -81,4 +80,12 @@ if ($Check) {
 } else {
     [IO.File]::WriteAllLines($out, $all.ToArray(), [Text.Encoding]::ASCII)
 }
-Write-Host ("ZIMAP_INSTALL.abap: {0} lines" -f $all.Count)
+Write-Host ("ZCHE_IMAP_INSTALL.abap: {0} lines" -f $all.Count)
+
+$gitOut = Join-Path $root 'abapgit/zche_imap_install.prog.abap'
+if ($Check) {
+    if (-not [IO.File]::Exists($gitOut) -or [IO.File]::ReadAllText($gitOut) -cne [IO.File]::ReadAllText($out)) { throw 'abapGit installer copy is stale' }
+} else {
+    [IO.Directory]::CreateDirectory((Split-Path $gitOut -Parent)) | Out-Null
+    [IO.File]::WriteAllText($gitOut, [IO.File]::ReadAllText($out), [Text.Encoding]::ASCII)
+}

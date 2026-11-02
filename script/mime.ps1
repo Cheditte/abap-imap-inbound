@@ -7,14 +7,14 @@ if (-not $MimeLimits) { $MimeLimits = @{ MaxParts = 1000; MaxDepth = 20; MaxByte
 
 function Get-OutEncoding {
     if ($OutCodepage -eq 65001) { return $Utf8NoBom }
-    [Text.Encoding]::GetEncoding($OutCodepage, [Text.EncoderFallback]::ExceptionFallback, [Text.DecoderFallback]::ExceptionFallback)
+    [Text.Encoding]::GetEncoding($OutCodepage, [Text.EncoderReplacementFallback]::new("?"), [Text.DecoderFallback]::ReplacementFallback)
 }
 
 function Get-Encoding([string]$Charset) {
     if ($Charset) {
         $name = ($Charset.Trim().Trim('"') -split '\*')[0]
-        try { return [System.Text.Encoding]::GetEncoding($name, [Text.EncoderFallback]::ExceptionFallback, [Text.DecoderFallback]::ExceptionFallback) }
-        catch { throw 'PARSE: unsupported character set' }
+        try { return [System.Text.Encoding]::GetEncoding($name, [Text.EncoderReplacementFallback]::new("?"), [Text.DecoderFallback]::ReplacementFallback) }
+        catch { return [Text.Encoding]::GetEncoding($OutCodepage) }
     }
     $Latin1
 }
@@ -24,7 +24,7 @@ function Repair-8bit([string]$Text) {
     if ($Text -notmatch '[\x80-\xFF]') { return $Text }
     $bytes = $Latin1.GetBytes($Text)
     try { return $Utf8Strict.GetString($bytes) } catch { }
-    [System.Text.Encoding]::GetEncoding(1254).GetString($bytes)
+    [System.Text.Encoding]::GetEncoding($OutCodepage).GetString($bytes)
 }
 
 function ConvertFrom-Base64Loose([string]$Text) {
@@ -33,7 +33,6 @@ function ConvertFrom-Base64Loose([string]$Text) {
 }
 
 function ConvertFrom-QuotedPrintable([string]$Text, [bool]$Header) {
-    if ($Text -cmatch '=(?![0-9A-Fa-f]{2}|[ \t]*\r?\n)') { throw 'PARSE: invalid quoted-printable data' }
     if ($Header) { $Text = $Text.Replace('_', ' ') }
     else { $Text = [regex]::Replace($Text, '=[ \t]*\r?\n', '') }
     $s = [regex]::Replace($Text, '=([0-9A-Fa-f]{2})', {
@@ -315,12 +314,27 @@ function Split-Long([string]$Text, [int]$Width) {
     return , $out.ToArray()
 }
 
+# Display metadata is bounded; raw mail and attachment bytes are unchanged.
+function Limit-Display([string]$Text, [int]$Max, [bool]$KeepExtension = $false) {
+    if ($Max -le 0) { return '' }
+    if ($Text.Length -le $Max) { return $Text }
+    $suffix = ''
+    if ($KeepExtension) {
+        $ext = [IO.Path]::GetExtension($Text)
+        if ($ext.Length -le [Math]::Min(16, $Max)) { $suffix = $ext }
+    }
+    $cut = $Max - $suffix.Length
+    if ($cut -gt 0 -and [char]::IsHighSurrogate($Text[$cut - 1])) { $cut-- }
+    $Text.Substring(0, $cut) + $suffix
+}
+
 function Write-TextFile([string]$Path, [string[]]$Lines) {
     if ($null -eq $Lines) { $Lines = @() }
     foreach ($line in $Lines) {
-        if ($line.Length -gt 255 -or $line -cmatch '[\r\n]') { throw 'PARSE: metadata exceeds the SAP line format' }
+        if ($line -cmatch '[\r\n]') { throw 'PARSE: metadata contains a line break' }
     }
-    [System.IO.File]::WriteAllLines($Path, $Lines, (Get-OutEncoding))
+    $bounded = @($Lines | ForEach-Object { Limit-Display $_ 255 })
+    [System.IO.File]::WriteAllLines($Path, $bounded, (Get-OutEncoding))
 }
 
 function Expand-Mail([string]$EmlPath, [string]$OutDir) {
@@ -353,7 +367,10 @@ function Expand-Mail([string]$EmlPath, [string]$OutDir) {
         ('ATTCOUNT=' + $ctx.Att.Count)
     )
     $att = @()
-    foreach ($a in $ctx.Att) { $att += ('{0}|{1}|{2}|{3}|{4}' -f $a.Name, $a.Size, $a.Mime, $a.Disp, $a.Orig) }
+    foreach ($a in $ctx.Att) {
+        $a.Mime = Limit-Display $a.Mime 100
+        $a.Disp = Limit-Display $a.Disp 12
+        $att += ('{0}|{1}|{2}|{3}|{4}' -f $a.Name, $a.Size, $a.Mime, $a.Disp, (Limit-Display $a.Orig (255 - ('{0}|{1}|{2}|{3}|' -f $a.Name, $a.Size, $a.Mime, $a.Disp).Length) $true)) }
 
     Write-TextFile (Join-Path $OutDir 'header.txt') $head
     Write-TextFile (Join-Path $OutDir 'body.txt') (Split-Long $body 250)

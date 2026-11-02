@@ -32,7 +32,12 @@ $samples = Join-Path $work 'samples'
 if ($LASTEXITCODE -ne 0) { throw 'Parser tests failed; integration test stopped' }
 
 $policy = Join-Path $work 'policy.psd1'
-$env:SAPIMAP_POLICY = $policy
+$runtime = Join-Path $work 'runtime'
+New-Item -ItemType Directory -Path $runtime | Out-Null
+Copy-Item -LiteralPath $imap -Destination (Join-Path $runtime 'imap.ps1')
+Copy-Item -LiteralPath (Join-Path $repo 'script/mime.ps1') -Destination $runtime
+$imap = Join-Path $runtime 'imap.ps1'
+$policy = Join-Path $runtime 'policy.psd1'
 $revision = '0000000001'
 $key = 'TST_001_DEMO'
 $testUser = 'run' + [Guid]::NewGuid().ToString('N') + '@demo.local'
@@ -92,13 +97,21 @@ $userJson = Join-Path $work 'user.json'
 & $curl --fail --silent --show-error -o $nullDevice -X POST -H 'Content-Type: application/json' --data-binary "@$userJson" "http://${MailHost}:$ApiPort/api/user"
 if ($LASTEXITCODE -ne 0) { throw 'Could not create isolated GreenMail test user' }
 CurlImap '' 'CREATE SAP-Processed' | Out-Null
+& $curl --fail --silent --show-error "smtp://${MailHost}:$SmtpPort" --mail-from 'supplier@demo.local' --mail-rcpt $testUser -T (Join-Path $samples 'plain-utf8.eml')
+if ($LASTEXITCODE -ne 0) { throw 'Could not create UID gap fixture' }
+CurlImap 'INBOX' 'UID STORE 1 +FLAGS (\Deleted)' | Out-Null
+CurlImap 'INBOX' 'EXPUNGE' | Out-Null
 foreach ($mail in 'plain-utf8', 'qp-8859-9', 'multipart', 'html-1254') {
     & $curl --fail --silent --show-error --max-time 30 "smtp://${MailHost}:$SmtpPort" --mail-from 'supplier@demo.local' --mail-rcpt $testUser -T (Join-Path $samples "$mail.eml")
     if ($LASTEXITCODE -ne 0) { throw "Could not deliver $mail test fixture" }
 }
 Write-Policy $true
 Write-Profile $key
+$env:SAPIMAP_POLICY = Join-Path $work 'does-not-exist.psd1'
 Require-Ok @('test') | Out-Null
+$longKey = 'TST_001_ABCDEFGHIJKLMNOPQRST'
+Write-Profile $longKey
+Require-Ok @('list', $longKey, $revision, 'PURGE') | Out-Null
 Require-Ok @('test', $key, $revision) | Out-Null
 
 Write-Host 'read-only list and production fetch'
@@ -106,6 +119,7 @@ $r = Require-Ok @('list', $key, $revision)
 $uidv = @($r | Where-Object { $_ -cmatch '^UIDVALIDITY [0-9]+$' } | ForEach-Object { $_.Substring(12) })[0]
 $uids = @($r | Where-Object { $_ -cmatch '^UID [0-9]+$' } | ForEach-Object { $_.Substring(4) })
 Check 'mailbox identity provided' ([bool]$uidv) ($r -join ' | ')
+Check 'UID gap differs from sequence numbers' ($uids[0] -eq '2') ($uids -join ',')
 Check 'four unique mails' ($uids.Count -eq 4 -and @($uids | Sort-Object -Unique).Count -eq 4) ($uids -join ',')
 if (-not $uidv -or $uids.Count -ne 4) { throw 'Cannot continue without expected fixture mail identity' }
 # Listing must not delete old local archives (also used by ABAP test mode).

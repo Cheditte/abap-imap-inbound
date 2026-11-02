@@ -1,7 +1,7 @@
 # Demo environment on Google Cloud
 > **English** | [Türkçe](../docs/tr/GCP-DEMO.md)
 
-A disposable demo environment for learning and screenshots. Check your cloud account's costs and trial-credit conditions before creating resources. The current SAP 1.1.0 runtime still needs target-system validation.
+A disposable demo environment for learning and screenshots. Check your cloud account's costs and trial-credit conditions before creating resources. The current SAP 0.9.0 runtime still needs target-system validation.
 
 ```
 Windows (SAP GUI) ──SSH tunnel──► Google Cloud VM (Ubuntu 24.04)
@@ -62,7 +62,7 @@ If the connection drops, reconnect and continue with `tmux attach -t setup`.
 
 The script installs Docker, sets kernel parameters, asks you to accept the SAP license, logs in to Docker Hub (a free Docker Hub account is needed), starts GreenMail, pulls and starts the SAP image, installs PowerShell 7, runs the server setup, and sends sample mails. The longest step is pulling the image and the first SAP start.
 
-The script ends by running the same server setup Basis would run ([SERVER-SETUP.md](../docs/SERVER-SETUP.md)), sends six sample mails, and runs the self-test as the SAP user (`a4hadm`). The last lines must show `STEP POLICY OK`, `STEP CURL OK`, `STEP FOLDERS OK` and `OK`.
+The script ends by running the same server setup Basis would run ([WALKTHROUGH.md](../docs/WALKTHROUGH.md)), sends six sample mails, and runs the self-test as the SAP user (`a4hadm`). The last lines must show `STEP POLICY OK`, `STEP CURL OK`, `STEP FOLDERS OK` and `OK`.
 
 ## 4. SAP GUI connection (Windows)
 
@@ -75,19 +75,19 @@ SAP Logon → new connection: application server `127.0.0.1`, instance number `0
 
 ## 5. Install in SAP
 
-Follow the [SAP installation steps](../docs/WALKTHROUGH.md#31-create-the-installer-program). On this demo the server root folder is `/usr/sap/sapimap`; `ZIMAP_INSTALL` detects Linux and Unicode by itself.
+Follow the [SAP installation steps](../docs/WALKTHROUGH.md#31-create-the-installer-program). On this demo the server root folder is `/usr/sap/sapimap`; `ZCHE_IMAP_INSTALL` detects Linux and Unicode by itself.
 
-In `ZIMAP_CONFIG`, the demo mailbox is: server `greenmail`, port `3993`, IMAPS, certificate check off, user `sap@demo.local`, password `sapdemo` (GreenMail test values only).
+In `ZCHE_IMAP_CONFIG`, the demo mailbox is: server `greenmail`, port `3993`, IMAPS, certificate check off, user `sap@demo.local`, password `sapdemo` (GreenMail test values only).
 
 ## 6. Screenshots
 
 | # | Screen | What it should show |
 |---|---|---|
-| 1 | `ZIMAP_INSTALL` output | DDIC, programs, syntax checks, SM69 commands, server test OK |
-| 2 | `ZIMAP_CONFIG` | Profile and the step-by-step connection test |
-| 3 | `ZIMAP_INBOUND`, list-only | Eligible message numbers only; no body or attachment preview |
+| 1 | `ZCHE_IMAP_INSTALL` output | DDIC, programs, syntax checks, SM69 commands, server test OK |
+| 2 | `ZCHE_IMAP_CONFIG` | Profile and the step-by-step connection test |
+| 3 | `ZCHE_IMAP_INBOUND`, list-only | Eligible message numbers only; no body or attachment preview |
 | 4 | Same report, test mode off | Processed mails |
-| 5 | `ZIMAP_MONITOR` | List, mail details, a PDF and an image opened on the PC |
+| 5 | `ZCHE_IMAP_MONITOR` | List, mail details, a PDF and an image opened on the PC |
 | 6 | Error scenario | A mail with `TEST-ERROR` in the subject: status `E`, then reprocessing |
 | 7 | SM37 | Periodic job and spool output |
 | 8 | Windows PowerShell | `test\run-tests.ps1` and `test\run-imap-tests.ps1` output |

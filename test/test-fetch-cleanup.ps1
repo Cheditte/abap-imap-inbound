@@ -27,7 +27,10 @@ function Stop-Ok { throw 'Unexpected success in failure-only test' }
 function Invoke-Curl {
     param([string[]]$Arguments)
     $outputIndex = [Array]::IndexOf($Arguments, '-o')
-    if ($outputIndex -lt 0) { return '* 1 FETCH (UID 1 RFC822.SIZE 10)' }
+    if ($outputIndex -lt 0) {
+        $size = if ($script:scenario -eq 'parse') { $script:parseBytes.Length } else { 10 }
+        return ('* 1 FETCH (UID 1 RFC822.SIZE ' + $size + ')')
+    }
     $path = $Arguments[$outputIndex + 1]
     switch ($script:scenario) {
         'transfer' {
@@ -36,6 +39,7 @@ function Invoke-Curl {
         }
         'empty' { [IO.File]::WriteAllText($path, '') }
         'size' { [IO.File]::WriteAllText($path, ('x' * 1001)) }
+        'mismatch' { [IO.File]::WriteAllText($path, 'wrong-size') ; [IO.File]::AppendAllText($path, '!') }
         'parse' {
             # A valid attachment is written before the second part fails.
             $mail = @('Content-Type: multipart/mixed; boundary=B', '', '--B',
@@ -43,11 +47,12 @@ function Invoke-Curl {
                 'Content-Transfer-Encoding: base64', '', 'QUJD', '--B',
                 'Content-Type: application/octet-stream; name=bad.bin',
                 'Content-Transfer-Encoding: base64', '', 'A%%%', '--B--')
-            [IO.File]::WriteAllText($path, ($mail -join "`r`n"))
+            [IO.File]::WriteAllBytes($path, $script:parseBytes)
         }
     }
 }
-foreach ($scenario in 'transfer','empty','size','parse') {
+foreach ($scenario in 'transfer','empty','size','parse','mismatch') {
+    $script:parseBytes = [Text.Encoding]::ASCII.GetBytes((@('Content-Type: application/octet-stream', 'Content-Transfer-Encoding: base64', '', 'A%%%') -join "`r`n"))
     $script:scenario = $scenario
     $script:cleanupLog = @()
     $Policy = @{ WorkDir = (Join-Path $fixtureRoot $scenario) }
@@ -64,7 +69,7 @@ foreach ($scenario in 'transfer','empty','size','parse') {
     $failed = $false
     try { Invoke-Fetch '1' '123' } catch { $failed = $true; $failure = $_.Exception.Message }
     if (-not $failed) { throw "Expected failure: $scenario" }
-    $expected = @{ transfer = 'Simulated transfer failure'; empty = 'NOMAIL:*'; size = 'SIZE:*'; parse = 'PARSE:*' }
+    $expected = @{ transfer = 'Simulated transfer failure'; empty = 'NOMAIL:*'; size = 'SIZE:*'; parse = 'PARSE:*'; mismatch = 'SIZE:*' }
     if ($failure -notlike $expected[$scenario]) { throw "Wrong failure in ${scenario}: $failure" }
     if ($script:cleanupLog.Count) { throw "Cleanup error: $($script:cleanupLog -join ';')" }
     foreach ($sentinel in $sentinels) {

@@ -296,7 +296,7 @@ $r = Parse 'long-line.eml'
 $lines = [IO.File]::ReadAllLines((Join-Path $r.Dir 'body.txt'), $Cp)
 Check 'lines 250' ($lines.Count -eq 3 -and $lines[0].Length -eq 250 -and $lines[2].Length -eq 100) ($lines | ForEach-Object Length)
 
-foreach ($invalid in 'invalid-base64.eml', 'invalid-quoted-printable.eml', 'unsupported-transfer.eml', 'encoded-multipart.eml', 'missing-boundary.eml', 'too-deep.eml', 'too-many-parts.eml') {
+foreach ($invalid in 'invalid-base64.eml', 'unsupported-transfer.eml', 'encoded-multipart.eml', 'missing-boundary.eml', 'too-deep.eml', 'too-many-parts.eml') {
     Write-Host $invalid
     $r = Parse $invalid
     Check 'malformed MIME rejected' ($r.Exit -ne 0 -and $r.Last -like 'ERR PARSE *') $r.Last
@@ -323,11 +323,11 @@ foreach ($mail in 'plain-utf8', 'multipart', 'unicode-name') {
 }
 Write-Host 'long-header'
 $r = Parse 'long-header.eml'
-Check 'oversize header fails explicitly' ($r.Exit -ne 0 -and $r.Last -like 'ERR PARSE *') $r.Last
-Check 'oversize header has no ready flag' (-not (Test-Path (Join-Path $r.Dir 'ready.flg'))) ''
+Check 'long display header accepted' ($r.Exit -eq 0) $r.Last
+Check 'long header display bounded' ($r.Header.SUBJECT.Length -le 247) $r.Header.SUBJECT.Length
 $r = Parse 'long-attachment.eml'
-Check 'oversize metadata fails explicitly' ($r.Exit -ne 0 -and $r.Last -like 'ERR PARSE *') $r.Last
-Check 'oversize metadata has no ready flag' (-not (Test-Path (Join-Path $r.Dir 'ready.flg'))) ''
+Check 'long attachment display accepted' ($r.Exit -eq 0) $r.Last
+Check 'long attachment extension retained' ($r.Att[0].Length -le 255 -and $r.Att[0].EndsWith('.pdf')) $r.Att[0]
 Write-Host 'unicode-width'
 $r = Parse 'unicode-width.eml' 65001
 Check 'UTF-8 result OK' ($r.Exit -eq 0 -and $r.Last -eq 'OK') $r.Last
@@ -367,6 +367,21 @@ Check 'existing output rejected' ($LASTEXITCODE -ne 0 -and @($res)[-1] -like 'ER
 Check 'existing file retained unchanged' ((Test-Path -LiteralPath $sentinel) -and (Get-FileHash -LiteralPath $sentinel -Algorithm SHA256).Hash -eq $sentinelHash) ''
 Check 'existing directory receives no parser output' (@(Get-ChildItem -LiteralPath $existingOutput).Count -eq 1) ''
 
+Write-Host 'lossy display and tolerant MIME'
+$display = ([char]::ConvertFromUtf32(0x1F600)) + (U '{20ba}{0416}')
+Save-Eml 'replacement.eml' @('Content-Type: text/plain; charset=utf-8',
+    ('Subject: =?utf-8?B?' + (B64 $display 'utf-8') + '?='), '', (Raw $display 'utf-8'))
+$r = Parse 'replacement.eml'
+Check 'unrepresentable display accepted' ($r.Exit -eq 0 -and $r.Header.SUBJECT.Contains('?')) $r.Last
+Save-Eml 'recipients.eml' @(('To: ' + ((1..10 | ForEach-Object { 'long-recipient-number-' + $_ + '@example.invalid' }) -join ', ')), '', 'body')
+$r = Parse 'recipients.eml'
+Check 'ten recipients accepted and bounded' ($r.Exit -eq 0 -and $r.Header.TO.Length -le 252) $r.Last
+$r = Parse 'invalid-quoted-printable.eml'
+Check 'malformed quoted printable retained literally' ($r.Exit -eq 0) $r.Last
+Save-Eml 'wrong-charset.eml' @('Content-Type: text/plain; charset=unknown-vendor-charset', '', 'plain fallback')
+$r = Parse 'wrong-charset.eml'
+Check 'unknown charset falls back' ($r.Exit -eq 0 -and $r.Body.Contains('plain fallback')) $r.Last
+
 Write-Host 'arguments'
 $res = & $Shell -NoProfile -ExecutionPolicy Bypass -File $imap fetch 'TST_001_DEMO' 'abc' '1' '0000000001'
 Check 'invalid uid rejected' (@($res)[-1] -like 'ERR ARG *') (@($res)[-1])
@@ -383,6 +398,9 @@ foreach ($bad in @(
     $res = & $Shell -NoProfile -ExecutionPolicy Bypass -File $imap @bad
     Check ('invalid command rejected: ' + ($bad -join ' ')) ($LASTEXITCODE -ne 0 -and @($res)[-1] -like 'ERR ARG *') (@($res)[-1])
 }
+
+& $Shell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'test-codepage-retention.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Codepage/retention tests failed' }
 
 Write-Host ''
 if ($script:fail -eq 0) { Write-Host 'ALL TESTS PASSED' -ForegroundColor Green; exit 0 }

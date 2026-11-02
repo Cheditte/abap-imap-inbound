@@ -20,7 +20,7 @@ On Windows, also run the parser tests with Windows PowerShell 5.1 when changing 
 powershell.exe -NoProfile -File test/run-tests.ps1 -Shell powershell.exe
 ```
 
-Tests create isolated fixtures under `work/`. Keep real mail and credentials out of the repository and test fixtures. ABAP source remains ASCII, at most 72 columns, with legacy syntax. The pinned abaplint 7.02 grammar check does not certify 4.6C or non-Unicode runtime compatibility.
+Tests create isolated fixtures under `work/`. Keep real mail and credentials out of the repository and test fixtures. ABAP source remains ASCII, at most 255 columns, with classic ABAP 7.00 syntax. The pinned abaplint 7.00 syntax check does not certify 7.00 or non-Unicode runtime compatibility.
 
 ## IMAP integration tests
 
