@@ -2,7 +2,7 @@
 
 > [English](../TECHNICAL-REFERENCE.md) | **Türkçe** · [Projeyi tanıyın](../../README.tr.md) · [Kurulum](WALKTHROUGH.md) · [Kod örnekleri](TECHNICAL-GUIDE.md)
 
-Bu dosya, kurulumu hazırlayan Basis ve e-posta ekipleri ile ayrıntıları incelemek isteyen geliştiriciler içindir. **0.9.2 kaynaklarını ve betik protokolü 2'yi** anlatır. Sırayla kurulum yapmak için [adım adım rehberi](WALKTHROUGH.md), kendi iş mantığınızı eklemek için [geliştirici rehberini](TECHNICAL-GUIDE.md) kullanın.
+Bu dosya, kurulumu hazırlayan Basis ve e-posta ekipleri ile ayrıntıları incelemek isteyen geliştiriciler içindir. **0.9.3 kaynaklarını ve betik protokolü 2'yi** anlatır. Sırayla kurulum yapmak için [adım adım rehberi](WALKTHROUGH.md), kendi iş mantığınızı eklemek için [geliştirici rehberini](TECHNICAL-GUIDE.md) kullanın.
 
 SAP adımlarında okuyucunun SE38 ile program oluşturup etkinleştirebildiği ve çalıştırabildiği varsayılır. Bu rehberde **Basis / sunucu yöneticisi**, sunucunun yönetim sorumluluğunu üstlenen kişi veya ekibi ifade eder; gerekli yetkilere sahipseniz bu kişi siz olabilirsiniz. Posta yönetimi için de aynı ayrım geçerlidir. [Yetkiler sizdeyse hazırlık adımları](SELF-MANAGED-SETUP.md).
 
@@ -222,7 +222,7 @@ Varsayılan kök klasör `C:\sapimap`. Yukarıdaki blok klasör yolunu ayrıca s
 }
 ```
 
-Başarılı çıktı `PROTOCOL 2`, `VERSION 0.9.2` ve seçilen kökü belirtir; `OK` ile biter. Yönetici hesabıyla bu test yararlıdır; ileride SAP kurulum programının testi gerçek SAP çalışma hesabıyla da geçmelidir.
+Başarılı çıktı `PROTOCOL 2`, `VERSION 0.9.3` ve seçilen kökü belirtir; `OK` ile biter. Yönetici hesabıyla bu test yararlıdır; ileride SAP kurulum programının testi gerçek SAP çalışma hesabıyla da geçmelidir.
 
 ### Linux
 
@@ -255,7 +255,7 @@ Seçilen kökü SAP'nin çalışma kullanıcısıyla test edin. İki soruya önc
 }
 ```
 
-Çıktı protokol `2`, sürüm `0.9.2` ve seçilen kökü belirtip `OK` ile bitmelidir. Bu yerel ön koşulları kontrol eder; SAP kurulumu ve posta bağlantısı sonraki adımlardadır.
+Çıktı protokol `2`, sürüm `0.9.3` ve seçilen kökü belirtip `OK` ile bitmelidir. Bu yerel ön koşulları kontrol eder; SAP kurulumu ve posta bağlantısı sonraki adımlardadır.
 
 ### Sertifika ve danışmana teslim
 
@@ -392,7 +392,7 @@ Bu isteğe bağlı bölüm Basis/geliştirme ekibinin teşhisi içindir; canlı 
 4. Sunucuyu, rolleri ve profilleri kontrol edin. Profilleri tekrar kaydedip `S` parolalarını yeniden girin. `O` parolalarını tam `SID_MANDANT_PROFIL` anahtarıyla oluşturun.
 5. Sunucu, bağlantı, salt okunur liste, normal demo, hata/tekrar deneme ve bekleyen taşıma kurtarma kontrollerini yapın. Job kullanıcısı ve iş handler'ını doğrulayıp job'ları yeniden açın.
 
-**0.9.x içinde** (örneğin 0.9.1'den 0.9.2'ye) protokol ve saklama biçimi değişmez. 1–3. adımlardan sonra SE38'de `ZCHE_IMAP_INSTALL` kaynağını yeni dosyayla değiştirip etkinleştirin; **Programs**, **Overwrite existing programs (update)** ve **Server check** seçili çalıştırın. **Overwrite** seçilmezse programlar farklı olduğu için kurulum durur. Yeniden çalıştırma mevcut handler önekini ve deneme sınırını korur.
+**0.9.x içinde** (örneğin 0.9.2'den 0.9.3'e) protokol ve saklama biçimi değişmez. 1–3. adımlardan sonra SE38'de `ZCHE_IMAP_INSTALL` kaynağını yeni dosyayla değiştirip etkinleştirin; **Programs**, **Overwrite existing programs (update)** ve **Server check** seçili çalıştırın. **Overwrite** seçilmezse programlar farklı olduğu için kurulum durur. Yeniden çalıştırma mevcut handler önekini ve deneme sınırını korur.
 
 Posta geçmişi olan profil başka kutuya yönlendirilemez veya silinemez. Posta kimliği değişecekse profili pasifleştirip yenisini oluşturun.
 

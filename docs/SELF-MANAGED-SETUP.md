@@ -123,7 +123,7 @@ Follow the instructions for your operating system:
 - [Windows server setup block and self-test](TECHNICAL-REFERENCE.md#windows)
 - [Linux server setup block and self-test](TECHNICAL-REFERENCE.md#linux)
 
-The blocks ask for the actual IMAP server, SAP service account and chosen working folder. They prepare protected folders and permissions and deploy both `imap.ps1` and `mime.ps1`. Confirm that the self-test ends in `OK` and reports protocol `2` and version `0.9.2`. Record the full working-folder path; use the same path in the SAP installer.
+The blocks ask for the actual IMAP server, SAP service account and chosen working folder. They prepare protected folders and permissions and deploy both `imap.ps1` and `mime.ps1`. Confirm that the self-test ends in `OK` and reports protocol `2` and version `0.9.3`. Record the full working-folder path; use the same path in the SAP installer.
 
 The mail server must be reachable **from the SAP machine**. For certificate errors, correct the actual hostname and trusted certificates; keep certificate verification enabled.
 

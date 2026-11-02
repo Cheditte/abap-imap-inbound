@@ -49,7 +49,7 @@ Normal processing may mark mail as read and move it. Start with **a test SAP sys
 
 ## Status and details
 
-**Published version: [v0.9.2 — release candidate](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.2).** An A4H/001 installation attempt on 3 November 2026 stopped while creating the profile table: its 17-character name exceeds the ABAP Dictionary limit of 16. Do not use this release for a new installation. A corrected installer is awaiting SAP verification; the earlier mail and attachment screenshots belong to the older `ZIMAP_` edition. Classic ABAP 7.00 compatibility remains a target, not an ECC runtime certification. [Validation record](VALIDATION.md).
+**Current version: [v0.9.3](https://github.com/Cheditte/abap-imap-inbound/releases/tag/v0.9.3).** Installed and run end to end on SAP ABAP Platform 2025 (SAP_BASIS 816, Linux, Unicode) with a GreenMail test mailbox: profile, connection test, list only, processing, move and attachments in the monitor. ECC 6.0, Windows hosts and production mail servers are not yet tested; feedback is welcome. [Validation record](VALIDATION.md).
 
 - [Setup and usage](docs/WALKTHROUGH.md) · [Field guide](docs/SCREEN-GUIDE.md)
 - [Preparing the host yourself](docs/SELF-MANAGED-SETUP.md)

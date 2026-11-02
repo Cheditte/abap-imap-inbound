@@ -1,6 +1,6 @@
 * Project: abap-imap-inbound
 *---------------------------------------------------------------
-* ZCHE_IMAP_INSTALL - abap-imap-inbound installer (v0.9.2)
+* ZCHE_IMAP_INSTALL - abap-imap-inbound installer (v0.9.3)
 *
 * Usage: in SE38 create an executable program named ZCHE_IMAP_INSTALL
 * (local object, $TMP), paste this whole file, activate it and
@@ -107,7 +107,7 @@ DATA: gt_src    TYPE STANDARD TABLE OF abapsource,
       gv_newinb(1) TYPE c,
       gv_same   TYPE i.
 
-CONSTANTS gc_version(10) TYPE c VALUE '0.9.2'.
+CONSTANTS gc_version(10) TYPE c VALUE '0.9.3'.
 
 * Embedded source lines: src adds a new line, cnt continues the
 * last line (for lines longer than 72 characters). def adds a
@@ -2379,7 +2379,7 @@ FORM fill_common.
   src 'TYPES: ty_t_uid TYPE STANDARD TABLE OF ty_uid'.
   src '                WITH DEFAULT KEY.'.
   src ''.
-  src 'CONSTANTS: gc_version(10) TYPE c VALUE ''0.9.2''.'.
+  src 'CONSTANTS: gc_version(10) TYPE c VALUE ''0.9.3''.'.
   src ''.
   src 'DATA: gv_root(200)  TYPE c,'.
   src '      gv_sep(1)     TYPE c,'.
@@ -2681,7 +2681,7 @@ FORM fill_common.
   src '  ENDIF.'.
   src '  IF NOT cv_ok IS INITIAL AND lv_protocol <> 1.'.
   src '    CLEAR cv_ok.'.
-  src '    cv_msg = ''ERR CFG Script protocol mismatch; install v0.9.2'.
+  src '    cv_msg = ''ERR CFG Script protocol mismatch; install v0.9.3'.
   cnt '''.'.
   src '  ENDIF.'.
   src 'ENDFORM.'.

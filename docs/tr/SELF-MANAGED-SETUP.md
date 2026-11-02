@@ -123,7 +123,7 @@ Ardından işletim sisteminize uygun adımları uygulayın:
 - [Windows sunucu kurulum bloğu ve öz test](TECHNICAL-REFERENCE.md#windows)
 - [Linux sunucu kurulum bloğu ve öz test](TECHNICAL-REFERENCE.md#linux)
 
-Bu bloklar gerçek IMAP sunucusunu, SAP servis hesabını ve seçtiğiniz çalışma klasörünü sorar. Korunan klasörleri ve dosya izinlerini hazırlar; `imap.ps1` ile `mime.ps1` dosyalarını birlikte yerleştirir. Öz testin `OK` ile bittiğini, protokol `2` ve sürüm `0.9.2` bildirdiğini kontrol edin. Kullanılan klasörün tam yolunu kaydedin; SAP kurulum ekranında da aynısını kullanacaksınız.
+Bu bloklar gerçek IMAP sunucusunu, SAP servis hesabını ve seçtiğiniz çalışma klasörünü sorar. Korunan klasörleri ve dosya izinlerini hazırlar; `imap.ps1` ile `mime.ps1` dosyalarını birlikte yerleştirir. Öz testin `OK` ile bittiğini, protokol `2` ve sürüm `0.9.3` bildirdiğini kontrol edin. Kullanılan klasörün tam yolunu kaydedin; SAP kurulum ekranında da aynısını kullanacaksınız.
 
 Posta sunucusuna bağlantı **SAP makinesinden** kurulabilmelidir. Sertifika hatası varsa gerçek sunucu adını ve güvenilen sertifikaları düzeltin; sertifika doğrulamasını kapatmayın.
 

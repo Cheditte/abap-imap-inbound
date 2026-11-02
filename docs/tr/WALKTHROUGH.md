@@ -18,7 +18,7 @@ Bu rehberde önce posta hesabını, SAP sunucusunu ve SAP programlarını hazır
 | Kendi iş adımımı eklemek | [Geliştirici rehberi](TECHNICAL-GUIDE.md) | Hazır örnek yerine kendi doğrulanmış ABAP işleminiz kullanılır. |
 | Otomatik çalıştırmak | [Yol C — Varyant ve job](#otomatik) | Doğru sunucuda çalışan işin log ve spool'u incelenir. |
 
-Rehber `v0.9.2` sürüm adayını anlatır. **Bu sürümün release dosyasıyla yeni kuruluma başlamayın:** profil tablosunun adı ABAP Dictionary sınırını aştığı için kurulum SAP'de duruyor. Düzeltilmiş kurucu SAP doğrulamasını bekliyor. [Doğrulama kaydı](../../VALIDATION.md).
+Rehber `v0.9.3` sürümünü anlatır. [Doğrulama kaydı](../../VALIDATION.md).
 
 SAP ekran örneklerinde menüler İngilizcedir; adımlarda Türkçe karşılıkları da verilir. Görseller SE38 ve SM36 hazırlık ekranlarını gösterir. [Görsellerin kapsamı](../screenshots/README.md).
 
@@ -61,7 +61,7 @@ SE38'de program oluşturup etkinleştirebilen bir SAP geliştiricisi olduğunuz 
 
 Yönetim yetkiniz varsa [RDP/SSH ve dosya aktarımı rehberini](SELF-MANAGED-SETUP.md) izleyin. Başka ekip hazırlayacaksa tabloyu onlara iletin. [Windows](TECHNICAL-REFERENCE.md#windows) veya [Linux kurulum komutlarını](TECHNICAL-REFERENCE.md#linux) SAP makinesinde çalıştırın.
 
-**Devam koşulu:** Sunucu kontrolü `PROTOCOL 2`, `VERSION 0.9.2` ve doğru klasörü gösterip `OK` ile bitmeli. Kullanılacak **SAP uygulama sunucusunu ve tam çalışma klasörü yolunu** not edin. Sonraki adımlarda aynı sunucuyu kullanın.
+**Devam koşulu:** Sunucu kontrolü `PROTOCOL 2`, `VERSION 0.9.3` ve doğru klasörü gösterip `OK` ile bitmeli. Kullanılacak **SAP uygulama sunucusunu ve tam çalışma klasörü yolunu** not edin. Sonraki adımlarda aynı sunucuyu kullanın.
 
 <a id="kurulum"></a>
 ## 3. SAP ERP içindeki kurulumu yapın
@@ -213,7 +213,7 @@ Bu kontrolü gerçek job kullanıcısı ve seçilen sunucuda tamamladıktan sonr
 
 İlk kurulum adımlarını doğrudan tekrar etmeyin. İşleri durdurup [güncelleme prosedürünü](TECHNICAL-REFERENCE.md#8-mevcut-kurulumu-güncelleyin) izleyin.
 
-`0.9.0 / 0.9.1 → 0.9.2` için SAP'deki installer kaynağını güncel dosyayla değiştirip etkinleştirin; sunucudaki iki betiği aynı sürüme güncelleyin. Yedekleme ve inceleme sonrasında **Programs + Overwrite existing programs (update) + Server check** seçin; gereken SM69/DDIC adımlarını mevcut kurulumunuza göre değerlendirin. Overwrite yerel kaynak değişikliklerini değiştirebilir. Sunucu kontrolü ve profil kontrolü başarılı olmadan işleri yeniden açmayın.
+`0.9.x → 0.9.3` için SAP'deki installer kaynağını güncel dosyayla değiştirip etkinleştirin; sunucudaki iki betiği aynı sürüme güncelleyin. Yedekleme ve inceleme sonrasında **Programs + Overwrite existing programs (update) + Server check** seçin; gereken SM69/DDIC adımlarını mevcut kurulumunuza göre değerlendirin. Overwrite yerel kaynak değişikliklerini değiştirebilir. Sunucu kontrolü ve profil kontrolü başarılı olmadan işleri yeniden açmayın.
 
 Eski `ZIMAP_` ve yeni `ZCHE_IMAP_` işleri aynı kutuyu birlikte işlememeli; eski geçmişin otomatik taşındığını varsaymayın.
 
