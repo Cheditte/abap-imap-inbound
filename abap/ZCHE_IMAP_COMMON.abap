@@ -484,7 +484,7 @@ FORM show_msg USING iv_type TYPE c
                lv_text+150(50).
 ENDFORM.
 
-* Both the configuration UI and processor enforce this server-owned prefix.
+* Configuration and processing both enforce this server-owned prefix.
 FORM handler_allowed USING iv_prog TYPE c iv_form TYPE c
                      CHANGING cv_ok TYPE c.
   DATA: lv_prefix(255) TYPE c, lv_pattern(256) TYPE c,
@@ -524,7 +524,7 @@ FORM profile_auth USING iv_prof TYPE c iv_activity TYPE c
   ENDIF.
 ENDFORM.
 
-FORM list_arguments USING iv_key TYPE c iv_revision TYPE c
+FORM list_arguments USING iv_key TYPE c iv_revision TYPE clike
                           iv_test TYPE c CHANGING cv_args TYPE c.
   CONCATENATE iv_key iv_revision INTO cv_args SEPARATED BY space.
   IF iv_test IS INITIAL.

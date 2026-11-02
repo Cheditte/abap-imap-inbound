@@ -55,7 +55,7 @@ SE38'de program oluşturup etkinleştirebilen bir SAP geliştiricisi olduğunuz 
 | Hazırlık | Ne işe yarar? | Beklenen çıktı |
 |---|---|---|
 | PowerShell | Projenin sunucu komutlarını çalıştırır. | Windows'ta 5.1; Linux'ta 7.4+ hazır. |
-| curl | Posta sunucusuna şifreli IMAP bağlantısı kurar. | Sürüm 8.0.0+ ve `imaps` desteği. |
+| curl | Posta sunucusuna şifreli IMAP bağlantısı kurar. | Sürüm 7.66.0+ ve `imaps` desteği. |
 | Proje dosyaları ve klasör | Mail, ek ve bağlantı dosyalarını tutar. | İki betik aynı sürümde; klasör ve dosya izinleri hazırlanmış. |
 | Ağ ve sertifika | SAP sunucusunun posta hizmetine erişmesini sağlar. | Gerçek posta adresine/portuna erişim; sertifika güveni hazır. |
 

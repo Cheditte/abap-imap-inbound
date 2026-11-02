@@ -1782,7 +1782,19 @@ FORM create_command USING iv_name   TYPE c
     ENDIF.
   ENDIF.
   CONCATENATE lv_script 'bin' lv_sep 'imap.ps1' INTO lv_script.
-  CONCATENATE '"' lv_script '"' INTO lv_quoted.
+* SAPXPG passes Unix parameters without a shell, so quotes would
+* reach pwsh literally. Quote only on Windows; no spaces on Unix.
+  IF lv_sep = '/'.
+    lv_len = STRLEN( lv_script ).
+    IF lv_script(lv_len) CA ' '.
+      WRITE: / 'Server folder must not contain spaces on Unix.'.
+      gv_err = 'X'.
+      EXIT.
+    ENDIF.
+    lv_quoted = lv_script.
+  ELSE.
+    CONCATENATE '"' lv_script '"' INTO lv_quoted.
+  ENDIF.
 * Reserve the largest valid additional argument block (61 chars)
 * in the old SXPG 128-character combined parameter limit.
   lv_len = STRLEN( iv_pre ) + STRLEN( lv_quoted ) +
@@ -2863,8 +2875,8 @@ FORM fill_common.
   src '               lv_text+150(50).'.
   src 'ENDFORM.'.
   src ''.
-  src '* Both the configuration UI and processor enforce this server-o'.
-  cnt 'wned prefix.'.
+  src '* Configuration and processing both enforce this server-owned p'.
+  cnt 'refix.'.
   src 'FORM handler_allowed USING iv_prog TYPE c iv_form TYPE c'.
   src '                     CHANGING cv_ok TYPE c.'.
   src '  DATA: lv_prefix(255) TYPE c, lv_pattern(256) TYPE c,'.
@@ -2906,7 +2918,7 @@ FORM fill_common.
   src '  ENDIF.'.
   src 'ENDFORM.'.
   src ''.
-  src 'FORM list_arguments USING iv_key TYPE c iv_revision TYPE c'.
+  src 'FORM list_arguments USING iv_key TYPE c iv_revision TYPE clike'.
   src '                          iv_test TYPE c CHANGING cv_args TYPE'.
   cnt ' c.'.
   src '  CONCATENATE iv_key iv_revision INTO cv_args SEPARATED BY spac'.
@@ -3249,8 +3261,8 @@ FORM fill_inbound.
   src '  SELECT * FROM zche_imap_prof INTO TABLE lt_prof'.
   src '    WHERE profile IN s_prof AND active = ''X''.'.
   src '  IF sy-subrc <> 0.'.
-  src '    WRITE: / ''No active profile. Define a profile with ZCHE_IM'.
-  cnt 'AP_CONFIG.''.'.
+  src '    WRITE: / ''No active profile.'','.
+  src '             ''Define a profile with ZCHE_IMAP_CONFIG.''.'.
   src '    EXIT.'.
   src '  ENDIF.'.
   src ''.

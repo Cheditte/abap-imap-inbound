@@ -189,7 +189,7 @@ Bağlantıyı o sunucudan kontrol edin. Windows örneği:
 
 ### Windows
 
-Windows PowerShell 5.1 ve `curl.exe --version` çıktısında `imaps` bulunan **curl 8.0.0 veya üzeri** gerekir. Eski Windows sürümlerindeki `curl.exe` daha eskidir; güncel bir curl kurup yolunu `-CurlPath` ile verin. curl 8'den eskiyse kurulum anlaşılır bir mesajla durur. Windows PowerShell'de `curl.exe` yazın; `curl` başka bir komutu ifade edebilir.
+Windows PowerShell 5.1 ve `curl.exe --version` çıktısında `imaps` bulunan **curl 7.66.0 veya üzeri** gerekir. Windows Server 2019'daki `curl.exe` daha eskidir (7.55); güncel bir curl kurup yolunu `-CurlPath` ile verin. curl 7.66'dan eskiyse kurulum anlaşılır bir mesajla durur. Windows PowerShell'de `curl.exe` yazın; `curl` başka bir komutu ifade edebilir.
 
 Depo klasöründen, yönetici PowerShell oturumunda aşağıdaki bloğu çalıştırın. Sorulduğunda posta ekibinin IMAP sunucusunu, Basis'in doğruladığı Windows SAP hesabını ve tam çalışma klasörünü girin. Boş yanıtla kurulum başlamaz.
 
@@ -226,7 +226,7 @@ Başarılı çıktı `PROTOCOL 2`, `VERSION 0.9.2` ve seçilen kökü belirtir; 
 
 ### Linux
 
-PowerShell (`pwsh`) ve IMAPS destekli **curl 8.0.0 veya üzeri** kurun. Birçok SAP Linux sürümünde `/usr/bin` altındaki curl 7.x'tir; daha yeni bir curl kurup kuruluma `--curl-path /tam/yol/curl` verin, kurulum bunu `bin/policy.psd1` dosyasına yazar. curl 8'den eskiyse kurulum anlaşılır bir mesajla durur. Oluşturulan SM69 komutu `/usr/bin/pwsh` bekler. SAP'nin gerçek çalışma kullanıcısını doğrulayın; `a4hadm` örnektir.
+PowerShell (`pwsh`) ve IMAPS destekli **curl 7.66.0 veya üzeri** kurun; SLES 15'te `/usr/bin` altında bulunur. Başka bir curl için kuruluma `--curl-path /tam/yol/curl` verin, kurulum bunu `bin/policy.psd1` dosyasına yazar. curl 7.66'dan eskiyse kurulum anlaşılır bir mesajla durur. Oluşturulan SM69 komutu `/usr/bin/pwsh` bekler. SAP'nin gerçek çalışma kullanıcısını doğrulayın; `a4hadm` örnektir.
 
 Depo klasöründen Bash içinde aşağıdaki bloğu çalıştırın. Sunucu adı posta ekibinden, Linux SAP kullanıcısı ve tam çalışma klasörü Basis'ten alınır; her soruya kendi değerinizle yanıt verin.
 

@@ -55,7 +55,7 @@ In the [repository](https://github.com/Cheditte/abap-imap-inbound), choose **Cod
 | Preparation | Purpose | Expected output |
 |---|---|---|
 | PowerShell | Runs the project's host commands. | Windows PowerShell 5.1; Linux PowerShell 7.4+. |
-| curl | Connects to the mail server using encrypted IMAP. | Version 8.0.0+ with `imaps` support. |
+| curl | Connects to the mail server using encrypted IMAP. | Version 7.66.0+ with `imaps` support. |
 | Project files and folder | Holds mail, attachments and connection files. | Matching script versions and protected directories. |
 | Network and certificates | Allows the SAP host to reach the mail service. | Actual mail endpoint/port reachable; certificate trust prepared. |
 

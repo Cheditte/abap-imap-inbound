@@ -14,7 +14,8 @@ Earlier code reviews found two defects: in 0.9.0 the installer never wrote the h
 | Windows PowerShell 5.1 and 7 | Parser, codepage and retention regressions; Windows CI | 2026-11-02 | Passed for 0.9.2. |
 | Linux helper | Linux CI + disposable GreenMail 2.1.14 | 2026-11-02 | Passed for 0.9.2. |
 | Earlier edition in SAP | A4H (SAP_BASIS 7.58), `ZIMAP_` objects before the rename | before 2026-11-02 | Owner processed mail, viewed it in the monitor and opened attachments. Does not cover the 0.9.x changes. |
-| Old curl 7.55.1 | Unsupported | 2026-11-02 | Rejected by the version check; setup requires curl 8.0.0 or newer. |
+| curl 7.66.0 on SLES 15 | A4H host (PowerShell 7.4.6) + GreenMail 2.1.14 | 2026-11-03 | IMAP test suite passed: list, nonconsecutive UIDs, size limit, bad MIME, cleanup, TLS policy. 7.66.0 is the minimum. |
+| Old curl 7.55.1 | Unsupported | 2026-11-02 | Rejected by the version check. |
 
 The DDIC fixtures are development-only and must never be installed into SAP. Real authorization enforcement, database LUWs, installer APIs and file permissions still require SAP acceptance before production use.
 

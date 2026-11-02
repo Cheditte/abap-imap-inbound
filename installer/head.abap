@@ -1782,7 +1782,19 @@ FORM create_command USING iv_name   TYPE c
     ENDIF.
   ENDIF.
   CONCATENATE lv_script 'bin' lv_sep 'imap.ps1' INTO lv_script.
-  CONCATENATE '"' lv_script '"' INTO lv_quoted.
+* SAPXPG passes Unix parameters without a shell, so quotes would
+* reach pwsh literally. Quote only on Windows; no spaces on Unix.
+  IF lv_sep = '/'.
+    lv_len = STRLEN( lv_script ).
+    IF lv_script(lv_len) CA ' '.
+      WRITE: / 'Server folder must not contain spaces on Unix.'.
+      gv_err = 'X'.
+      EXIT.
+    ENDIF.
+    lv_quoted = lv_script.
+  ELSE.
+    CONCATENATE '"' lv_script '"' INTO lv_quoted.
+  ENDIF.
 * Reserve the largest valid additional argument block (61 chars)
 * in the old SXPG 128-character combined parameter limit.
   lv_len = STRLEN( iv_pre ) + STRLEN( lv_quoted ) +

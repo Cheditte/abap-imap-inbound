@@ -59,7 +59,8 @@ FORM main.
   SELECT * FROM zche_imap_prof INTO TABLE lt_prof
     WHERE profile IN s_prof AND active = 'X'.
   IF sy-subrc <> 0.
-    WRITE: / 'No active profile. Define a profile with ZCHE_IMAP_CONFIG.'.
+    WRITE: / 'No active profile.',
+             'Define a profile with ZCHE_IMAP_CONFIG.'.
     EXIT.
   ENDIF.
 

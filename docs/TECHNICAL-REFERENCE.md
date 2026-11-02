@@ -189,7 +189,7 @@ Check connectivity from that server. On Windows, for example:
 
 ### Windows
 
-Use Windows PowerShell 5.1 and **curl 8.0.0 or newer** whose `curl.exe --version` output includes `imaps`. Older Windows releases ship an older `curl.exe`; install a current build and pass its path with `-CurlPath`. Setup stops with a clear message if curl is older than 8. In Windows PowerShell, use `curl.exe`: `curl` can mean a different command.
+Use Windows PowerShell 5.1 and **curl 7.66.0 or newer** whose `curl.exe --version` output includes `imaps`. Windows Server 2019 ships an older `curl.exe` (7.55); install a current build and pass its path with `-CurlPath`. Setup stops with a clear message if curl is older than 7.66. In Windows PowerShell, use `curl.exe`: `curl` can mean a different command.
 
 Run this block from the repository folder in an administrator PowerShell session. At the prompts, enter the mail team's IMAP hostname and the Windows SAP account and full working folder confirmed by Basis. Blank answers stop setup.
 
@@ -226,7 +226,7 @@ Success identifies `PROTOCOL 2`, `VERSION 0.9.2` and the chosen root, then ends 
 
 ### Linux
 
-Install PowerShell (`pwsh`) and **curl 8.0.0 or newer** with IMAPS support. Many SAP Linux releases ship curl 7.x in `/usr/bin`; install a newer curl and pass `--curl-path /full/path/to/curl` to setup, which writes it to `bin/policy.psd1`. Setup stops with a clear message if curl is older than 8. The generated SM69 command expects `/usr/bin/pwsh`. Confirm the actual SAP execution user; `a4hadm` is an example.
+Install PowerShell (`pwsh`) and **curl 7.66.0 or newer** with IMAPS support; SLES 15 provides it in `/usr/bin`. For another curl, pass `--curl-path /full/path/to/curl` to setup, which writes it to `bin/policy.psd1`. Setup stops with a clear message if curl is older than 7.66. The generated SM69 command expects `/usr/bin/pwsh`. Confirm the actual SAP execution user; `a4hadm` is an example.
 
 Run this block in Bash from the repository folder. Obtain the hostname from the mail team and the Linux SAP execution user and full working folder from Basis; enter your own values at each prompt.
 

@@ -135,7 +135,8 @@ function Read-Policy {
     $versionLines = @(& $p.CurlPath --version)
     $versionText = $versionLines[0]
     if ($LASTEXITCODE -ne 0 -or $versionText -notmatch '^curl ([0-9]+)\.([0-9]+)\.') { throw 'CFG: cannot determine curl version' }
-    if ([int]$Matches[1] -lt 8) { throw 'CFG: curl 8.0.0 or newer is required' }
+    # 7.66 is the oldest release tested with the GreenMail suite (SLES 15).
+    if ([version]"$($Matches[1]).$($Matches[2])" -lt [version]'7.66') { throw 'CFG: curl 7.66.0 or newer is required' }
     $p.AllowedHosts = @($p.AllowedHosts | ForEach-Object { ([string]$_).Trim().ToLowerInvariant() })
     $p
 }
