@@ -2,6 +2,8 @@
 
 > **English** | [Türkçe](tr/WALKTHROUGH.md) · [Overview](../README.md) · [Field guide](SCREEN-GUIDE.md)
 
+Prepare the mailbox, SAP host and SAP programs first. Then open a test email in SAP and, if needed, schedule the same process in the background.
+
 ## Choose your goal first
 
 **List only** shows message identifiers without downloading mail or attachments. **Normal processing** downloads content, runs the selected ABAP handler, and moves successful mail to the destination folder.
@@ -18,6 +20,8 @@
 
 This guide describes the `v0.9.2` release candidate. [Validation record](../VALIDATION.md).
 
+The SAP examples use English menu labels. They show the SE38 and SM36 preparation screens. [Screenshot scope](screenshots/README.md).
+
 <a id="prepare"></a>
 ## Three preparations before you start
 
@@ -33,6 +37,8 @@ In the [repository](https://github.com/Cheditte/abap-imap-inbound), choose **Cod
 
 **Goal:** choose the account SAP will read and two mail folders.
 
+![Source mail folder, processing in SAP and a different destination folder](assets/diagrams/mail-flow-en.svg)
+
 1. Obtain the **actual IMAP hostname, port and security type** from the provider or administrator. Do not enter your email address as the hostname.
 2. Confirm that the account permits IMAP and password/app-password sign-in. A correct password alone may be insufficient. This version does not support Microsoft 365 / Exchange Online or OAuth-only accounts.
 3. Select the source folder. `INBOX` is the default inbox; use the actual IMAP name for another folder.
@@ -43,6 +49,8 @@ In the [repository](https://github.com/Cheditte/abap-imap-inbound), choose **Cod
 ## 2. Prepare the machine running SAP
 
 **Goal:** prepare mail retrieval tools on the Windows/Linux machine running SAP. This can be different from your SAP GUI computer.
+
+![Prepare the tools, project files and protected folder on the SAP host](assets/diagrams/host-prep-en.svg)
 
 | Preparation | Purpose | Expected output |
 |---|---|---|
@@ -63,7 +71,17 @@ If you hold administrator access, follow the [RDP/SSH and file transfer guide](S
 ### 3.1. Create the installer program
 
 1. In **SE38**, enter `ZCHE_IMAP_INSTALL` and choose **Create**.
+
+   ![SE38 initial screen with ZCHE_IMAP_INSTALL and the Create button](screenshots/sap-se38-installer-entry.png)
+
+   **On this screen:** enter the program name, then choose **Create** to open its attributes.
+
 2. Enter a description; choose **Executable program** in **Type**.
+
+   ![Initial program attributes dialog; Title and Type are still empty](screenshots/sap-program-attributes.png)
+
+   **On this screen:** enter a title such as “IMAP installation”, choose **Executable program** in the empty **Type** field, then save. The image shows the dialog before those fields are filled.
+
 3. Use your customer package, for example a package you created as `ZCHE_IMAP`. `$TMP` is for a temporary local trial only.
 4. Replace the starter code with the **entire source** from [the installer file](../ZCHE_IMAP_INSTALL.abap). Do not upload the GitHub page saved as HTML.
 5. Save, check syntax and activate with **Ctrl+F3**.
@@ -130,6 +148,8 @@ For source `O`, the administrator [prepares the host credential](TECHNICAL-REFER
 <a id="first-mail"></a>
 ## Path B — Open the first email and attachment in SAP
 
+![From the mailbox into SAP: read the message and process attachments with your ABAP code](assets/diagrams/usage-en.svg)
+
 ### B1. Process a dedicated test message
 
 1. Send a small PDF/text attachment to the test account. If using another source folder, put the message there.
@@ -172,6 +192,11 @@ In INBOUND, enter your profile, **select List only**, and leave retry cleared. S
 ### C2. Define the job in SM36
 
 1. Open **SM36** and enter an unused job name. `ZCHE_IMAP_LIST_DEMO` in the image is only an example.
+
+   ![Initial SM36 job definition; target, step and start condition are not yet set](screenshots/sap-sm36-job-definition.png)
+
+   **On this screen:** **Job Name** identifies the job, **Target** selects its server, **Step** sets the program/variant, and **Start condition** sets timing. This is an unsaved definition; complete it using the steps below.
+
 2. Use **Job Class C** unless your organization specifies another class.
 3. Set **Target** to the installation's application server. In a multi-server system, do not leave host selection to chance.
 4. Choose **Step → ABAP program**; enter `ZCHE_IMAP_INBOUND` and your list-only variant. Check the execution user and save the step.

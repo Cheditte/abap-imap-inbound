@@ -2,6 +2,8 @@
 
 > [English](../WALKTHROUGH.md) | **Türkçe** · [Proje özeti](../../README.tr.md) · [Alan rehberi](SCREEN-GUIDE.md)
 
+Bu rehberde önce posta hesabını, SAP sunucusunu ve SAP programlarını hazırlayacaksınız. Ardından bir deneme e-postasını SAP içinde açacak; isterseniz aynı işlemi arka planda çalışacak şekilde planlayacaksınız.
+
 ## Önce hedefinizi seçin
 
 **Yalnız listeleme**, ileti numaralarını gösterir; maili veya eki indirmez. **Normal işleme**, içeriği indirir, seçtiğiniz ABAP örneğini çalıştırır ve başarılı maili hedef klasöre taşır.
@@ -18,6 +20,8 @@
 
 Rehber `v0.9.2` sürüm adayını anlatır. [Doğrulama kaydı](../../VALIDATION.md).
 
+SAP ekran örneklerinde menüler İngilizcedir; adımlarda Türkçe karşılıkları da verilir. Görseller SE38 ve SM36 hazırlık ekranlarını gösterir. [Görsellerin kapsamı](../screenshots/README.md).
+
 <a id="hazirlik"></a>
 ## Başlamadan önce üç hazırlık
 
@@ -33,6 +37,8 @@ SE38'de program oluşturup etkinleştirebilen bir SAP geliştiricisi olduğunuz 
 
 **Amaç:** SAP'nin okuyacağı hesabı ve iki posta klasörünü belirlemek.
 
+![Kaynak posta klasörü, SAP içinde işleme ve farklı hedef klasör](../assets/diagrams/mail-flow-tr.svg)
+
 1. Posta sağlayıcısından veya yöneticiden **gerçek IMAP sunucu adı, port ve bağlantı türünü** alın. Sunucu alanına kendi e-posta adresinizi yazmayın.
 2. Hesabın IMAP erişimine ve parola/uygulama şifresiyle girişe izin verdiğini doğrulatın. Doğru parola tek başına yeterli olmayabilir. Bu sürüm Microsoft 365 / Exchange Online veya yalnız OAuth kabul eden hesaplarla çalışmaz.
 3. Okuma klasörünü seçin. Varsayılan `INBOX`, Gelen Kutusu'dur; başka klasör istiyorsanız onun gerçek IMAP adını kullanın.
@@ -43,6 +49,8 @@ SE38'de program oluşturup etkinleştirebilen bir SAP geliştiricisi olduğunuz 
 ## 2. SAP'nin kurulu olduğu makineyi hazırlayın
 
 **Amaç:** Maili getiren araçları SAP'nin çalıştığı Windows/Linux makinesine hazırlamak. SAP GUI'yi açtığınız bilgisayar aynı makine olmayabilir.
+
+![SAP sunucusunda araçları, proje dosyalarını ve korumalı klasörü hazırlayın](../assets/diagrams/host-prep-tr.svg)
 
 | Hazırlık | Ne işe yarar? | Beklenen çıktı |
 |---|---|---|
@@ -63,7 +71,17 @@ Yönetim yetkiniz varsa [RDP/SSH ve dosya aktarımı rehberini](SELF-MANAGED-SET
 ### 3.1. Kurulum programını oluşturun
 
 1. **SE38**'de program adına `ZCHE_IMAP_INSTALL` yazıp **Create / Oluştur** seçin.
+
+   ![SE38 başlangıç ekranında ZCHE_IMAP_INSTALL adı ve Create düğmesi](../screenshots/sap-se38-installer-entry.png)
+
+   **Bu ekranda:** program adını yazdıktan sonra **Create** ile özellikler penceresine geçin.
+
 2. Açıklama girin; **Type / Tür** alanında **Executable program / Çalıştırılabilir program** seçin.
+
+   ![Program özelliklerinin başlangıç penceresi; Title ve Type henüz boş](../screenshots/sap-program-attributes.png)
+
+   **Bu ekranda:** **Title** alanına örneğin “IMAP kurulumu” yazın; boş görünen **Type** alanından **Executable program** seçip kaydedin. Görsel, alanlar doldurulmadan önceki pencereyi gösterir.
+
 3. Kendi müşteri paketinizi kullanın; örneğin önceden oluşturduğunuz `ZCHE_IMAP`. `$TMP` yalnız geçici yerel deneme içindir.
 4. [Installer dosyasının](../../ZCHE_IMAP_INSTALL.abap) **tam kaynak kodunu** başlangıç kodunun yerine koyun. GitHub sayfasını HTML olarak kaydedip yüklemeyin.
 5. Kaydedin, sözdizimini kontrol edin ve **Ctrl+F3** ile etkinleştirin.
@@ -132,6 +150,8 @@ Yetki yönetimi başka ekipteyse bu adımı onlarla yapın. **Devam koşulu:** k
 <a id="ilk-mail"></a>
 ## Yol B — İlk maili ve eki SAP'de açın
 
+![Posta kutusundan SAP'ye: e-postayı okuyun ve ekleri kendi ABAP kodunuzla işleyin](../assets/diagrams/usage-tr.svg)
+
 ### B1. Ayrı bir deneme mailini işleyin
 
 1. Deneme kutusuna küçük bir PDF veya metin eki içeren mail gönderin. Farklı kaynak klasör seçtiyseniz maili oraya koyun.
@@ -174,6 +194,11 @@ INBOUND seçim ekranında kendi profilinizi girin, **List only işaretli** ve re
 ### C2. SM36'da işi tanımlayın
 
 1. **SM36** açın; kullanılmayan bir job adı girin. Görseldeki `ZCHE_IMAP_LIST_DEMO` yalnız örnektir.
+
+   ![SM36 başlangıç ekranında örnek iş adı; hedef, adım ve başlangıç henüz tanımlanmamış](../screenshots/sap-sm36-job-definition.png)
+
+   **Bu ekranda:** **Job Name** işin adı, **Target** çalışacağı sunucu, **Step** program/varyant, **Start condition** başlangıç zamanıdır. Görsel kaydedilmemiş bir tanımı gösterir; kalan alanları aşağıdaki adımlarla tamamlayın.
+
 2. Normal iş için **Job Class C** kullanın; kurumunuzun kuralı varsa onu izleyin.
 3. **Target / Hedef** alanında kurulum yapılan uygulama sunucusunu seçin. Çok sunuculu sistemde boş hedefi rastgele sunucu seçimine bırakmayın.
 4. **Step / Adım → ABAP program:** `ZCHE_IMAP_INBOUND` ve kaydettiğiniz listeleme varyantını girin. Doğru çalışma kullanıcısını kontrol edip adımı kaydedin.
