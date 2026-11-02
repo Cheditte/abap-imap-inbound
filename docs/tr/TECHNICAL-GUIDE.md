@@ -149,10 +149,10 @@ Bu örnek yalnız uygun UID'leri listeler. Bilerek normal işleme için `p_test`
 - SAP nesneleri ve iki sunucu modülünü uyumlu protokol-2 bütünü olarak kurun. Eski arşivler ve güncellemeler için [geçiş adımlarını](TECHNICAL-REFERENCE.md#8-mevcut-kurulumu-güncelleyin) izleyin.
 - Ayar, işleme ve izleme tek sunucuya bağlıdır. Yeni handler'ı uygun `S_DATASET` ve iş yetkisi tasarımına dahil edin. [Rol özetine](TECHNICAL-REFERENCE.md#yetkiler-ve-işletim-sınırları) bakın.
 
-Kaynak modern ABAP sözdiziminden kaçınır, ASCII kullanır ve ABAP satırlarını 72 sütunda sınırlar. Eski SAP uyumluluğu hedeftir; doğrulanmış sürüm sertifikası değildir. Eklemeleri uyumlu tutup gerçek hedef sistemde derleyin.
+Kaynak modern ABAP sözdiziminden kaçınır, ASCII kullanır ve ABAP kaynak satırlarını 255 sütunda (`ABAPSOURCE` genişliği) sınırlar. Oluşturulan kurulum programı kaynakları en çok 72 sütunluk metin parçaları olarak içerir; bu bölmeyi `installer/build.ps1` yapar. Eski SAP uyumluluğu hedeftir; doğrulanmış sürüm sertifikası değildir. Eklemeleri uyumlu tutup gerçek hedef sistemde derleyin.
 
 ## 8. Handler kabul kontrolleri
 
 Ayrılmış deneme kutusu ve hedef SAP sisteminde normal başarıyı, eksik/geçersiz eki, rollback gerektiren iş hatasını, başarısız yerel V1 update'i, yetkili tekrar denemeyi ve handler başarısından sonraki taşıma hatasını deneyin. Kurtarmanın iş belgesini çoğaltmadığını doğrulayın. Zamanlanacak varyantı gerçek kısıtlı job kullanıcısıyla seçili sunucuda çalıştırın.
 
-Kaynak/ayrıştırıcı/IMAP testleri elle çalıştırılır; [CONTRIBUTING.md](../../CONTRIBUTING.md) komutları içerir. Bunlar iş API'nizi çalıştırmaz, SAP derleyicisi ve çalışma zamanı kabul testinin yerini almaz. Güncel doğrulama sınırları [doğrulama kaydındadır](../../VALIDATION.md).
+Kaynak, ayrıştırıcı ve IMAP testleri her push ve pull request'te GitHub Actions'ta çalışır, yerelde de çalıştırılabilir; komutlar [CONTRIBUTING.md](../../CONTRIBUTING.md) içindedir. Bunlar iş API'nizi çalıştırmaz, SAP derleyicisi ve çalışma zamanı kabul testinin yerini almaz. Güncel doğrulama sınırları [doğrulama kaydındadır](../../VALIDATION.md).
