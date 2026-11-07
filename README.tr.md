@@ -2,7 +2,7 @@
 
 > [English](README.md) | **Türkçe**
 
-![SAP, PowerShell ve curl logolu abap-imap-inbound kapağı. E-posta ve ekleri SAP'ye aktarılıyor.](docs/assets/visuals/imap-cover.png)
+![SAP ve curl logolu abap-imap-inbound kapağı. E-posta ve ekleri SAP'ye aktarılıyor.](docs/assets/visuals/imap-cover.png)
 
 **SAP tarafını tek kurulum programıyla hazırlayın; e-postaları ve eklerini SAP'den yönetin.**
 

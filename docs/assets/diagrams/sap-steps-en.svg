@@ -1,26 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="470" viewBox="0 0 1440 470" role="img" aria-labelledby="title desc">
-<title id="title">Four steps inside SAP.</title><desc id="desc">Four steps inside SAP.. ABAP IMAP Inbound.</desc>
-<rect x="0" y="0" width="1440" height="470" rx="0" fill="#F4F7FA"/>
-<rect x="56" y="44" width="30" height="4" rx="2" fill="#087F8C"/>
-<text x="100" y="53" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">STEP BY STEP</text>
-<text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="600" fill="#183448">Four steps inside SAP.</text>
-<text x="56" y="169" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#536A7B">Follow these steps if you can create and run a report in SE38.</text>
-<rect x="56.0" y="210" width="314.0" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<text x="78.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">01</text>
-<text x="78.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Create the report</text>
-<text x="78.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">SE38 / INSTALL</text>
-<rect x="394.0" y="210" width="314.0" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<text x="416.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">02</text>
-<text x="416.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Run the installer</text>
-<text x="416.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">SAP objects</text>
-<rect x="732.0" y="210" width="314.0" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<text x="754.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">03</text>
-<text x="754.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Check permissions</text>
-<text x="754.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">Tables, commands, files</text>
-<rect x="1070.0" y="210" width="314.0" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<text x="1092.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">04</text>
-<text x="1092.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Save the profile</text>
-<text x="1092.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">CONFIG / connection</text>
-<text x="56" y="443" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#536A7B">Additional per-profile authorization is optional; see the security guide.</text>
-<text x="1234" y="443" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">ABAP / IMAP</text>
+  <title id="title">Four steps inside SAP.</title>
+  <desc id="desc">Four steps inside SAP.. ABAP IMAP Inbound.</desc>
+  <rect x="0" y="0" width="1440" height="470" rx="0" fill="#231A28" />
+  <rect x="56" y="44" width="30" height="4" rx="2" fill="#D4E86A" />
+  <text x="100" y="53" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#BDB4C2">STEP BY STEP</text>
+  <text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="700" fill="#F4F0E8">Four steps inside SAP.</text>
+  <text x="56" y="169" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#BDB4C2">Follow these steps if you can create and run a report in SE38.</text>
+  <rect x="56.0" y="210" width="314.0" height="171" rx="14" fill="#302638" stroke="#76667D" stroke-width="1.5" />
+  <text x="78.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#D4E86A">01</text>
+  <text x="78.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" fill="#F4F0E8">Create the report</text>
+  <text x="78.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#BDB4C2">SE38 / INSTALL</text>
+  <rect x="394.0" y="210" width="314.0" height="171" rx="14" fill="#302638" stroke="#76667D" stroke-width="1.5" />
+  <text x="416.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#D4E86A">02</text>
+  <text x="416.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" fill="#F4F0E8">Run the installer</text>
+  <text x="416.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#BDB4C2">SAP objects</text>
+  <rect x="732.0" y="210" width="314.0" height="171" rx="14" fill="#302638" stroke="#76667D" stroke-width="1.5" />
+  <text x="754.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#D4E86A">03</text>
+  <text x="754.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" fill="#F4F0E8">Check permissions</text>
+  <text x="754.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#BDB4C2">Tables, commands, files</text>
+  <rect x="1070.0" y="210" width="314.0" height="171" rx="14" fill="#302638" stroke="#76667D" stroke-width="1.5" />
+  <text x="1092.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#D4E86A">04</text>
+  <text x="1092.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" fill="#F4F0E8">Save the profile</text>
+  <text x="1092.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#BDB4C2">CONFIG / connection</text>
+  <text x="56" y="443" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#BDB4C2">Additional per-profile authorization is optional; see the security guide.</text>
+  <text x="1234" y="443" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#BDB4C2">ABAP / IMAP</text>
+  <g transform="translate(277.0 222.0) scale(.8)">
+    <rect x="5" y="7" width="62" height="46" rx="5" fill="#F4F0E8" />
+    <path d="M17 19 L29 30 L17 41 M36 41 H53" fill="none" stroke="#231A28" stroke-width="4" />
+  </g>
+  <g transform="translate(615.0 222.0) scale(.8)">
+    <path d="M5 16 L25 3 L68 12 L48 26 Z" fill="#F4F0E8" />
+    <path d="M48 26 L68 12 V43 L48 56 Z" fill="#76667D" />
+    <path d="M5 16 L48 26 V56 L5 46 Z" fill="#F4F0E8" stroke="#231A28" stroke-width="2" />
+    <path d="M12 29 L32 34 M12 37 L32 42" stroke="#231A28" stroke-width="3" />
+    <circle cx="40" cy="45" r="4" fill="#D4E86A" stroke="#231A28" />
+  </g>
+  <g transform="translate(953.0 222.0) scale(.8)">
+    <circle cx="22" cy="23" r="17" fill="#D4E86A" />
+    <circle cx="22" cy="23" r="7" fill="#302638" />
+    <path d="M34 25 H67 V34 H57 V43 H49 V34 H34 Z" fill="#D4E86A" />
+  </g>
+  <g transform="translate(1291.0 222.0) scale(.8)">
+    <path d="M6 10 H57 L67 3 V44 L57 51 H6 Z" fill="#76667D" stroke="#F4F0E8" stroke-width="2" />
+    <rect x="7" y="11" width="49" height="35" rx="2" fill="#F4F0E8" />
+    <path d="M16 22 H45 M16 30 H37 M16 38 H45" stroke="#231A28" stroke-width="3" />
+    <path d="M28 51 V59 M17 59 H43" stroke="#F4F0E8" stroke-width="3" />
+  </g>
 </svg>

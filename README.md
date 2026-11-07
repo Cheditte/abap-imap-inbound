@@ -2,7 +2,7 @@
 
 > **English** | [Türkçe](README.tr.md)
 
-![abap-imap-inbound cover with SAP, PowerShell and curl logos. An email and its attachments enter SAP.](docs/assets/visuals/imap-cover.png)
+![abap-imap-inbound cover with SAP and curl logos. An email and its attachments enter SAP.](docs/assets/visuals/imap-cover.png)
 
 **Set up the SAP objects with one installer, then manage emails and attachments from SAP.**
 

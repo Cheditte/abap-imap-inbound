@@ -1,37 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="660" viewBox="0 0 1440 660" role="img" aria-labelledby="title desc">
-<title id="title">Postadan SAP’ye</title><desc id="desc">Postadan SAP’ye. ABAP IMAP Inbound.</desc>
-<rect x="0" y="0" width="1440" height="660" rx="0" fill="#F4F7FA"/>
-<rect x="56" y="44" width="30" height="4" rx="2" fill="#087F8C"/>
-<text x="100" y="53" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">KULLANIM AKIŞI</text>
-<text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="600" fill="#183448">Posta kutunuz, SAP’nin içinde.</text>
-<text x="56" y="169" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#536A7B">İletiyi görün, ekini açın ve kendi iş adımınızı ekleyin.</text>
-<rect x="56" y="245" width="340" height="256" rx="18" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<rect x="86" y="278" width="44" height="30" rx="4" fill="none" stroke="#087F8C" stroke-width="2"/>
-<polyline points="88,281 108,295 128,281" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="86" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="31" font-weight="600" fill="#183448">Posta kutusu</text>
-<text x="86" y="419" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#536A7B">E-postalar</text>
-<text x="86" y="453" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#536A7B">ve dosya ekleri</text>
-<polyline points="414,373 514,373" fill="none" stroke="#087F8C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<polyline points="506,366 514,373 506,380" fill="none" stroke="#087F8C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="534" y="282" width="302" height="182" rx="18" fill="#102639"/>
-<text x="622" y="362" font-family="Segoe UI, Arial, sans-serif" font-size="53" font-weight="600" fill="#FFFFFF">SAP</text>
-<text x="580" y="411" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="400" fill="#BFD5E1">Mail monitörü</text>
-<polyline points="855,373 895,373 895,284 930,284" fill="none" stroke="#087F8C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<polyline points="855,373 895,373 895,461 930,461" fill="none" stroke="#087F8C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-<rect x="950" y="216" width="434" height="136" rx="16" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<rect x="976" y="240" width="44" height="30" rx="4" fill="none" stroke="#087F8C" stroke-width="2"/>
-<polyline points="978,243 998,257 1018,243" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="1036" y="267" font-family="Segoe UI, Arial, sans-serif" font-size="29" font-weight="600" fill="#183448">İletiyi okuyun</text>
-<text x="976" y="319" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#536A7B">Başlık, gönderen ve gövde</text>
-<rect x="950" y="393" width="434" height="136" rx="16" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<polyline points="982,417 1005,417 1016,428 1016,455 982,455 982,417" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<polyline points="1005,417 1005,428 1016,428" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<polyline points="990,438 1007,438" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<polyline points="990,445 1007,445" fill="none" stroke="#087F8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="1036" y="444" font-family="Segoe UI, Arial, sans-serif" font-size="29" font-weight="600" fill="#183448">Eki açın</text>
-<text x="976" y="496" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#536A7B">PDF, görsel ve diğer dosyalar</text>
-<rect x="56" y="552" width="1328" height="52" rx="10" fill="#E6F4F4"/>
-<text x="80" y="587" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="600" fill="#087F8C">Kendi ABAP kodunuzla ekleri iş sürecinize bağlayın.</text>
-<text x="56" y="633" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#536A7B">Cheditte / abap-imap-inbound</text>
-<text x="1234" y="633" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">ABAP / IMAP</text>
+  <title id="title">Postadan SAP’ye</title>
+  <desc id="desc">Postadan SAP’ye. ABAP IMAP Inbound.</desc>
+  <rect x="0" y="0" width="1440" height="660" rx="0" fill="#231A28" />
+  <rect x="56" y="44" width="30" height="4" rx="2" fill="#D4E86A" />
+  <text x="100" y="53" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#BDB4C2">KULLANIM AKIŞI</text>
+  <text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="700" fill="#F4F0E8">Posta kutunuz, SAP’nin içinde.</text>
+  <text x="56" y="169" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#BDB4C2">İletiyi görün, ekini açın ve kendi iş adımınızı ekleyin.</text>
+  <rect x="56" y="245" width="340" height="256" rx="18" fill="#302638" stroke="#76667D" stroke-width="1.5" />
+  <rect x="86" y="278" width="44" height="30" rx="4" fill="none" stroke="#D4E86A" stroke-width="2" />
+  <polyline points="88,281 108,295 128,281" fill="none" stroke="#D4E86A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="86" y="373" font-family="Segoe UI, Arial, sans-serif" font-size="31" font-weight="700" fill="#F4F0E8">Posta kutusu</text>
+  <text x="86" y="419" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#BDB4C2">E-postalar</text>
+  <text x="86" y="453" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#BDB4C2">ve dosya ekleri</text>
+  <polyline points="414,373 514,373" fill="none" stroke="#D4E86A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <polyline points="506,366 514,373 506,380" fill="none" stroke="#D4E86A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <rect x="534" y="282" width="302" height="182" rx="18" fill="#231A28" />
+  <text x="622" y="362" font-family="Segoe UI, Arial, sans-serif" font-size="53" font-weight="700" fill="#F4F0E8">SAP</text>
+  <text x="580" y="411" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="400" fill="#BDB4C2">Mail monitörü</text>
+  <polyline points="855,373 895,373 895,284 930,284" fill="none" stroke="#D4E86A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <polyline points="855,373 895,373 895,461 930,461" fill="none" stroke="#D4E86A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  <rect x="950" y="216" width="434" height="136" rx="16" fill="#302638" stroke="#76667D" stroke-width="1.5" />
+  <rect x="976" y="240" width="44" height="30" rx="4" fill="none" stroke="#D4E86A" stroke-width="2" />
+  <polyline points="978,243 998,257 1018,243" fill="none" stroke="#D4E86A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="1036" y="267" font-family="Segoe UI, Arial, sans-serif" font-size="29" font-weight="700" fill="#F4F0E8">İletiyi okuyun</text>
+  <text x="976" y="319" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#BDB4C2">Başlık, gönderen ve gövde</text>
+  <rect x="950" y="393" width="434" height="136" rx="16" fill="#302638" stroke="#76667D" stroke-width="1.5" />
+  <polyline points="982,417 1005,417 1016,428 1016,455 982,455 982,417" fill="none" stroke="#D4E86A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <polyline points="1005,417 1005,428 1016,428" fill="none" stroke="#D4E86A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <polyline points="990,438 1007,438" fill="none" stroke="#D4E86A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <polyline points="990,445 1007,445" fill="none" stroke="#D4E86A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="1036" y="444" font-family="Segoe UI, Arial, sans-serif" font-size="29" font-weight="700" fill="#F4F0E8">Eki açın</text>
+  <text x="976" y="496" font-family="Segoe UI, Arial, sans-serif" font-size="23" font-weight="400" fill="#BDB4C2">PDF, görsel ve diğer dosyalar</text>
+  <rect x="56" y="552" width="1328" height="52" rx="10" fill="#302638" />
+  <text x="80" y="587" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#D4E86A">Kendi ABAP kodunuzla ekleri iş sürecinize bağlayın.</text>
+  <text x="56" y="633" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#BDB4C2">Cheditte / abap-imap-inbound</text>
+  <text x="1234" y="633" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#BDB4C2">ABAP / IMAP</text>
 </svg>
