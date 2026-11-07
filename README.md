@@ -2,15 +2,17 @@
 
 > **English** | [Türkçe](README.tr.md)
 
-![ABAP IMAP Inbound — read messages and process attachments inside SAP](docs/assets/social-preview.jpg)
+![abap-imap-inbound cover with SAP, PowerShell and curl logos. An email and its attachments enter SAP.](docs/assets/visuals/imap-cover.png)
 
 **Set up the SAP objects with one installer, then manage emails and attachments from SAP.**
 
 Use this project to read messages from a mail server in SAP, retrieve attachments, and connect them to your own ABAP process. The supplied example lets you open the message and attachments in SAP. Add your own ABAP business action, such as linking an attachment to a document.
 
+**Microsoft 365 / Exchange Online is unsupported.** This project uses IMAP with a password or app password. For Microsoft 365 mail through Microsoft Graph, see [abap-graph](https://github.com/Cheditte/abap-graph).
+
 ## Three parts to prepare
 
-![Preparation map: mailbox, SAP application host and SAP programs](docs/assets/diagrams/setup-en.svg)
+![Prepare the mailbox, SAP host and SAP programs. List messages, process a test email and open it in the SAP monitor.](docs/assets/visuals/imap-setup-en.png)
 
 1. **Mailbox:** prepare the account SAP will read, its sign-in method, and the mail folders.
 2. **Machine running SAP:** prepare PowerShell, curl, the project files, and a protected working folder. Your SAP GUI computer may be a different machine.
@@ -33,7 +35,7 @@ We assume you can create and activate programs in SE38. Prepare the host and mai
 
 ## Is your mailbox suitable?
 
-**A correct email address and password may not be enough.** The account must allow IMAP and the password/app-password sign-in implemented here. Microsoft 365 / Exchange Online and OAuth-only accounts are unsupported in this version. [Mailbox requirements](docs/TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
+The account must allow IMAP over TLS and password or app-password sign-in. Processing requires `UID MOVE` to move successful messages. [Mailbox requirements](docs/TECHNICAL-REFERENCE.md#before-you-start-is-your-mailbox-suitable).
 
 The default source is **the inbox (`INBOX`)**; you can select another folder. Successful messages move to a different folder in the same account. **`SAP-Processed` is an example name, not a required new folder.** The destination you select must exist in the mailbox.
 

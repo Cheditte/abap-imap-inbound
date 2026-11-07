@@ -2,15 +2,17 @@
 
 > [English](README.md) | **Türkçe**
 
-![ABAP IMAP Inbound — e-postaları SAP içinde okuyun, eklerini işleyin](docs/assets/social-preview.jpg)
+![SAP, PowerShell ve curl logolu abap-imap-inbound kapağı. E-posta ve ekleri SAP'ye aktarılıyor.](docs/assets/visuals/imap-cover.png)
 
 **SAP tarafını tek kurulum programıyla hazırlayın; e-postaları ve eklerini SAP'den yönetin.**
 
 Bir posta sunucusundaki e-postaları SAP'de okumak, eklerini almak ve kendi ABAP sürecinizde işlemek için bu projeyi kullanabilirsiniz. Hazır örnekle e-postayı ve eklerini SAP içinde açabilirsiniz. Ekleri bir belgeye bağlamak gibi kendi iş adımlarınızı ABAP koduyla eklersiniz.
 
+**Microsoft 365 / Exchange Online desteklenmez.** Bu proje IMAP üzerinden parola veya uygulama şifresiyle bağlanır. Microsoft 365 postalarına Microsoft Graph ile erişmek için [abap-graph](https://github.com/Cheditte/abap-graph) projesine bakın.
+
 ## Kurulumun üç parçası
 
-![Posta hesabı, SAP sunucusu ve SAP programları için hazırlık haritası](docs/assets/diagrams/setup-tr.svg)
+![Posta hesabını, SAP sunucusunu ve SAP programlarını hazırlayın. İletileri listeleyin, bir deneme e-postasını işleyin ve SAP monitöründe açın.](docs/assets/visuals/imap-setup-tr.png)
 
 1. **Posta hesabı:** SAP'nin okuyacağı hesap, giriş yöntemi ve posta klasörleri hazırlanır.
 2. **SAP'nin çalıştığı makine:** Maili getiren PowerShell ve curl araçları, proje dosyaları ve korumalı çalışma klasörü hazırlanır. SAP GUI'yi açtığınız bilgisayar farklı olabilir.
@@ -33,7 +35,7 @@ SE38'de program oluşturup etkinleştirebildiğiniz varsayılır. Sunucu ve post
 
 ## Posta hesabınız uygun mu?
 
-**Doğru e-posta adresi ve parola tek başına yeterli olmayabilir.** Hesap IMAP erişimine ve bu projenin kullandığı parola/uygulama şifresiyle girişe izin vermelidir. Microsoft 365 / Exchange Online ve yalnız OAuth kabul eden hesaplar bu sürümde desteklenmez. [Posta hesabı koşulları](docs/tr/TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu).
+Hesap, TLS üzerinden IMAP erişimine ve parola veya uygulama şifresiyle girişe izin vermelidir. Başarıyla işlenen iletilerin taşınabilmesi için `UID MOVE` gerekir. [Posta hesabı koşulları](docs/tr/TECHNICAL-REFERENCE.md#başlamadan-önce-posta-kutunuz-uygun-mu).
 
 Varsayılan okuma klasörü **Gelen Kutusu (`INBOX`)**. İsterseniz başka bir klasör seçebilirsiniz. Başarıyla işlenen mailler aynı hesapta farklı bir klasöre taşınır. **`SAP-Processed` örnek addır; bu isimle klasör oluşturmak zorunlu değildir.** Seçtiğiniz hedef klasörün posta hesabında bulunması gerekir.
 
