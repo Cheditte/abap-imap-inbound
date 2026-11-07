@@ -25,7 +25,7 @@ The SAP examples use English menu labels. They show the SE38 and SM36 preparatio
 <a id="prepare"></a>
 ## Three preparations before you start
 
-![Mailbox, SAP host and SAP ERP preparation](assets/diagrams/setup-en.svg)
+![Mailbox, SAP host and SAP ERP preparation](assets/visuals/imap-setup-en.png)
 
 We assume you can create and activate programs in SE38. **Use a test SAP system and a dedicated test mailbox.** Prepare the host and mailbox yourself if you administer them; otherwise pass the listed requirements to their administrators.
 

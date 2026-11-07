@@ -1,22 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="470" viewBox="0 0 1440 470" role="img" aria-labelledby="title desc">
-<title id="title">SAP sunucusunu hazırlayın.</title><desc id="desc">SAP sunucusunu hazırlayın.. ABAP IMAP Inbound.</desc>
-<rect x="0" y="0" width="1440" height="470" rx="0" fill="#F4F7FA"/>
-<rect x="56" y="44" width="30" height="4" rx="2" fill="#087F8C"/>
-<text x="100" y="53" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">ADIM ADIM</text>
-<text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="600" fill="#183448">SAP sunucusunu hazırlayın.</text>
-<text x="56" y="169" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#536A7B">Bu hazırlık SAP GUI bilgisayarında değil, SAP’nin çalıştığı makinede yapılır.</text>
-<rect x="56.0" y="210" width="426.6666666666667" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<text x="78.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">01</text>
-<text x="78.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Sunucuya erişin</text>
-<text x="78.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">Windows veya Linux</text>
-<rect x="506.6666666666667" y="210" width="426.6666666666667" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<text x="528.6666666666667" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">02</text>
-<text x="528.6666666666667" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Araçları hazırlayın</text>
-<text x="528.6666666666667" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">PowerShell + curl</text>
-<rect x="957.3333333333334" y="210" width="426.6666666666667" height="171" rx="14" fill="#FFFFFF" stroke="#D8E3EB" stroke-width="1"/>
-<text x="979.3333333333334" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#087F8C">03</text>
-<text x="979.3333333333334" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="600" fill="#183448">Dosyaları yerleştirin</text>
-<text x="979.3333333333334" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#536A7B">Proje + korumalı klasör</text>
-<text x="56" y="443" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#536A7B">Kendiniz yetkiliyseniz uygulayın; sunucu başka ekipteyse bu hazırlığı onlarla yapın.</text>
-<text x="1234" y="443" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="600" fill="#536A7B">ABAP / IMAP</text>
+  <title id="title">SAP sunucusunu hazırlayın.</title>
+  <desc id="desc">SAP sunucusunu hazırlayın.. ABAP IMAP Inbound.</desc>
+  <rect x="0" y="0" width="1440" height="470" rx="0" fill="#231A28" />
+  <rect x="56" y="44" width="30" height="4" rx="2" fill="#D4E86A" />
+  <text x="100" y="53" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#BDB4C2">ADIM ADIM</text>
+  <text x="56" y="124" font-family="Segoe UI, Arial, sans-serif" font-size="48" font-weight="700" fill="#F4F0E8">SAP sunucusunu hazırlayın.</text>
+  <text x="56" y="169" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="400" fill="#BDB4C2">Bu hazırlık SAP GUI bilgisayarında değil, SAP’nin çalıştığı makinede yapılır.</text>
+  <rect x="56.0" y="210" width="426.6666666666667" height="171" rx="14" fill="#302638" stroke="#76667D" stroke-width="1.5" />
+  <text x="78.0" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#D4E86A">01</text>
+  <text x="78.0" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" fill="#F4F0E8">Sunucuya erişin</text>
+  <text x="78.0" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#BDB4C2">Windows veya Linux</text>
+  <rect x="506.6666666666667" y="210" width="426.6666666666667" height="171" rx="14" fill="#302638" stroke="#76667D" stroke-width="1.5" />
+  <text x="528.6666666666667" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#D4E86A">02</text>
+  <text x="528.6666666666667" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" fill="#F4F0E8">Araçları hazırlayın</text>
+  <text x="528.6666666666667" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#BDB4C2">PowerShell + curl</text>
+  <rect x="957.3333333333334" y="210" width="426.6666666666667" height="171" rx="14" fill="#302638" stroke="#76667D" stroke-width="1.5" />
+  <text x="979.3333333333334" y="247" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="700" fill="#D4E86A">03</text>
+  <text x="979.3333333333334" y="292" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" fill="#F4F0E8">Dosyaları yerleştirin</text>
+  <text x="979.3333333333334" y="351" font-family="Segoe UI, Arial, sans-serif" font-size="21" font-weight="400" fill="#BDB4C2">Proje + korumalı klasör</text>
+  <text x="56" y="443" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="400" fill="#BDB4C2">Kendiniz yetkiliyseniz uygulayın; sunucu başka ekipteyse bu hazırlığı onlarla yapın.</text>
+  <text x="1234" y="443" font-family="Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" fill="#BDB4C2">ABAP / IMAP</text>
+  <g transform="translate(389.6666666666667 222.0) scale(.8)">
+    <path d="M5 16 L25 3 L68 12 L48 26 Z" fill="#F4F0E8" />
+    <path d="M48 26 L68 12 V43 L48 56 Z" fill="#76667D" />
+    <path d="M5 16 L48 26 V56 L5 46 Z" fill="#F4F0E8" stroke="#231A28" stroke-width="2" />
+    <path d="M12 29 L32 34 M12 37 L32 42" stroke="#231A28" stroke-width="3" />
+    <circle cx="40" cy="45" r="4" fill="#D4E86A" stroke="#231A28" />
+  </g>
+  <g transform="translate(840.3333333333334 222.0) scale(.8)">
+    <rect x="5" y="7" width="62" height="46" rx="5" fill="#F4F0E8" />
+    <path d="M17 19 L29 30 L17 41 M36 41 H53" fill="none" stroke="#231A28" stroke-width="4" />
+  </g>
+  <g transform="translate(1291.0 222.0) scale(.8)">
+    <path d="M7 17 L19 6 H36 L44 14 H67 V45 L55 54 Z" fill="#76667D" stroke="#F4F0E8" />
+    <path d="M4 19 H23 L30 26 H57 V54 H4 Z" fill="#F4F0E8" />
+    <path d="M26 39 L34 46 L47 32" fill="none" stroke="#231A28" stroke-width="3" />
+  </g>
 </svg>

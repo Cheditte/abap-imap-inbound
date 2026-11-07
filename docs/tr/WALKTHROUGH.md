@@ -25,7 +25,7 @@ SAP ekran örneklerinde menüler İngilizcedir; adımlarda Türkçe karşılıkl
 <a id="hazirlik"></a>
 ## Başlamadan önce üç hazırlık
 
-![Posta hesabı, SAP sunucusu ve SAP ERP hazırlıkları](../assets/diagrams/setup-tr.svg)
+![Posta hesabı, SAP sunucusu ve SAP ERP hazırlıkları](../assets/visuals/imap-setup-tr.png)
 
 SE38'de program oluşturup etkinleştirebilen bir SAP geliştiricisi olduğunuz varsayılır. **Deneme SAP sistemi ve ayrı bir deneme posta kutusuyla başlayın.** Sunucu ve posta yönetimi sizdeyse aşağıdaki hazırlıkları da yapabilirsiniz; değilse ilgili yöneticiye belirtilen bilgileri iletin.
 
