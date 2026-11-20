@@ -1,6 +1,8 @@
 # SAP screenshot reference / SAP ekran görüntüleri
 
-These SAP GUI images include preparation screens captured on 2 November 2026 and owner-supplied A4H/001 results received on 3 November 2026. Labels are English; both walkthroughs explain them in their own language. Current release validation is recorded in [VALIDATION.md](../../VALIDATION.md). The diagrams are SVG in GitHub; the [setup-map PNG export](../assets/diagrams/setup-en.png) is provided for the SAP Community article.
+These SAP GUI images include preparation screens captured on 2 November 2026 and owner-supplied A4H/001 results received on 3 November 2026. Labels are English; both walkthroughs explain them in their own language. Current release validation is recorded in [VALIDATION.md](../../VALIDATION.md).
+
+For the SAP Community article, use the same setup map as the walkthrough. Download the PNG in [English](../assets/visuals/imap-setup-en.png) or [Türkçe](../assets/visuals/imap-setup-tr.png).
 
 | File | Screen and point in the workflow |
 |---|---|
