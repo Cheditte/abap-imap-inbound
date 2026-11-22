@@ -12,9 +12,9 @@ Kapak ve kurulum çizimleri Cheditte'nin koyu mürdüm, krem ve limon yeşili g�
 | [social-preview.jpg](../social-preview.jpg) | GitHub social preview / sosyal önizleme — 1280 × 640, under / altında 1 MB |
 | [Editable diagrams / Düzenlenebilir şemalar](../diagrams/) | SVG guides with the same palette / Aynı renklerle hazırlanmış SVG rehber şemaları |
 
-The illustrations were generated with the built-in image generation tool using supplied SAP and curl logo references. The curl lettering is cream and its second slash lime for contrast on the dark background. Neither logo has a backing panel. Original supplied artwork is retained in [logos/](logos/). SAP and curl marks remain the property of their respective owners; the project's MIT license does not grant trademark rights or imply endorsement.
+The illustrations were generated with the built-in image generation tool using supplied SAP and curl logo references. The curl lettering is cream and its second slash lime for contrast on the dark background. Neither logo has a backing panel. SAP and curl marks remain the property of their respective owners; the project's MIT license does not grant trademark rights or imply endorsement.
 
-Çizimler, sağlanan SAP ve curl logo referanslarıyla yerleşik görsel üretim aracı kullanılarak hazırlandı. Koyu zeminde okunması için curl yazısı krem, ikinci eğik çizgisi limon yeşili olarak uyarlandı. Logoların arkasında kutu yoktur. Sağlanan orijinal dosyalar [logos/](logos/) klasöründedir. SAP ve curl markaları hak sahiplerine aittir; projenin MIT lisansı marka hakkı veya resmî destek anlamına gelmez.
+Çizimler, sağlanan SAP ve curl logo referanslarıyla yerleşik görsel üretim aracı kullanılarak hazırlandı. Koyu zeminde okunması için curl yazısı krem, ikinci eğik çizgisi limon yeşili olarak uyarlandı. Logoların arkasında kutu yoktur. SAP ve curl markaları hak sahiplerine aittir; projenin MIT lisansı marka hakkı veya resmî destek anlamına gelmez.
 
 Generation prompts / Üretim komutları: [prompts.json](prompts.json). SAP screenshots are separate, unchanged evidence / SAP ekran görüntüleri ayrı tutulmuş ve değiştirilmemiştir: [screenshots](../../screenshots/README.md).
 
