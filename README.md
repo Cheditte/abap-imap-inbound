@@ -8,7 +8,7 @@
 
 Use this project to read messages from a mail server in SAP, retrieve attachments, and connect them to your own ABAP process. The supplied example lets you open the message and attachments in SAP. Add your own ABAP business action, such as linking an attachment to a document.
 
-**Microsoft 365 / Exchange Online is unsupported.** This project uses IMAP with a password or app password. For Microsoft 365 mail through Microsoft Graph, see [abap-graph](https://github.com/Cheditte/abap-graph).
+**Microsoft 365 / Exchange Online is unsupported.** This project uses IMAP with a password or app password.
 
 ## Three parts to prepare
 

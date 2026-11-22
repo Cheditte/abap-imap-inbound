@@ -8,7 +8,7 @@
 
 Bir posta sunucusundaki e-postaları SAP'de okumak, eklerini almak ve kendi ABAP sürecinizde işlemek için bu projeyi kullanabilirsiniz. Hazır örnekle e-postayı ve eklerini SAP içinde açabilirsiniz. Ekleri bir belgeye bağlamak gibi kendi iş adımlarınızı ABAP koduyla eklersiniz.
 
-**Microsoft 365 / Exchange Online desteklenmez.** Bu proje IMAP üzerinden parola veya uygulama şifresiyle bağlanır. Microsoft 365 postalarına Microsoft Graph ile erişmek için [abap-graph](https://github.com/Cheditte/abap-graph) projesine bakın.
+**Microsoft 365 / Exchange Online desteklenmez.** Bu proje IMAP üzerinden parola veya uygulama şifresiyle bağlanır.
 
 ## Kurulumun üç parçası
 
